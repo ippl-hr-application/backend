@@ -9,3 +9,315 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model RegisteredUser {
+  user_id      String @id @default(uuid())
+  full_name    String @db.VarChar(50)
+  email        String @unique
+  phone_number String
+  package_type String
+
+  role    Role @relation(fields: [role_id], references: [role_id])
+  role_id Int
+
+  company Company?
+
+  @@map("registered_users")
+}
+
+model Role {
+  role_id Int    @id @default(autoincrement())
+  name    String @db.VarChar(20)
+
+  users RegisteredUser[]
+
+  @@map("roles")
+}
+
+// Companies
+model Company {
+  company_id String @id @default(uuid())
+
+  User    RegisteredUser @relation(fields: [user_id], references: [user_id])
+  user_id String         @unique
+
+  name       String
+  industry   String
+  size       Int     @db.Integer()
+  npwp_digit String? @db.VarChar(16)
+
+  company_logo          CompanyLogo?
+  company_branches      CompanyBranches[]
+  company_announcements CompanyAnnouncement[]
+  company_files         CompanyFile[]
+
+  @@map("companies")
+}
+
+model CompanyBranches {
+  company_branch_id Int @id @default(autoincrement())
+
+  company    Company @relation(fields: [company_id], references: [company_id])
+  company_id String  @unique
+
+  email        String
+  phone_number String @db.VarChar(15)
+  address      String @db.VarChar(255)
+  province     String @db.VarChar(50)
+  city         String @db.VarChar(50)
+  size         Int    @db.Integer()
+  hq_initial   String @db.VarChar(50)
+  hq_code      String @db.VarChar(50)
+  umr          Float
+  umr_province Float
+  umr_city     Float
+  bpjs         String @db.VarChar(50)
+
+  company_announcement_to CompanyAnnouncementTo[]
+  employees               Employee[]
+  job_positions           JobPosition[]
+  employment_statuses     EmploymentStatus[]
+  employee_tasks          EmployeeTask[]
+  reimbursement           Reimbursement[]
+
+  @@map("company_branches")
+}
+
+model CompanyLogo {
+  company_logo_id Int @id @default(autoincrement())
+
+  company    Company @relation(fields: [company_id], references: [company_id])
+  company_id String  @unique
+
+  file_name String
+  file_size Int
+  file_url  String
+
+  @@map("company_logos")
+}
+
+model CompanyFile {
+  company_file_id Int @id @default(autoincrement())
+
+  company    Company @relation(fields: [company_id], references: [company_id])
+  company_id String
+
+  file_name                             String
+  file_size                             Int
+  file_type                             String
+  file_url                              String
+  description                           String?                             @db.VarChar(255)
+  company_announcement_file_attachments CompanyAnnouncementFileAttachment[]
+
+  @@map("company_files")
+}
+
+model CompanyAnnouncement {
+  company_announcement_id Int @id @default(autoincrement())
+
+  company    Company @relation(fields: [company_id], references: [company_id])
+  company_id String
+
+  title                                 String
+  description                           String
+  company_announcement_to               CompanyAnnouncementTo[]
+  company_announcement_file_attachments CompanyAnnouncementFileAttachment[]
+
+  @@map("company_announcements")
+}
+
+model CompanyAnnouncementTo {
+  company_branches  CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
+  company_branch_id Int
+
+  announcement            CompanyAnnouncement @relation(fields: [company_announcement_id], references: [company_announcement_id])
+  company_announcement_id Int
+
+  @@id([company_branch_id, company_announcement_id])
+  @@map("company_announcement_to")
+}
+
+model CompanyAnnouncementFileAttachment {
+  company_announcement    CompanyAnnouncement @relation(fields: [company_announcement_id], references: [company_announcement_id])
+  company_announcement_id Int
+
+  company_file    CompanyFile @relation(fields: [company_file_id], references: [company_file_id])
+  company_file_id Int
+
+  @@id([company_announcement_id, company_file_id])
+  @@map("company_announcement_file_attachements")
+}
+
+//Employees
+model JobPosition {
+  job_position_id Int @id @default(autoincrement())
+
+  company_branch    CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
+  company_branch_id Int
+
+  name      String
+  employees Employee[]
+
+  @@map("job_positions")
+}
+
+model EmploymentStatus {
+  employment_status_id Int @id @default(autoincrement())
+
+  company_branch    CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
+  company_branch_id Int
+
+  name      String
+  employees Employee[]
+
+  @@map("employment_statuses")
+}
+
+model Employee {
+  employee_id String @id @default(uuid())
+
+  company_branch    CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
+  company_branch_id Int
+
+  job_position    JobPosition @relation(fields: [job_position_id], references: [job_position_id])
+  job_position_id Int
+
+  employment_status    EmploymentStatus @relation(fields: [employment_status_id], references: [employment_status_id])
+  employment_status_id Int
+
+  unique_id             String          @unique
+  first_name            String
+  last_name             String
+  email                 String
+  phone_number          String          @db.VarChar(15)
+  place_of_birth        String
+  birth_date            DateTime        @db.Date
+  marital_status        String          @db.VarChar(20)
+  blood_type            String          @db.VarChar(3)
+  religion              String          @db.VarChar(20)
+  identity_type         String          @db.VarChar(20)
+  identity_number       String          @db.VarChar(20)
+  identity_expired_date DateTime        @db.Date
+  postcal_code          String          @db.VarChar(10)
+  citizen_id_address    String
+  residential_address   String
+  bank_account_number   String?         @db.VarChar(20)
+  bank_type             String?         @db.VarChar(20)
+  wage                  Float
+  tasks                 EmployeeTask[]  @relation("employee")
+  give_tasks            EmployeeTask[]  @relation("manager")
+  files                 EmployeeFile[]
+  reimbursement         Reimbursement[]
+  shifts                Shift[]
+  attendances           Attendance[]
+
+  @@map("employees")
+}
+
+model EmployeeTask {
+  task_id Int @id @default(autoincrement())
+
+  company_branch    CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
+  company_branch_id Int
+
+  employee    Employee @relation("employee", fields: [employee_id], references: [employee_id])
+  employee_id String
+
+  title       String
+  description String
+  start_date  DateTime @db.Date
+  end_date    DateTime @db.Date
+
+  given_by    Employee @relation("manager", fields: [given_by_id], references: [employee_id])
+  given_by_id String
+
+  @@map("employee_tasks")
+}
+
+model EmployeeFile {
+  employee_file_id Int                           @id @default(autoincrement())
+  employee         Employee                      @relation(fields: [employee_id], references: [employee_id])
+  employee_id      String
+  file_name        String
+  file_size        Int
+  file_type        String
+  file_url         String
+  file_for         String?                       @db.VarChar(20)
+  reimbursements   ReimbursementFileAttachment[]
+  attendances      AttendanceFileAttachment[]
+
+  @@map("employee_files")
+}
+
+model Reimbursement {
+  reimbursement_id Int @id @default(autoincrement())
+
+  company_branch    CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
+  company_branch_id Int
+
+  employee    Employee @relation(fields: [employee_id], references: [employee_id])
+  employee_id String
+
+  total            Float
+  description      String
+  date             DateTime                      @db.Date
+  file_attachments ReimbursementFileAttachment[]
+
+  @@map("reimbursements")
+}
+
+model ReimbursementFileAttachment {
+  reimbursement    Reimbursement @relation(fields: [reimbursement_id], references: [reimbursement_id])
+  reimbursement_id Int
+
+  employee_file    EmployeeFile @relation(fields: [employee_file_id], references: [employee_file_id])
+  employee_file_id Int
+
+  @@id([reimbursement_id])
+  @@map("reimbursement_file_attachments")
+}
+
+model Shift {
+  shift_id    Int          @id @default(autoincrement())
+  employee    Employee     @relation(fields: [employee_id], references: [employee_id])
+  employee_id String
+  start_time  String
+  end_time    String
+  attendance  Attendance[]
+
+  @@map("shifts")
+}
+
+enum AttendanceStatus {
+  ACCEPTED
+  REJECTED
+}
+
+model Attendance {
+  attendance_id Int @id @default(autoincrement())
+
+  employee    Employee @relation(fields: [employee_id], references: [employee_id])
+  employee_id String
+
+  shift    Shift @relation(fields: [shift_id], references: [shift_id])
+  shift_id Int
+
+  date      DateTime                   @db.Date
+  check_in  String
+  check_out String
+  status    AttendanceStatus
+  files     AttendanceFileAttachment[]
+
+  @@map("attendances")
+}
+
+model AttendanceFileAttachment {
+  attendance    Attendance @relation(fields: [attendance_id], references: [attendance_id])
+  attendance_id Int
+
+  employee_file    EmployeeFile @relation(fields: [employee_file_id], references: [employee_file_id])
+  employee_file_id Int
+
+  @@id([attendance_id, employee_file_id])
+  @@map("attendance_file_attachments")
+}
