@@ -104,7 +104,15 @@
 
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
-    "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
+    "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
+    "baseUrl": "./src",
+    "paths": {
+      "@/validations": ["validations/index"],
+      "@/models": ["models/index"],
+      "@/middlewares": ["middlewares/index"],
+      "@/utils": ["utils/index"],
+      "@/applications": ["applications/index"],
+    },
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

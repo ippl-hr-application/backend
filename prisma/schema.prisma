@@ -16,6 +16,7 @@ model RegisteredUser {
   email        String @unique
   phone_number String
   package_type String
+  password     String
 
   role    Role @relation(fields: [role_id], references: [role_id])
   role_id Int
@@ -204,6 +205,7 @@ model Employee {
   bank_account_number   String?         @db.VarChar(20)
   bank_type             String?         @db.VarChar(20)
   wage                  Float
+  password              String
   tasks                 EmployeeTask[]  @relation("employee")
   give_tasks            EmployeeTask[]  @relation("manager")
   files                 EmployeeFile[]
