@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-app.use(authRoute);
+app.use("/auth", authRoute);
 
 app.use(ErrorMiddleware.notFound);
 app.use(ErrorMiddleware.returnError);
