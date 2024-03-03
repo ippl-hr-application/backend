@@ -9,7 +9,7 @@ import {
   LoginResponse,
   RegisterRequest,
   RegisteredUserWithoutPassword,
-} from "./models";
+} from "./auth-model";
 import jwt from "jsonwebtoken";
 
 export class AuthService {
