@@ -13,7 +13,7 @@ export class JWTMiddleware {
       res.locals.user = decoded;
       next();
     } catch (error) {
-      throw new ErrorResponse("Invalid token", 401, ["token"], "TOKEN_EXPIRED");
+      next(error)
     }
   }
 }
