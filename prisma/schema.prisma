@@ -43,8 +43,7 @@ model Company {
   user_id String         @unique
 
   name       String
-  industry   String
-  size       Int     @db.Integer()
+  industry   String?
   npwp_digit String? @db.VarChar(16)
 
   company_logo          CompanyLogo?
@@ -61,18 +60,18 @@ model CompanyBranches {
   company    Company @relation(fields: [company_id], references: [company_id])
   company_id String  @unique
 
-  email        String
-  phone_number String @db.VarChar(15)
-  address      String @db.VarChar(255)
-  province     String @db.VarChar(50)
-  city         String @db.VarChar(50)
-  size         Int    @db.Integer()
-  hq_initial   String @db.VarChar(50)
-  hq_code      String @db.VarChar(50)
-  umr          Float
-  umr_province Float
-  umr_city     Float
-  bpjs         String @db.VarChar(50)
+  email        String?
+  phone_number String? @db.VarChar(15)
+  address      String? @db.VarChar(255)
+  province     String? @db.VarChar(50)
+  city         String? @db.VarChar(50)
+  size         Int?    @db.Integer()
+  hq_initial   String? @db.VarChar(50)
+  hq_code      String? @db.VarChar(50)
+  umr          Float?
+  umr_province Float?
+  umr_city     Float?
+  bpjs         String? @db.VarChar(50)
 
   company_announcement_to CompanyAnnouncementTo[]
   employees               Employee[]
