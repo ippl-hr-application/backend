@@ -6,6 +6,11 @@ export class AuthValidation {
     password: z.string().min(6).max(20),
   });
 
+  static readonly EMPLOYEE_LOGIN: ZodType = z.object({
+    uniqueId: z.string().min(3).max(50),
+    password: z.string().min(6).max(20),
+  });
+
   static readonly REGISTER: ZodType = z.object({
     full_name: z.string().min(3).max(50),
     email: z.string().email(),
