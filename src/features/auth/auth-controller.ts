@@ -50,8 +50,8 @@ export class AuthController {
     next: NextFunction
   ) {
     try {
-      const { user_id } = res.locals.user;
-      const user = await AuthService.getCurrentLoggedInUser(user_id);
+      const { user_id, unique_id } = res.locals.user;
+      const user = await AuthService.getCurrentLoggedInUser(user_id, unique_id);
       return res.status(200).json({
         success: true,
         data: { user },

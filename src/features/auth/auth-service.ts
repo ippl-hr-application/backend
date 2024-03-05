@@ -89,7 +89,7 @@ export class AuthService {
     }
 
     const token = jwt.sign(
-      { employee_id: employee.employee_id },
+      { unique_id: employee.unique_id },
       process.env.JWT_SECRET!,
       {
         expiresIn: "7d",
