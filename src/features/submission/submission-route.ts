@@ -12,4 +12,12 @@ submissionRoute.post("/sick", [
   upload.single("permission_file"),
   SubmissionController.createSickLetter,
 ]);
+submissionRoute.post("/leave", [
+  upload.single("leave_file"),
+  SubmissionController.createLeaveLetter,
+]);
+submissionRoute.post("/mutation", [
+  upload.single("mutation_file"),
+  SubmissionController.createMutationLetter,
+]);
 export default submissionRoute;
