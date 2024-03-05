@@ -246,6 +246,10 @@ model EmployeeFile {
   file_for         String?                       @db.VarChar(20)
   reimbursements   ReimbursementFileAttachment[]
   attendances      AttendanceFileAttachment[]
+  permission_submission PermissionSubmission?
+  leave_submission LeaveSubmission?
+  mutation_submission MutationSubmission?
+ 
 
   @@map("employee_files")
 }
@@ -321,4 +325,49 @@ model AttendanceFileAttachment {
 
   @@id([attendance_id, employee_file_id])
   @@map("attendance_file_attachments")
+}
+
+enum PermissionType {
+  SAKIT
+  IZIN
+}
+enum SubmissionStatus {
+  ACCEPTED
+  PENDING
+  REJECTED
+}
+model PermissionSubmission {
+  permission_submission_id Int @id @default(autoincrement())
+  
+  employee_file EmployeeFile @relation(fields: [employee_file_id],references: [employee_file_id])
+  employee_file_id Int @unique
+  date_and_time DateTime
+  permission_reason String @db.VarChar(100)
+  type PermissionType
+  status SubmissionStatus
+
+  @@map("permission_submission")
+}
+
+model LeaveSubmission{
+  leave_permission_id Int @id @default(autoincrement())
+  employee_file_id Int @unique
+  employee_file EmployeeFile @relation(fields: [employee_file_id],references: [employee_file_id])
+  from DateTime
+  to DateTime
+  leave_reason String @db.VarChar(100)
+  leave_type String @db.VarChar(10)
+  status SubmissionStatus
+
+
+  @@map("leave_permission")
+}
+model MutationSubmission {
+  mutation_permission_id Int @id @default(autoincrement())
+  employee_file EmployeeFile @relation(fields: [employee_file_id],references: [employee_file_id])
+
+  employee_file_id Int @unique
+  mutation_reason String @db.VarChar(100)
+  status SubmissionStatus
+  @@map("mutation_submission")
 }
