@@ -331,6 +331,11 @@ enum PermissionType {
   SAKIT
   IZIN
 }
+enum SubmissionStatus {
+  ACCEPTED
+  PENDING
+  REJECTED
+}
 model PermissionSubmission {
   permission_submission_id Int @id @default(autoincrement())
   
@@ -339,6 +344,7 @@ model PermissionSubmission {
   date_and_time DateTime
   permission_reason String @db.VarChar(100)
   type PermissionType
+  status SubmissionStatus
 
   @@map("permission_submission")
 }
@@ -351,6 +357,9 @@ model LeaveSubmission{
   to DateTime
   leave_reason String @db.VarChar(100)
   leave_type String @db.VarChar(10)
+  status SubmissionStatus
+
+
   @@map("leave_permission")
 }
 model MutationSubmission {
@@ -359,5 +368,6 @@ model MutationSubmission {
 
   employee_file_id Int @unique
   mutation_reason String @db.VarChar(100)
+  status SubmissionStatus
   @@map("mutation_submission")
 }
