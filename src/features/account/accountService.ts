@@ -1,30 +1,24 @@
 import { Validation } from "../../validations";
-import { prisma } from "../../applications";
-import { comparePassword, hashPassword } from "../../utils";
-import { ErrorResponse } from "../../models";
-import { AuthValidation } from "./auth-validation";
+import { AccountValidation } from "./accountValidation";
 import {
-  CurrentLoggedInUserResponse,
-  LoginRequest,
-  LoginResponse,
-  RegisterRequest,
-  RegisteredUserWithoutPassword,
-} from "./models";
-import jwt from "jsonwebtoken";
+    CreateRequest,
+    CreateResponse,
+    UpdateRequest,
+    UpdateResponse,
+    DeleteRequest,
+    DeleteResponse,
+  } from "./models";
+import { prisma } from "../../applications";
+import { ErrorResponse } from "../../models"
 
 export class AccountService {
-  static async findAllEmployees(){
+  static async getAllEmployees(){
     return await prisma.employee.findMany();
   };
 
   static async createEmployee(
-    employeeData: 
-    { 
-      firstName: string; 
-      lastName: string; 
-      email: string 
-    }){
-
+    employeeData: CreateRequest
+    ){
     return await prisma.employee.create({
       data: employeeData,
     });

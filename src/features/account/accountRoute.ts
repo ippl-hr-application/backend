@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { AccountController } from "./accountController";
-import { JWTMiddleware } from "../middlewares/jwt_middleware";
 
 const accountRoute = Router();
 
@@ -8,3 +7,5 @@ const accountRoute = Router();
 accountRoute.get('/employees', AccountController.Employees);
 // Create a new employee
 accountRoute.post('/employees', AccountController.createEmployee);
+
+export default accountRoute;
