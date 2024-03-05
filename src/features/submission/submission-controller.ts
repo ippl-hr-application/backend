@@ -8,19 +8,19 @@ export class SubmissionController {
   ) {
     try {
       const { date_and_time, permission_reason } = req.body;
-      const { employee_id } = res.locals.user;
+      const { unique_id } = res.locals.user;
       const permission_file: Express.Multer.File | undefined = req.file;
       const result = await SubmissionService.createSickLetter({
         date_and_time,
         permission_reason,
         type: "IZIN",
-        employee_id,
+        unique_id,
         permission_file,
       });
       return res.status(201).json({
         success: true,
         data: {
-          result,
+          ...result,
         },
         message: "Permission Letter Submitted",
       });
@@ -35,19 +35,19 @@ export class SubmissionController {
   ) {
     try {
       const { date_and_time, permission_reason } = req.body;
-      const { employee_id } = res.locals.user;
+      const { unique_id } = res.locals.user;
       const permission_file: Express.Multer.File | undefined = req.file;
       const result = await SubmissionService.createSickLetter({
         date_and_time,
         permission_reason,
         type: "SAKIT",
-        employee_id,
+        unique_id,
         permission_file,
       });
       return res.status(201).json({
         success: true,
         data: {
-          result,
+          ...result,
         },
         message: "Sick Letter Submitted",
       });
@@ -62,20 +62,20 @@ export class SubmissionController {
   ) {
     try {
       const { from, to, leave_reason, leave_type } = req.body;
-      const { employee_id } = res.locals.user;
+      const { unique_id } = res.locals.user;
       const leave_file: Express.Multer.File | undefined = req.file;
       const result = await SubmissionService.createLeaveLetter({
         from,
         to,
         leave_reason,
         leave_type,
-        employee_id,
+        unique_id,
         leave_file,
       });
       return res.status(201).json({
         success: true,
         data: {
-          result,
+          ...result,
         },
         message: "Leave Letter Submitted",
       });
@@ -90,18 +90,19 @@ export class SubmissionController {
   ) {
     try {
       const { mutation_reason } = req.body;
-      const { employee_id } = res.locals.user;
+      const { unique_id } = res.locals.user;
       const mutation_file: Express.Multer.File | undefined = req.file;
       const result = await SubmissionService.createMutationLetter({
         mutation_reason,
-        employee_id,
+        unique_id,
         mutation_file,
       });
       return res.status(201).json({
         success: true,
         data: {
-          result,
+          ...result,
         },
+        message: "Mutation Letter Submitted",
       });
     } catch (error) {
       next(error);
