@@ -16,6 +16,7 @@ export type CreateRequest = {
   company_branch_id: number;
   job_position_id: number;
   employment_status_id: number;
+  unique_id: string;
   first_name: string;
   last_name: string;
   address: string;

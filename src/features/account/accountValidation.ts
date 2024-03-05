@@ -6,6 +6,7 @@ export class AccountValidation {
     company_branch_id: z.number(),
     job_position_id: z.number(),
     employment_status_id: z.number(),
+    unique_id: z.string().min(3).max(20),
     first_name: z.string().min(3).max(50),
     last_name: z.string().min(3).max(50),
     email: z.string().email(),
