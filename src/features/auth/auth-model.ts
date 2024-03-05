@@ -1,7 +1,12 @@
-import { RegisteredUser } from "@prisma/client";
+import { Employee, RegisteredUser } from "@prisma/client";
 
 export type LoginRequest = {
   email: string;
+  password: string;
+};
+
+export type LoginEmployeeRequest = {
+  uniqueId: string;
   password: string;
 };
 
@@ -30,4 +35,17 @@ export type CurrentLoggedInUserResponse = {
     name: string;
     industry: string | null;
   } | null;
+};
+
+export type CurrentEmployeeLoggedInUserResponse = Employee & {
+  job_position: {
+    job_position_id: number;
+    company_branch_id: number;
+    name: string;
+  };
+  employment_status: {
+    employment_status_id: number;
+    company_branch_id: number;
+    name: string;
+  };
 };
