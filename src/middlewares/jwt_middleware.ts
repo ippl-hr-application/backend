@@ -13,7 +13,7 @@ export class JWTMiddleware {
       res.locals.user = decoded;
       next();
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 }
