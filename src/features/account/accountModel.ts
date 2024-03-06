@@ -30,7 +30,7 @@ export type CreateRequest = {
   password: string;
   phone_number: string;
   place_of_birth: string;
-  date_of_birth: Date;
+  birth_date: Date;
   marital_status: string;
   blood_type: string;
   religion: string;
