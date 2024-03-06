@@ -6,6 +6,7 @@ import morgan from "morgan";
 import { ErrorMiddleware } from "./middlewares";
 import { authRoute } from "./features/auth";
 import { SubmissionRoute } from "./features/submission";
+import { ProfileRoute } from "./features/profile";
 
 dotenv.config();
 const app: Express = express();
@@ -22,6 +23,7 @@ app.get("/", (req, res) => {
 
 app.use("/auth", authRoute);
 app.use("/submission", SubmissionRoute);
+app.use("/profile", ProfileRoute);
 
 app.use(ErrorMiddleware.notFound);
 app.use(ErrorMiddleware.returnError);
