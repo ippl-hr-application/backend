@@ -12,11 +12,13 @@ import { prisma } from '../../applications';
 import { ErrorResponse } from '../../models';
 
 export class AccountService {
-  static async getAllEmployees() {
-    return await prisma.employee.findMany();
+  static async getAllEmployees(company_branch_id: number) {
+    return await prisma.employee.findMany({
+      where: { company_branch_id: company_branch_id },
+    });
   }
 
-  static async createEmployee(employeeData: CreateRequest) {
+  static async createEmployee(employeeData: CreateRequest) : Promise<CreateResponse> {
     const request = Validation.validate(
       AccountValidation.CREATE_EMPLOYEE,
       employeeData
@@ -67,14 +69,17 @@ export class AccountService {
     return newEmployee;
   }
 
-  static async updateEmployee(employeeData: UpdateRequest) {
+  static async updateEmployee(employeeData: UpdateRequest) : Promise<UpdateResponse> {
     const request = Validation.validate(
       AccountValidation.UPDATE_EMPLOYEE,
       employeeData
     );
 
     const findEmployee = await prisma.employee.findUnique({
-      where: { employee_id: request.employee_id },
+      where: {
+        company_branch_id: request.company_branch_id,
+        employee_id: request.employee_id,
+       },
     });
 
     if (!findEmployee) {
@@ -87,16 +92,27 @@ export class AccountService {
     }
 
     const employeeUpdate = await prisma.employee.update({
-      where: { employee_id: request.employee_id},
+      where: { 
+        company_branch_id: request.company_branch_id,
+        employee_id: request.employee_id
+      },
       data: employeeData,
     });
 
-    return employeeUpdate;
+    return  employeeUpdate ;
   }
 
-  static async deleteEmployee(employeeId: string) {
+  static async deleteEmployee(employeeId: DeleteRequest) : Promise<DeleteResponse> {
+    const request = Validation.validate(
+      AccountValidation.DELETE_EMPLOYEE,
+      employeeId
+    );
+
     const findEmployee = await prisma.employee.findUnique({
-      where: { employee_id: employeeId},
+      where : { 
+        company_branch_id: request.company_branch_id,
+        employee_id: request.employee_id 
+      },
     });
 
     if (!findEmployee) {
@@ -109,7 +125,10 @@ export class AccountService {
     }
 
     const employeeDelete = await prisma.employee.delete({
-      where: { employee_id: employeeId},
+      where: { 
+        company_branch_id: request.company_branch_id,
+        employee_id: request.employee_id
+      },
     });
 
     return employeeDelete;
