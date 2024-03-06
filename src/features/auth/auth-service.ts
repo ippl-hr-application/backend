@@ -203,4 +203,30 @@ export class AuthService {
 
     return user;
   }
+
+  static async resetPassword(
+    email: string,
+    newPassword: string
+  ): Promise<void> {
+    const request = Validation.validate(AuthValidation.RESET_PASSWORD, {
+      email,
+      newPassword,
+    });
+
+    const user = await prisma.registeredUser.findUnique({
+      where: { email: request.email },
+    });
+
+    if (!user) {
+      throw new ErrorResponse("User not found", 404, ["email"], "USER_NOT_FOUND");
+    }
+
+    const hashedPassword = hashPassword(request.newPassword);
+
+    await prisma.registeredUser.update({
+      where: { email: request.email },
+      data: { password: hashedPassword },
+    });
+  }
+
 }
