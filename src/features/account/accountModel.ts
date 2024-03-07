@@ -26,8 +26,10 @@ export type GetEmployeeResponse = Employee[];
 export type CreateRequest = {
   company_branch_id: number;
   job_position_id: number;
+  job_position_name: string;
   employment_status_id: number;
-  // unique_id: string; // biar di generate di service
+  employment_status_name: string;
+  unique_id: string; // employee_id
   first_name: string;
   last_name: string;
   address: string;
