@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { AccountController } from "./accountController";
 
-const accountRoute = Router();
+const accountRoute: Router = Router();
 
 // Get all employees
 accountRoute.get('/employees/:company_branch_id', AccountController.getAllEmployees);
