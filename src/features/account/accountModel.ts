@@ -1,4 +1,10 @@
-import { Employee, EmploymentStatus, JobPosition, EmployeeTask, EmployeeFile } from "@prisma/client";
+import {
+  Employee,
+  EmploymentStatus,
+  JobPosition,
+  EmployeeTask,
+  EmployeeFile,
+} from '@prisma/client';
 
 // export type EmployeeWithRelations = Employee & {
 //   employment_status: EmploymentStatus;
@@ -18,11 +24,10 @@ export type GetEmployeeRequest = {
 export type GetEmployeeResponse = Employee[];
 
 export type CreateRequest = {
-  employee_id: string;
   company_branch_id: number;
   job_position_id: number;
   employment_status_id: number;
-  unique_id: string;
+  // unique_id: string; // biar di generate di service
   first_name: string;
   last_name: string;
   address: string;
@@ -49,7 +54,7 @@ export type CreateResponse = {
   employee_id: string;
   first_name: string;
   last_name: string;
-}
+};
 
 export type UpdateRequest = {
   employee_id: string;
@@ -82,7 +87,7 @@ export type UpdateResponse = {
   employee_id: string;
   first_name: string;
   last_name: string;
-}
+};
 
 export type DeleteRequest = {
   employee_id: string;

@@ -2,7 +2,6 @@ import { z, ZodType } from 'zod';
 
 export class AccountValidation {
   static readonly CREATE_EMPLOYEE: ZodType = z.object({
-    employee_id: z.string().min(3).max(20),
     company_branch_id: z.number(),
     job_position_id: z.number(),
     employment_status_id: z.number(),

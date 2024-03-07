@@ -75,7 +75,7 @@ export class AccountService {
     });
 
     return {
-      employee_id: request.employee_id,
+      employee_id: request.unique_id,
       first_name: request.first_name,
       last_name: request.last_name,
     };
