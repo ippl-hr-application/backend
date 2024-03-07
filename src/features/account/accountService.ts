@@ -19,7 +19,7 @@ export class AccountService {
   }
 
   static async createEmployee(
-    employeeData: CreateRequest
+    employeeData: CreateRequest,
   ): Promise<CreateResponse> {
     const request = Validation.validate(
       AccountValidation.CREATE_EMPLOYEE,
@@ -82,6 +82,8 @@ export class AccountService {
   }
 
   static async updateEmployee(
+    // companyBranchId : number,
+    // employeeId: string,
     employeeData: UpdateRequest
   ): Promise<UpdateResponse> {
     const request = Validation.validate(
@@ -117,6 +119,7 @@ export class AccountService {
   }
 
   static async deleteEmployee(
+    // companyBranchId: number,
     employeeId: DeleteRequest
   ): Promise<DeleteResponse> {
     const request = Validation.validate(
@@ -127,6 +130,7 @@ export class AccountService {
     const findEmployee = await prisma.employee.findUnique({
       where: {
         company_branch_id: request.company_branch_id,
+        // company_branch_id: companyBranchId,
         employee_id: request.employee_id,
       },
     });
@@ -143,6 +147,7 @@ export class AccountService {
     const employeeDelete = await prisma.employee.delete({
       where: {
         company_branch_id: request.company_branch_id,
+        // company_branch_id: companyBranchId,
         employee_id: request.employee_id,
       },
     });
