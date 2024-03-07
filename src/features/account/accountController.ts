@@ -15,7 +15,10 @@ export class AccountController {
       // const employees = await AccountService.getAllEmployees(company_branch_id);
       res.status(200).json({
         success: true,
-        data: { employees }
+        data: { 
+          employees 
+        },
+        message: 'Employees retrieved successfully',
       });
     } catch (error) {
       next(error);
@@ -28,8 +31,13 @@ export class AccountController {
     next: NextFunction
     ) {
     try {
-      // const employee = await AccountService.createEmployee(req.body);
-      // res.status(201).json(employee);
+      const company_branch_id = res.locals.user.company_branch_id;
+      const employee = await AccountService.createEmployee(req.body);
+      res.status(201).json({
+        success: true,
+        data: employee,
+        message: "Employee created successfully",
+      });
     } catch (error) {
       next(error);
     }
@@ -38,11 +46,26 @@ export class AccountController {
   static async updateEmployee(
     req: Request, 
     res: Response, 
-    next: NextFunction) {
-    const id = parseInt(req.params.id);
-    try {
-      // const employee = await AccountService.updateEmployee(id, req.body);
-      // res.json(employee);
+    next: NextFunction
+    ) {
+      try {
+      // const employeeId = req.params.employee_id;
+      // const companyBranchId = parseInt(req.params.company_branch_id);
+
+      // atau pake local user daripada pake params
+      // const { company_branch_id } = res.locals.user;
+
+      // kalo pake params
+      // const employee = await AccountService.updateEmployee(companyBranchId, employeeId, req.body);
+      
+      // const employee = await AccountService.updateEmployee(req.body.company_branch_id, req.body.employee_id, req.body);
+
+      const employee = await AccountService.updateEmployee(req.body);
+      res.status(200).json({
+        success: true,
+        data: employee,
+        message: "Employee updated successfully",
+      });
     } catch (error) {
       next(error);
     }
@@ -52,10 +75,16 @@ export class AccountController {
     req: Request, 
     res: Response, 
     next: NextFunction) {
-    const id = parseInt(req.params.id);
-    try {
+      try {
+      const employee_id = req.params.employee_id;
+      const company_branch_id = parseInt(req.params.company_branch_id);
+      const deletingEmployee = await AccountService.deleteEmployee({company_branch_id, employee_id});
       // await AccountService.deleteEmployee(id);
-      // res.status(204).send();
+      res.status(200).json({
+        success: true,
+        data: deletingEmployee,
+        message: "Employee deleted successfully",
+      });
     } catch (error) {
       next(error);
     }
