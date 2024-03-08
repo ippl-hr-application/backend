@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import { ErrorMiddleware } from "./middlewares";
-import { authRoute } from "./features/auth";
+import { accountRoute } from "./features/account";
 
 dotenv.config();
 const app: Express = express();
@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-app.use("/auth", authRoute);
+app.use("/accountManagement", accountRoute);
 
 app.use(ErrorMiddleware.notFound);
 app.use(ErrorMiddleware.returnError);
