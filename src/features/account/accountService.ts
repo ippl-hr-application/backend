@@ -1,6 +1,6 @@
 import { Validation } from '../../validations';
 import { AccountValidation } from './accountValidation';
-import { hashPassword } from '../../utils';
+import { comparePassword, hashPassword } from '../../utils';
 import {
   CreateRequest,
   CreateResponse,
@@ -11,6 +11,7 @@ import {
 } from './accountModel';
 import { prisma } from '../../applications';
 import { ErrorResponse } from '../../models';
+import { boolean } from 'zod';
 
 export class AccountService {
   static async getAllEmployees(company_branch_id: number) {
@@ -24,7 +25,7 @@ export class AccountService {
   ): Promise<CreateResponse> {
     employeeData.identity_expired_date = new Date(employeeData.identity_expired_date);
     employeeData.birth_date = new Date(employeeData.birth_date);
-    
+
     const request = Validation.validate(
       AccountValidation.CREATE_EMPLOYEE,
       employeeData
@@ -120,10 +121,12 @@ export class AccountService {
   }
 
   static async updateEmployee(
-    // companyBranchId : number,
-    // employeeId: string,
     employeeData: UpdateRequest
   ): Promise<UpdateResponse> {
+    if (employeeData.identity_expired_date){
+      employeeData.identity_expired_date = new Date(employeeData.identity_expired_date);
+    }
+
     const request = Validation.validate(
       AccountValidation.UPDATE_EMPLOYEE,
       employeeData
@@ -131,7 +134,7 @@ export class AccountService {
 
     const findEmployee = await prisma.employee.findUnique({
       where: {
-        company_branch_id: request.company_branch_id,
+        company_branch_id: request.company_branch_id, // pake user local?
         employee_id: request.employee_id,
       },
     });
@@ -147,7 +150,7 @@ export class AccountService {
 
     const employeeUpdate = await prisma.employee.update({
       where: {
-        company_branch_id: request.company_branch_id,
+        company_branch_id: request.company_branch_id, // pake user local?
         employee_id: request.employee_id,
       },
       data: { ...request },
@@ -157,7 +160,6 @@ export class AccountService {
   }
 
   static async deleteEmployee(
-    // companyBranchId: number,
     employeeId: DeleteRequest
   ): Promise<DeleteResponse> {
     const request = Validation.validate(
@@ -168,7 +170,6 @@ export class AccountService {
     const findEmployee = await prisma.employee.findUnique({
       where: {
         company_branch_id: request.company_branch_id,
-        // company_branch_id: companyBranchId,
         employee_id: request.employee_id,
       },
     });
@@ -185,7 +186,6 @@ export class AccountService {
     const employeeDelete = await prisma.employee.delete({
       where: {
         company_branch_id: request.company_branch_id,
-        // company_branch_id: companyBranchId,
         employee_id: request.employee_id,
       },
     });

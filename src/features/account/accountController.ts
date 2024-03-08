@@ -31,7 +31,7 @@ export class AccountController {
     next: NextFunction
     ) {
     try {
-      const company_branch_id = res.locals.user.company_branch_id;
+      // const company_branch_id = res.locals.user.company_branch_id;
       const employee = await AccountService.createEmployee(req.body);
       res.status(201).json({
         success: true,
