@@ -6,6 +6,8 @@ import morgan from "morgan";
 import { ErrorMiddleware } from "./middlewares";
 import { authRoute } from "./features/auth";
 import { SubmissionRoute } from "./features/submission";
+import { ProfileRoute } from "./features/profile";
+import { accountRoute } from "./features/account";
 
 dotenv.config();
 const app: Express = express();
@@ -15,7 +17,6 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.send("Hello World");
@@ -23,6 +24,8 @@ app.get("/", (req, res) => {
 
 app.use("/auth", authRoute);
 app.use("/submission", SubmissionRoute);
+app.use("/profile", ProfileRoute);
+app.use("/account", accountRoute);
 
 app.use(ErrorMiddleware.notFound);
 app.use(ErrorMiddleware.returnError);

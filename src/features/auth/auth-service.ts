@@ -204,10 +204,7 @@ export class AuthService {
     return user;
   }
 
-  static async resetPassword(
-    email: string,
-    newPassword: string
-  ): Promise<void> {
+  static async resetPassword(email: string, newPassword: string) {
     const request = Validation.validate(AuthValidation.RESET_PASSWORD, {
       email,
       newPassword,
@@ -218,15 +215,50 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new ErrorResponse("User not found", 404, ["email"], "USER_NOT_FOUND");
+      throw new ErrorResponse(
+        "User not found",
+        404,
+        ["email"],
+        "USER_NOT_FOUND"
+      );
     }
 
     const hashedPassword = hashPassword(request.newPassword);
 
     await prisma.registeredUser.update({
       where: { email: request.email },
-      data: { password: hashedPassword },
+      data: {
+        password: hashedPassword,
+      },
     });
   }
 
+  static async employeeResetPassword(uniqueId: string, newPassword: string) {
+    const request = Validation.validate(AuthValidation.RESET_PASSWORD, {
+      email: uniqueId,
+      newPassword,
+    });
+
+    const employee = await prisma.employee.findUnique({
+      where: { unique_id: request.email },
+    });
+
+    if (!employee) {
+      throw new ErrorResponse(
+        "Employee not found",
+        404,
+        ["uniqueId"],
+        "EMPLOYEE_NOT_FOUND"
+      );
+    }
+
+    const hashedPassword = hashPassword(request.newPassword);
+
+    await prisma.employee.update({
+      where: { unique_id: request.email },
+      data: {
+        password: hashedPassword,
+      },
+    });
+  }
 }

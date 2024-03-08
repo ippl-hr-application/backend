@@ -60,4 +60,34 @@ export class AuthController {
       next(error);
     }
   }
+
+  static async resetPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email, newPassword } = req.body;
+      await AuthService.resetPassword(email, newPassword);
+      return res.status(200).json({
+        success: true,
+        message: "Password reset successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async employeeResetPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { uniqueId, newPassword } = req.body;
+      await AuthService.employeeResetPassword(uniqueId, newPassword);
+      return res.status(200).json({
+        success: true,
+        message: "Password reset successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
