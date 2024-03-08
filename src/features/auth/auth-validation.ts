@@ -19,4 +19,9 @@ export class AuthValidation {
     company_name: z.string().min(3).max(50),
     industry: z.string().optional(),
   });
+
+  static readonly RESET_PASSWORD: ZodType = z.object({
+    email: z.string().email(),
+    newPassword: z.string().min(6).max(20),
+  });
 }
