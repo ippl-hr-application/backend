@@ -57,21 +57,33 @@ export class AuthService {
   }
 
   static async employeeLogin({
-    uniqueId,
+    company_id,
+    unique_id,
     password,
   }: LoginEmployeeRequest): Promise<LoginResponse> {
     const request = Validation.validate(AuthValidation.EMPLOYEE_LOGIN, {
-      uniqueId,
+      company_id,
+      unique_id,
       password,
     });
 
+    const company = await prisma.company.findUnique({
+      where: { company_id: request.company_id },
+    });
+
+    if (!company) {
+      throw new ErrorResponse("Invalid company id", 400, [
+        "company_id",
+      ]);
+    };
+
     const employee = await prisma.employee.findUnique({
-      where: { unique_id: request.uniqueId },
+      where: { unique_id: request.unique_id },
     });
 
     if (!employee) {
       throw new ErrorResponse("Invalid unique id or password", 400, [
-        "uniqueId",
+        "unique_id",
         "password",
       ]);
     }
@@ -83,7 +95,7 @@ export class AuthService {
 
     if (!isPasswordValid) {
       throw new ErrorResponse("Invalid unique id or password", 400, [
-        "uniqueId",
+        "unique_id",
         "password",
       ]);
     }
