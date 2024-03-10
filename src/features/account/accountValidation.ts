@@ -24,8 +24,8 @@ export class AccountValidation {
     postcal_code: z.string().min(3).max(10),
     citizen_id_address: z.string(),
     residential_address: z.string(),
-    bank_account_number: z.string().max(20),
-    bank_type: z.string().max(20),
+    bank_account_number: z.string().max(20).optional(),
+    bank_type: z.string().max(20).optional(),
     wage: z.number(),
   });
 
