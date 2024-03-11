@@ -19,4 +19,8 @@ scheduleRoute.get("/:schedule_id", [
   JWTMiddleware.verifyToken,
   ScheduleController.getDetailSchedule,
 ]);
+scheduleRoute.get("/", [
+  JWTMiddleware.verifyToken,
+  ScheduleController.getAllSchedules,
+]);
 export default scheduleRoute;

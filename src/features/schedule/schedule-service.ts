@@ -79,4 +79,47 @@ export class ScheduleService {
     }
     return schedule;
   }
+  static async getAllSchedules({
+    month,
+    year,
+  }: {
+    month: number;
+    year: number;
+  }): Promise<GetDetailScheduleResponse[]> {
+    if (!month || !year) {
+      const schedules = await prisma.schedule.findMany();
+      return schedules;
+    }
+    if (!month) {
+      const schedules = await prisma.schedule.findMany({
+        where: {
+          date: {
+            gte: new Date(year, 0, 1),
+            lte: new Date(year, 11, 0),
+          },
+        },
+      });
+      return schedules;
+    }
+    if (!year) {
+      const schedules = await prisma.schedule.findMany({
+        where: {
+          date: {
+            gte: new Date(0, month - 1, 1),
+            lte: new Date(0, month, 0),
+          },
+        },
+      });
+      return schedules;
+    }
+    const schedules = await prisma.schedule.findMany({
+      where: {
+        date: {
+          gte: new Date(year, month - 1, 1),
+          lte: new Date(year, month, 0),
+        },
+      },
+    });
+    return schedules;
+  }
 }

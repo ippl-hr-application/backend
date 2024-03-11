@@ -31,3 +31,12 @@ export type GetDetailScheduleRequest = {
 };
 
 export type GetDetailScheduleResponse = AddScheduleResponse;
+export type GetAllScheduleRequest = {
+  month: number;
+  year: number;
+};
+
+export type GetAllScheduleResponse = Pick<
+  AddScheduleResponse,
+  "title" | "date"
+>;

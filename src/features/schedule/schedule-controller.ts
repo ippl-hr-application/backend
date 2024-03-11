@@ -74,4 +74,25 @@ export class ScheduleController {
       next(error);
     }
   }
+  static async getAllSchedules(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { month, year } = req.query;
+
+      const schedules = await ScheduleService.getAllSchedules({
+        month: Number(month),
+        year: Number(year),
+      });
+      return res.status(201).json({
+        success: true,
+        data: { ...schedules },
+        message: "Schedules Found",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
