@@ -8,6 +8,9 @@ taskManagementRouter.get("/:company_branch_id", [
   TaskManagementController.getTaskManagementFromCompany,
 ]);
 
-taskManagementRouter.post("/", TaskManagementController.addTaskManagement);
+taskManagementRouter.post("/", [
+  JWTMiddleware.verifyToken,
+  TaskManagementController.addTaskManagement,
+]);
 
 export default taskManagementRouter;

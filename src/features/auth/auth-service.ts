@@ -65,8 +65,8 @@ export class AuthService {
       password,
     });
 
-    const employee = await prisma.employee.findUnique({
-      where: { unique_id: request.uniqueId },
+    const employee = await prisma.employee.findFirst({
+      where: { unique_id: request.uniqueId,  },
     });
 
     if (!employee) {
@@ -155,7 +155,7 @@ export class AuthService {
     CurrentLoggedInUserResponse | CurrentEmployeeLoggedInUserResponse
   > {
     if (uniqueId) {
-      const employee = await prisma.employee.findUnique({
+      const employee = await prisma.employee.findFirst({
         where: { unique_id: uniqueId },
         include: {
           employment_status: true,
@@ -240,7 +240,7 @@ export class AuthService {
       newPassword,
     });
 
-    const employee = await prisma.employee.findUnique({
+    const employee = await prisma.employee.findFirst({
       where: { unique_id: request.email },
     });
 
@@ -255,11 +255,11 @@ export class AuthService {
 
     const hashedPassword = hashPassword(request.newPassword);
 
-    await prisma.employee.update({
-      where: { unique_id: request.email },
-      data: {
-        password: hashedPassword,
-      },
-    });
+    // await prisma.employee.update({
+    //   where: { email: request.email },
+    //   data: {
+    //     password: hashedPassword,
+    //   },
+    // });
   }
 }

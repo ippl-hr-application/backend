@@ -16,7 +16,7 @@ export class TaskManagementController {
       return res.status(201).json({
         success: true,
         data: { tasks },
-        message: "User registered successfully",
+        message: "Task Management Retrieved Successfully",
       });
     } catch (error) {
       next(error);
@@ -37,7 +37,7 @@ export class TaskManagementController {
       return res.status(201).json({
         success: true,
         data: { task },
-        message: "Task added successfully",
+        message: "Task added successfully"
       });
     } catch (error) {
       next(error);

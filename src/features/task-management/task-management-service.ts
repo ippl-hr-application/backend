@@ -3,6 +3,7 @@ import { prisma } from "../../applications";
 import { Validation } from "../../validations";
 import { CreateTaskRequest } from "./task-management-model";
 import { TaskManagementValidation } from "./task-management-validation";
+import { ErrorResponse } from "../../models";
 
 export class TaskManagementService {
   static async getTaskManagementFromCompany({
@@ -26,10 +27,17 @@ export class TaskManagementService {
       data
     );
 
+    const userGive = await prisma.employee.findFirst({
+      where: { unique_id: from },
+    });
+
+    if (!userGive)
+      throw new ErrorResponse("Invalid Unique ID", 400, ["from", "unique_id"]);
+
     const task = await prisma.employeeTask.create({
       data: {
         ...request,
-        given_by_id: from,
+        given_by_id: userGive?.employee_id!,
       },
     });
 
