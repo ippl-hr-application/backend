@@ -73,12 +73,12 @@ export class AuthService {
 
   static async employeeLogin({
     company_id,
-    unique_or_employee_id,
+    employee_id,
     password,
   }: LoginEmployeeRequest): Promise<LoginResponse> {
     const request = Validation.validate(AuthValidation.EMPLOYEE_LOGIN, {
       company_id,
-      unique_or_employee_id,
+      employee_id,
       password,
     });
 
@@ -92,10 +92,7 @@ export class AuthService {
 
     const employee = await prisma.employee.findFirst({
       where: {
-        OR: [
-          { unique_id: request.unique_or_employee_id },
-          { employee_id: request.unique_or_employee_id },
-        ],
+        employee_id: request.employee_id,
       },
     });
 
@@ -122,7 +119,6 @@ export class AuthService {
       {
         employee_id: employee.employee_id,
         company_branch_id: employee.company_branch_id,
-        unique_id: employee.unique_id,
       },
       process.env.JWT_SECRET!,
       {
@@ -184,13 +180,13 @@ export class AuthService {
 
   static async getCurrentLoggedInUser(
     userId: string,
-    uniqueId?: string
+    employee_id?: string
   ): Promise<
     CurrentLoggedInUserResponse | CurrentEmployeeLoggedInUserResponse
   > {
-    if (uniqueId) {
-      const employee = await prisma.employee.findFirst({
-        where: { unique_id: uniqueId },
+    if (employee_id) {
+      const employee = await prisma.employee.findUnique({
+        where: { employee_id: employee_id },
         include: {
           employment_status: true,
           job_position: true,
@@ -201,7 +197,7 @@ export class AuthService {
         throw new ErrorResponse(
           "Employee not found",
           404,
-          ["uniqueId"],
+          ["employee_id"],
           "EMPLOYEE_NOT_FOUND"
         );
       }
@@ -275,7 +271,7 @@ export class AuthService {
     });
 
     const employee = await prisma.employee.findFirst({
-      where: { unique_id: request.email },
+      where: { email: request.email },
     });
 
     if (!employee) {
