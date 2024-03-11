@@ -29,7 +29,7 @@ export type CreateRequest = {
   job_position_name: string;
   employment_status_id: number;
   employment_status_name: string;
-  unique_id: string; // employee_id
+  unique_id: string;
   first_name: string;
   last_name: string;
   address: string;
@@ -47,8 +47,8 @@ export type CreateRequest = {
   postcal_code: string;
   citizen_id_address: string;
   residential_address: string;
-  bank_account_number: string;
-  bank_type: string;
+  bank_account_number?: string;
+  bank_type?: string;
   wage: number;
 };
 
@@ -98,3 +98,15 @@ export type DeleteResponse = {
   employee_id: string;
   first_name: string;
 };
+
+export type JobPositionRequest = {
+  company_branch_id: number;
+};
+
+export type JobPositionResponse = JobPosition[];
+
+export type EmploymentStatusRequest = {
+  company_branch_id: number;
+};
+
+export type EmploymentStatusResponse = EmploymentStatus[];

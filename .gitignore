@@ -2,3 +2,5 @@ node_modules
 public
 .env
 pnpm-lock.yaml
+.combine.log
+error.log
