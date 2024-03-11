@@ -185,10 +185,10 @@ model Employee {
   employment_status    EmploymentStatus @relation(fields: [employment_status_id], references: [employment_status_id])
   employment_status_id Int
 
-  unique_id             String          
+  unique_id             String
   first_name            String
   last_name             String
-  email                 String
+  email                 String          @unique
   phone_number          String          @db.VarChar(15)
   place_of_birth        String
   birth_date            DateTime        @db.Date
@@ -277,7 +277,7 @@ model ReimbursementFileAttachment {
   employee_file    EmployeeFile @relation(fields: [employee_file_id], references: [employee_file_id])
   employee_file_id Int
 
-  @@id([reimbursement_id])
+  @@id([reimbursement_id, employee_file_id])
   @@map("reimbursement_file_attachments")
 }
 
