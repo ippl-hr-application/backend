@@ -4,3 +4,6 @@ public
 pnpm-lock.yaml
 .combine.log
 error.log
+yarn.lock
+package-lock.json
+*.log
