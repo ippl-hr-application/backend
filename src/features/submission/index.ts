@@ -1,1 +1,1 @@
-export { default as SubmissionRoute } from "./submission-route";
+export { default as submissionRoute } from "./submission-route";
