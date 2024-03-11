@@ -185,7 +185,6 @@ model Employee {
   employment_status    EmploymentStatus @relation(fields: [employment_status_id], references: [employment_status_id])
   employment_status_id Int
 
-  unique_id             String
   first_name            String
   last_name             String
   email                 String          @unique
