@@ -73,12 +73,12 @@ export class AuthService {
 
   static async employeeLogin({
     company_id,
-    unique_id,
+    unique_or_employee_id,
     password,
   }: LoginEmployeeRequest): Promise<LoginResponse> {
     const request = Validation.validate(AuthValidation.EMPLOYEE_LOGIN, {
       company_id,
-      unique_id,
+      unique_or_employee_id,
       password,
     });
 
@@ -91,7 +91,12 @@ export class AuthService {
     }
 
     const employee = await prisma.employee.findFirst({
-      where: { unique_id: request.unique_id },
+      where: {
+        OR: [
+          { unique_id: request.unique_or_employee_id },
+          { employee_id: request.unique_or_employee_id },
+        ],
+      },
     });
 
     if (!employee) {

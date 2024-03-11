@@ -8,7 +8,7 @@ export class AuthValidation {
 
   static readonly EMPLOYEE_LOGIN: ZodType = z.object({
     company_id: z.string().min(3).max(50),
-    unique_id: z.string().min(3).max(50),
+    unique_or_employee_id: z.string().min(3).max(50),
     password: z.string().min(6).max(20),
   });
 
