@@ -9,4 +9,11 @@ export class TaskManagementValidation {
     start_date: z.string(),
     end_date: z.string(),
   });
+
+  static readonly UPDATE_TASK: ZodType = z.object({
+    title: z.string().min(3).max(50).optional(),
+    description: z.string().min(3).max(255).optional(),
+    start_date: z.string().optional(),
+    end_date: z.string().optional(),
+  });
 }

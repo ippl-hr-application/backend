@@ -13,4 +13,14 @@ taskManagementRouter.post("/", [
   TaskManagementController.addTaskManagement,
 ]);
 
+taskManagementRouter.put("/:company_branch_id/:task_id", [
+  JWTMiddleware.verifyToken,
+  TaskManagementController.updateTaskManagement,
+]);
+
+taskManagementRouter.delete("/:company_branch_id/:task_id", [
+  JWTMiddleware.verifyToken,
+  TaskManagementController.deleteTaskManagement,
+]);
+
 export default taskManagementRouter;

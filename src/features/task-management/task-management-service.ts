@@ -1,7 +1,7 @@
 import { EmployeeTask } from "@prisma/client";
 import { prisma } from "../../applications";
 import { Validation } from "../../validations";
-import { CreateTaskRequest } from "./task-management-model";
+import { CreateTaskRequest, UpdateTaskRequest } from "./task-management-model";
 import { TaskManagementValidation } from "./task-management-validation";
 import { ErrorResponse } from "../../models";
 
@@ -39,6 +39,40 @@ export class TaskManagementService {
         ...request,
         given_by_id: userGive?.employee_id!,
       },
+    });
+
+    return task;
+  }
+
+  static async updateTaskManagement(
+    {
+      task_id,
+      company_branch_id,
+    }: {
+      task_id: number;
+      company_branch_id: number;
+    },
+    data: UpdateTaskRequest
+  ): Promise<EmployeeTask> {
+    const request: UpdateTaskRequest = Validation.validate(
+      TaskManagementValidation.UPDATE_TASK,
+      data
+    );
+
+    const task = await prisma.employeeTask.update({
+      where: { task_id, company_branch_id },
+      data: request,
+    });
+
+    return task;
+  }
+
+  static async deleteTaskManagement(
+    task_id: number,
+    company_branch_id: number
+  ): Promise<EmployeeTask> {
+    const task = await prisma.employeeTask.delete({
+      where: { task_id, company_branch_id },
     });
 
     return task;
