@@ -4,9 +4,9 @@ export class AccountValidation {
   static readonly CREATE_EMPLOYEE: ZodType = z.object({
     company_branch_id: z.number(),
     job_position_id: z.number(),
-    job_position_name: z.string(),
+    // job_position_name: z.string(),
     employment_status_id: z.number(),
-    employment_status_name: z.string(),
+    // employment_status_name: z.string(),
     unique_id: z.string().min(3).max(20),
     first_name: z.string().min(3).max(50),
     last_name: z.string().min(3).max(50),
@@ -60,16 +60,14 @@ export class AccountValidation {
     company_branch_id: z.number(),
   });
 
-  static JOB_POSITION: ZodType = z.object({
+  static CREATE_JOB_POSITION: ZodType = z.object({
     company_branch_id: z.number(),
-    job_position_id: z.number(),
-    job_position_name: z.string(),
+    name: z.string(),
   });
 
-  static EMPLOYMENT_STATUS: ZodType = z.object({
+  static CREATE_EMPLOYMENT_STATUS: ZodType = z.object({
     company_branch_id: z.number(),
-    employment_status_id: z.number(),
-    employment_status_name: z.string(),
+    name: z.string(),
   });
 
 }

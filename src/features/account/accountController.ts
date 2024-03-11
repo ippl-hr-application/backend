@@ -102,7 +102,18 @@ export class AccountController {
     }
   }
 
-  static async createJobPosition(){}
+  static async createJobPosition(req: Request, res: Response, next: NextFunction){
+    try {
+      const jobPosition = await AccountService.createJobPosition(req.body);
+      res.status(201).json({
+        success: true,
+        data: jobPosition,
+        message: 'Job position created successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 
   static async getEmploymentStatus(req: Request, res: Response, next: NextFunction) {
     try {
@@ -120,7 +131,16 @@ export class AccountController {
     }
   }
 
-  static async createEmploymentStatus(){}
-  
-
+  static async createEmploymentStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      const employmentStatus = await AccountService.createEmploymentStatus(req.body);
+      res.status(201).json({
+        success: true,
+        data: employmentStatus,
+        message: 'Employment status created successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
