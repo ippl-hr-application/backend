@@ -5,9 +5,10 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import { ErrorMiddleware } from "./middlewares";
 import { authRoute } from "./features/auth";
-import { SubmissionRoute } from "./features/submission";
-import { ProfileRoute } from "./features/profile";
+// import { SubmissionRoute } from "./features/submission";
+// import { ProfileRoute } from "./features/profile";
 import { accountRoute } from "./features/account";
+import { taskManagementRoute } from "./features/task-management";
 
 dotenv.config();
 const app: Express = express();
@@ -23,9 +24,10 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", authRoute);
-app.use("/submission", SubmissionRoute);
-app.use("/profile", ProfileRoute);
+// app.use("/submission", SubmissionRoute);
+// app.use("/profile", ProfileRoute);
 app.use("/account", accountRoute);
+app.use("/task-management", taskManagementRoute);
 
 app.use(ErrorMiddleware.notFound);
 app.use(ErrorMiddleware.returnError);
