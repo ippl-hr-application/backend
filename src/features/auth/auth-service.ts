@@ -26,6 +26,17 @@ export class AuthService {
 
     const user = await prisma.registeredUser.findUnique({
       where: { email: request.email },
+      select: {
+        user_id: true,
+        company: {
+          select: {
+            company_id: true,
+          },
+        },
+        password: true,
+        role_id: true,
+        package_type: true,
+      },
     });
 
     if (!user) {
@@ -47,9 +58,13 @@ export class AuthService {
       ]);
     }
 
-    const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET!, {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign(
+      { user_id: user.user_id, company_id: user.company?.company_id },
+      process.env.JWT_SECRET!,
+      {
+        expiresIn: "1d",
+      }
+    );
 
     return {
       token,
@@ -58,12 +73,12 @@ export class AuthService {
 
   static async employeeLogin({
     company_id,
-    unique_id,
+    unique_or_employee_id,
     password,
   }: LoginEmployeeRequest): Promise<LoginResponse> {
     const request = Validation.validate(AuthValidation.EMPLOYEE_LOGIN, {
       company_id,
-      unique_id,
+      unique_or_employee_id,
       password,
     });
 
@@ -72,13 +87,16 @@ export class AuthService {
     });
 
     if (!company) {
-      throw new ErrorResponse("Invalid company id", 400, [
-        "company_id",
-      ]);
-    };
+      throw new ErrorResponse("Invalid company id", 400, ["company_id"]);
+    }
 
     const employee = await prisma.employee.findFirst({
-      where: { unique_id: request.unique_id },
+      where: {
+        OR: [
+          { unique_id: request.unique_or_employee_id },
+          { employee_id: request.unique_or_employee_id },
+        ],
+      },
     });
 
     if (!employee) {
@@ -101,7 +119,11 @@ export class AuthService {
     }
 
     const token = jwt.sign(
-      { unique_id: employee.unique_id },
+      {
+        employee_id: employee.employee_id,
+        company_branch_id: employee.company_branch_id,
+        unique_id: employee.unique_id,
+      },
       process.env.JWT_SECRET!,
       {
         expiresIn: "7d",

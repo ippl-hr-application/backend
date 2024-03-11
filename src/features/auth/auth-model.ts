@@ -7,7 +7,7 @@ export type LoginRequest = {
 
 export type LoginEmployeeRequest = {
   company_id: string;
-  unique_id: string;
+  unique_or_employee_id: string;
   password: string;
 };
 

@@ -18,8 +18,8 @@ export class AuthController {
 
   static async employeeLogin(req: Request, res: Response, next: NextFunction) {
     try {
-      const { company_id, unique_id, password } = req.body;
-      const token = await AuthService.employeeLogin({ company_id, unique_id, password });
+      const { company_id, unique_or_employee_id, password } = req.body;
+      const token = await AuthService.employeeLogin({ company_id, unique_or_employee_id, password });
       return res.status(200).json({
         success: true,
         data: { ...token },
