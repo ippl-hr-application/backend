@@ -10,7 +10,7 @@ import { profileRoute } from "./features/profile";
 import { accountRoute } from "./features/account";
 import { scheduleRoute } from "./features/shift";
 import { taskManagementRoute } from "./features/task-management";
-
+import { attendanceRoute } from "./features/attendance";
 dotenv.config();
 const app: Express = express();
 
@@ -25,6 +25,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", authRoute);
+app.use("/attendance", attendanceRoute);
 app.use("/submission", submissionRoute);
 app.use("/schedules", scheduleRoute);
 app.use("/profile", profileRoute);
