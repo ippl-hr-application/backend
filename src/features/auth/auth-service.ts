@@ -196,6 +196,7 @@ export class AuthService {
         phone_number: true,
         company: {
           select: {
+            company_id: true,
             name: true,
             industry: true,
           },
