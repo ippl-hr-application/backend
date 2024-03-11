@@ -5,7 +5,7 @@ export type PermissionSubmissionRequest = {
   date_and_time: Date;
   permission_reason: string;
   type: PermissionType;
-  unique_id: string;
+  employee_id: string;
   permission_file: Express.Multer.File | undefined;
 };
 
@@ -20,7 +20,7 @@ export type LeaveSubmissionRequest = {
   to: Date;
   leave_reason: string;
   leave_type: string;
-  unique_id: string;
+  employee_id: string;
   leave_file: Express.Multer.File | undefined;
 };
 
@@ -33,7 +33,7 @@ export type LeaveSubmissionResponse = {
 
 export type MutationSubmissionRequest = {
   mutation_reason: string;
-  unique_id: string;
+  employee_id: string;
   mutation_file: Express.Multer.File | undefined;
 };
 

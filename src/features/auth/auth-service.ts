@@ -26,6 +26,17 @@ export class AuthService {
 
     const user = await prisma.registeredUser.findUnique({
       where: { email: request.email },
+      select: {
+        user_id: true,
+        company: {
+          select: {
+            company_id: true,
+          },
+        },
+        password: true,
+        role_id: true,
+        package_type: true,
+      },
     });
 
     if (!user) {
@@ -47,9 +58,13 @@ export class AuthService {
       ]);
     }
 
-    const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET!, {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign(
+      { user_id: user.user_id, company_id: user.company?.company_id },
+      process.env.JWT_SECRET!,
+      {
+        expiresIn: "1d",
+      }
+    );
 
     return {
       token,
@@ -57,21 +72,33 @@ export class AuthService {
   }
 
   static async employeeLogin({
-    uniqueId,
+    company_id,
+    employee_id,
     password,
   }: LoginEmployeeRequest): Promise<LoginResponse> {
     const request = Validation.validate(AuthValidation.EMPLOYEE_LOGIN, {
-      uniqueId,
+      company_id,
+      employee_id,
       password,
     });
 
-    const employee = await prisma.employee.findUnique({
-      where: { unique_id: request.uniqueId },
+    const company = await prisma.company.findUnique({
+      where: { company_id: request.company_id },
+    });
+
+    if (!company) {
+      throw new ErrorResponse("Invalid company id", 400, ["company_id"]);
+    }
+
+    const employee = await prisma.employee.findFirst({
+      where: {
+        employee_id: request.employee_id,
+      },
     });
 
     if (!employee) {
       throw new ErrorResponse("Invalid unique id or password", 400, [
-        "uniqueId",
+        "unique_id",
         "password",
       ]);
     }
@@ -83,13 +110,16 @@ export class AuthService {
 
     if (!isPasswordValid) {
       throw new ErrorResponse("Invalid unique id or password", 400, [
-        "uniqueId",
+        "unique_id",
         "password",
       ]);
     }
 
     const token = jwt.sign(
-      { unique_id: employee.unique_id },
+      {
+        employee_id: employee.employee_id,
+        company_branch_id: employee.company_branch_id,
+      },
       process.env.JWT_SECRET!,
       {
         expiresIn: "7d",
@@ -150,13 +180,13 @@ export class AuthService {
 
   static async getCurrentLoggedInUser(
     userId: string,
-    uniqueId?: string
+    employee_id?: string
   ): Promise<
     CurrentLoggedInUserResponse | CurrentEmployeeLoggedInUserResponse
   > {
-    if (uniqueId) {
+    if (employee_id) {
       const employee = await prisma.employee.findUnique({
-        where: { unique_id: uniqueId },
+        where: { employee_id: employee_id },
         include: {
           employment_status: true,
           job_position: true,
@@ -167,7 +197,7 @@ export class AuthService {
         throw new ErrorResponse(
           "Employee not found",
           404,
-          ["uniqueId"],
+          ["employee_id"],
           "EMPLOYEE_NOT_FOUND"
         );
       }
@@ -184,6 +214,7 @@ export class AuthService {
         phone_number: true,
         company: {
           select: {
+            company_id: true,
             name: true,
             industry: true,
           },
@@ -239,8 +270,8 @@ export class AuthService {
       newPassword,
     });
 
-    const employee = await prisma.employee.findUnique({
-      where: { unique_id: request.email },
+    const employee = await prisma.employee.findFirst({
+      where: { email: request.email },
     });
 
     if (!employee) {
@@ -255,7 +286,7 @@ export class AuthService {
     const hashedPassword = hashPassword(request.newPassword);
 
     await prisma.employee.update({
-      where: { unique_id: request.email },
+      where: { email: request.email },
       data: {
         password: hashedPassword,
       },

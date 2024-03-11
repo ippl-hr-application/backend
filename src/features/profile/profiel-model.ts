@@ -18,5 +18,5 @@ export type EmployeeProfileResponse = Pick<
 };
 
 export type EmployeeProfileRequest = {
-  unique_id: string;
+  employee_id: string;
 };

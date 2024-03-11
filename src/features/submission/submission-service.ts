@@ -15,21 +15,14 @@ export class SubmissionService {
     date_and_time,
     permission_reason,
     type,
-    unique_id,
+    employee_id,
     permission_file,
   }: PermissionSubmissionRequest): Promise<PermissionSubmissionResponse> {
     const request = Validation.validate(SubmissionValidation.SICK_LETTER, {
       permission_reason,
       type,
     });
-    const employee_id = await prisma.employee.findUnique({
-      where: {
-        unique_id,
-      },
-      select: {
-        employee_id: true,
-      },
-    });
+
     const permissionSubmission = await prisma.permissionSubmission.create({
       data: {
         date_and_time,
@@ -46,7 +39,7 @@ export class SubmissionService {
 
             employee: {
               connect: {
-                employee_id: employee_id?.employee_id,
+                employee_id,
               },
             },
           },
@@ -60,22 +53,15 @@ export class SubmissionService {
     to,
     leave_reason,
     leave_type,
-    unique_id,
+    employee_id,
     leave_file,
   }: LeaveSubmissionRequest): Promise<LeaveSubmissionResponse> {
     const request = Validation.validate(SubmissionValidation.LEAVE_LETTER, {
       leave_reason,
       leave_type,
-      unique_id,
+      employee_id,
     });
-    const employee_id = await prisma.employee.findUnique({
-      where: {
-        unique_id,
-      },
-      select: {
-        employee_id: true,
-      },
-    });
+
     const leaveSubmission = await prisma.leaveSubmission.create({
       data: {
         from,
@@ -92,7 +78,7 @@ export class SubmissionService {
             file_for: "pengajuan cuti",
             employee: {
               connect: {
-                employee_id: employee_id?.employee_id,
+                employee_id: employee_id,
               },
             },
           },
@@ -103,21 +89,14 @@ export class SubmissionService {
   }
   static async createMutationLetter({
     mutation_reason,
-    unique_id,
+    employee_id,
     mutation_file,
   }: MutationSubmissionRequest): Promise<MutationSubmissionResponse> {
     const request = Validation.validate(SubmissionValidation.MUTATION_LETTER, {
       mutation_reason,
-      unique_id,
+      employee_id,
     });
-    const employee_id = await prisma.employee.findUnique({
-      where: {
-        unique_id,
-      },
-      select: {
-        employee_id: true,
-      },
-    });
+
     const mutationSubmission = await prisma.mutationSubmission.create({
       data: {
         mutation_reason: request.mutation_reason,
@@ -131,7 +110,7 @@ export class SubmissionService {
             file_for: "pengajuan mutasi",
             employee: {
               connect: {
-                employee_id: employee_id?.employee_id,
+                employee_id,
               },
             },
           },

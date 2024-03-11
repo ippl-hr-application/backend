@@ -8,13 +8,13 @@ export class SubmissionController {
   ) {
     try {
       const { date_and_time, permission_reason } = req.body;
-      const { unique_id } = res.locals.user;
+      const { employee_id } = res.locals.user;
       const permission_file: Express.Multer.File | undefined = req.file;
       const result = await SubmissionService.createSickLetter({
         date_and_time,
         permission_reason,
         type: "IZIN",
-        unique_id,
+        employee_id,
         permission_file,
       });
       return res.status(201).json({
@@ -35,13 +35,13 @@ export class SubmissionController {
   ) {
     try {
       const { date_and_time, permission_reason } = req.body;
-      const { unique_id } = res.locals.user;
+      const { employee_id } = res.locals.user;
       const permission_file: Express.Multer.File | undefined = req.file;
       const result = await SubmissionService.createSickLetter({
         date_and_time,
         permission_reason,
         type: "SAKIT",
-        unique_id,
+        employee_id,
         permission_file,
       });
       return res.status(201).json({
@@ -62,14 +62,14 @@ export class SubmissionController {
   ) {
     try {
       const { from, to, leave_reason, leave_type } = req.body;
-      const { unique_id } = res.locals.user;
+      const { employee_id } = res.locals.user;
       const leave_file: Express.Multer.File | undefined = req.file;
       const result = await SubmissionService.createLeaveLetter({
         from,
         to,
         leave_reason,
         leave_type,
-        unique_id,
+        employee_id,
         leave_file,
       });
       return res.status(201).json({
@@ -90,11 +90,11 @@ export class SubmissionController {
   ) {
     try {
       const { mutation_reason } = req.body;
-      const { unique_id } = res.locals.user;
+      const { employee_id } = res.locals.user;
       const mutation_file: Express.Multer.File | undefined = req.file;
       const result = await SubmissionService.createMutationLetter({
         mutation_reason,
-        unique_id,
+        employee_id,
         mutation_file,
       });
       return res.status(201).json({
