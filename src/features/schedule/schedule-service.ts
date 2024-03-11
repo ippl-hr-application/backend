@@ -1,9 +1,12 @@
 import { prisma } from "../../applications";
+import { ErrorResponse } from "../../models";
 import {
   AddScheduleRequest,
   AddScheduleResponse,
   DeleteScheduleRequest,
   DeleteScheduleResponse,
+  GetDetailScheduleRequest,
+  GetDetailScheduleResponse,
   UpdateScheduleRequest,
   UpdateScheduleResponse,
 } from "./schedule-model";
@@ -61,6 +64,19 @@ export class ScheduleService {
         date,
       },
     });
+    return schedule;
+  }
+  static async getDetailSchedule({
+    schedule_id,
+  }: GetDetailScheduleRequest): Promise<GetDetailScheduleResponse> {
+    const schedule = await prisma.schedule.findUnique({
+      where: {
+        schedule_id,
+      },
+    });
+    if (!schedule) {
+      throw new ErrorResponse("Schedule not found", 404, ["schedule_id"]);
+    }
     return schedule;
   }
 }

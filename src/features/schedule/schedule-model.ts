@@ -25,3 +25,9 @@ export type UpdateScheduleRequest = {
 };
 
 export type UpdateScheduleResponse = AddScheduleResponse;
+
+export type GetDetailScheduleRequest = {
+  schedule_id: number;
+};
+
+export type GetDetailScheduleResponse = AddScheduleResponse;

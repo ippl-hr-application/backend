@@ -55,4 +55,23 @@ export class ScheduleController {
       next(error);
     }
   }
+  static async getDetailSchedule(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { schedule_id } = req.params;
+      const schedule = await ScheduleService.getDetailSchedule({
+        schedule_id: Number(schedule_id),
+      });
+      return res.status(201).json({
+        success: true,
+        data: { ...schedule },
+        message: "Schedule Found",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
