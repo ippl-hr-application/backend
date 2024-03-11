@@ -7,5 +7,9 @@ scheduleRoute.post("/", [
   JWTMiddleware.verifyToken,
   ScheduleController.addSchedule,
 ]);
+scheduleRoute.delete("/:schedule_id", [
+  JWTMiddleware.verifyToken,
+  ScheduleController.deleteSchedule,
+]);
 
 export default scheduleRoute;

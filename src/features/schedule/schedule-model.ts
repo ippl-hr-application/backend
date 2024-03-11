@@ -10,3 +10,9 @@ export type AddScheduleResponse = {
   description: string;
   date: Date;
 };
+
+export type DeleteScheduleRequest = {
+  schedule_id: number;
+};
+
+export type DeleteScheduleResponse = AddScheduleResponse;

@@ -1,5 +1,10 @@
 import { prisma } from "../../applications";
-import { AddScheduleRequest, AddScheduleResponse } from "./schedule-model";
+import {
+  AddScheduleRequest,
+  AddScheduleResponse,
+  DeleteScheduleRequest,
+  DeleteScheduleResponse,
+} from "./schedule-model";
 
 export class ScheduleService {
   static async addSchedule({
@@ -24,6 +29,16 @@ export class ScheduleService {
             employee_id: employee?.employee_id,
           },
         },
+      },
+    });
+    return schedule;
+  }
+  static async deleteSchedule({
+    schedule_id,
+  }: DeleteScheduleRequest): Promise<DeleteScheduleResponse> {
+    const schedule = await prisma.schedule.delete({
+      where: {
+        schedule_id,
       },
     });
     return schedule;

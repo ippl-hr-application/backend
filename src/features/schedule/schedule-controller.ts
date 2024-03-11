@@ -21,4 +21,19 @@ export class ScheduleController {
       next(error);
     }
   }
+  static async deleteSchedule(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { schedule_id } = req.params;
+      const schedule = await ScheduleService.deleteSchedule({
+        schedule_id: Number(schedule_id),
+      });
+      return res.status(201).json({
+        success: true,
+        data: { ...schedule },
+        message: "Schedule Deleted",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
