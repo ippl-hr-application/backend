@@ -16,3 +16,12 @@ export type DeleteScheduleRequest = {
 };
 
 export type DeleteScheduleResponse = AddScheduleResponse;
+
+export type UpdateScheduleRequest = {
+  schedule_id: number;
+  title: string;
+  description: string;
+  date: Date;
+};
+
+export type UpdateScheduleResponse = AddScheduleResponse;

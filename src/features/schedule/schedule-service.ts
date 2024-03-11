@@ -4,6 +4,8 @@ import {
   AddScheduleResponse,
   DeleteScheduleRequest,
   DeleteScheduleResponse,
+  UpdateScheduleRequest,
+  UpdateScheduleResponse,
 } from "./schedule-model";
 
 export class ScheduleService {
@@ -39,6 +41,24 @@ export class ScheduleService {
     const schedule = await prisma.schedule.delete({
       where: {
         schedule_id,
+      },
+    });
+    return schedule;
+  }
+  static async updateSchedule({
+    schedule_id,
+    title,
+    description,
+    date,
+  }: UpdateScheduleRequest): Promise<UpdateScheduleResponse> {
+    const schedule = await prisma.schedule.update({
+      where: {
+        schedule_id,
+      },
+      data: {
+        title,
+        description,
+        date,
       },
     });
     return schedule;

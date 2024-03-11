@@ -36,4 +36,23 @@ export class ScheduleController {
       next(error);
     }
   }
+  static async updateSchedule(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { schedule_id } = req.params;
+      const { title, description, date } = req.body;
+      const schedule = await ScheduleService.updateSchedule({
+        schedule_id: Number(schedule_id),
+        title,
+        description,
+        date,
+      });
+      return res.status(201).json({
+        success: true,
+        data: { ...schedule },
+        message: "Schedule Updated",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
