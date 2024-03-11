@@ -192,4 +192,17 @@ export class AccountService {
 
     return employeeDelete;
   }
+
+  static async jobPositionList(company_branch_id: number) {
+    return await prisma.jobPosition.findMany({
+      where: { company_branch_id: company_branch_id },
+    });
+  }
+
+  static async employmentStatusList(company_branch_id: number) {
+    return await prisma.employmentStatus.findMany({
+      where: { company_branch_id: company_branch_id },
+    });
+  }
+
 }

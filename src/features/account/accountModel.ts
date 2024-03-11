@@ -98,3 +98,15 @@ export type DeleteResponse = {
   employee_id: string;
   first_name: string;
 };
+
+export type JobPositionRequest = {
+  company_branch_id: number;
+};
+
+export type JobPositionResponse = JobPosition[];
+
+export type EmploymentStatusRequest = {
+  company_branch_id: number;
+};
+
+export type EmploymentStatusResponse = EmploymentStatus[];
