@@ -7,19 +7,10 @@ import {
   UpdateRequest,
   UpdateResponse,
   DeleteRequest,
-  DeleteResponse,
-  GetJobPositionRequest,
-  GetJobPositionResponse,
-  CreateJobPositionRequest,
-  CreateJobPositionResponse,
-  GetEmploymentStatusRequest,
-  GetEmploymentStatusResponse,
-  CreateEmploymentStatusRequest,
-  CreateEmploymentStatusResponse,
+  DeleteResponse
 } from './accountModel';
 import { prisma } from '../../applications';
 import { ErrorResponse } from '../../models';
-import { boolean } from 'zod';
 
 export class AccountService {
   static async getAllEmployees(company_branch_id: number) {
@@ -39,12 +30,11 @@ export class AccountService {
       employeeData
     );
 
-
-    const countEmployee = await prisma.employee.count({
+    const countEmailEmployee = await prisma.employee.count({
       where: { email: request.email },
     });
 
-    if (countEmployee > 0) {
+    if (countEmailEmployee > 0) {
       throw new ErrorResponse(
         'Email already exists',
         400,
@@ -52,38 +42,6 @@ export class AccountService {
         'EMAIL_ALREADY_EXISTS'
       );
     }
-
-    // const existingJobPosition = await prisma.jobPosition.findFirst({
-    //   where: {
-    //     company_branch_id: request.company_branch_id,
-    //     job_position_id: request.job_position_id,
-    //   },
-    // });
-
-    // if (!existingJobPosition) {
-    //   await prisma.jobPosition.create({
-    //     data: {
-    //       company_branch_id: request.company_branch_id,
-    //       name: request.job_position_name,
-    //     },
-    //   });
-    // }
-
-    // const existingEmploymentStatus = await prisma.employmentStatus.findFirst({
-    //   where: {
-    //     company_branch_id: request.company_branch_id,
-    //     employment_status_id: request.employment_status_id,
-    //   },
-    // });
-
-    // if (!existingEmploymentStatus) {
-    //   await prisma.employmentStatus.create({
-    //     data: {
-    //       company_branch_id: request.company_branch_id,
-    //       name: request.employment_status_name,
-    //     },
-    //   });
-    // }
 
     const hashedPassword = hashPassword(request.password);
 
@@ -192,81 +150,4 @@ export class AccountService {
 
     return employeeDelete;
   }
-
-  static async jobPositionList(company_branch_id: number) {
-    return await prisma.jobPosition.findMany({
-      where: { company_branch_id: company_branch_id },
-    });
-  }
-
-  static async createJobPosition(jobPositionData: CreateJobPositionRequest): Promise<CreateJobPositionResponse> {
-    const request = Validation.validate(
-      AccountValidation.CREATE_JOB_POSITION,
-      jobPositionData
-    );
-
-    const existingJobPosition = await prisma.jobPosition.findFirst({
-      where: {
-        company_branch_id: request.company_branch_id,
-        name: request.name,
-      },
-    });
-
-    if (existingJobPosition) {
-      throw new ErrorResponse(
-        'Job position already exists',
-        400,
-        ['name'],
-        'JOB_POSITION_ALREADY_EXISTS'
-      );
-    }
-
-    const newJobPosition = await prisma.jobPosition.create({
-      data: {
-        company_branch_id: request.company_branch_id,
-        name: request.name,
-      },
-    });
-
-    return newJobPosition;
-  }
-
-  static async employmentStatusList(company_branch_id: number) {
-    return await prisma.employmentStatus.findMany({
-      where: { company_branch_id: company_branch_id },
-    });
-  }
-
-  static async createEmploymentStatus(employmentStatusData: CreateEmploymentStatusRequest): Promise<CreateEmploymentStatusResponse> {
-    const request = Validation.validate(
-      AccountValidation.CREATE_EMPLOYMENT_STATUS,
-      employmentStatusData
-    );
-
-    const existingEmploymentStatus = await prisma.employmentStatus.findFirst({
-      where: {
-        company_branch_id: request.company_branch_id,
-        name: request.name,
-      },
-    });
-
-    if (existingEmploymentStatus) {
-      throw new ErrorResponse(
-        'Employment status already exists',
-        400,
-        ['name'],
-        'EMPLOYMENT_STATUS_ALREADY_EXISTS'
-      );
-    }
-
-    const newEmploymentStatus = await prisma.employmentStatus.create({
-      data: {
-        company_branch_id: request.company_branch_id,
-        name: request.name,
-      },
-    });
-
-    return newEmploymentStatus;
-  }
-
 }

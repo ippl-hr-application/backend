@@ -82,37 +82,3 @@ export type DeleteResponse = {
   employee_id: string;
   first_name: string;
 };
-
-export type GetJobPositionRequest = {
-  company_branch_id: number;
-};
-
-export type GetJobPositionResponse = JobPosition[];
-
-export type CreateJobPositionRequest = {
-  company_branch_id: number;
-  name: string;
-};
-
-export type CreateJobPositionResponse = {
-  job_position_id: number;
-  company_branch_id: number;
-  name: string;
-};
-
-export type GetEmploymentStatusRequest = {
-  company_branch_id: number;
-};
-
-export type GetEmploymentStatusResponse = EmploymentStatus[];
-
-export type CreateEmploymentStatusRequest = {
-  company_branch_id: number;
-  name: string;
-};
-
-export type CreateEmploymentStatusResponse = {
-  employment_status_id: number;
-  company_branch_id: number;
-  name: string;
-};
