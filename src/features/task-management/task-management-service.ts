@@ -11,13 +11,6 @@ export class TaskManagementService {
   }: {
     company_branch_id: number;
   }): Promise<EmployeeTask[]> {
-    const isCompanyBranchExist = await prisma.companyBranches.findFirst({
-      where: { company_branch_id },
-    });
-
-    if (!isCompanyBranchExist)
-      throw new ErrorResponse("Company Branch not found", 400, ["company_branch_id"]);
-
     const tasks = await prisma.employeeTask.findMany({
       where: { company_branch_id },
     });
@@ -35,18 +28,11 @@ export class TaskManagementService {
     );
 
     const userGive = await prisma.employee.findFirst({
-      where: { employee_id: from },
+      where: { unique_id: from },
     });
 
     if (!userGive)
       throw new ErrorResponse("Invalid Unique ID", 400, ["from", "unique_id"]);
-
-    const isEmployeeExist = await prisma.employee.findFirst({
-      where: { employee_id: request.employee_id },
-    });
-
-    if (!isEmployeeExist)
-      throw new ErrorResponse("Employee not found", 400, ["employee_id"]);
 
     const task = await prisma.employeeTask.create({
       data: {
@@ -85,13 +71,6 @@ export class TaskManagementService {
     task_id: number,
     company_branch_id: number
   ): Promise<EmployeeTask> {
-    const isTaskExist = await prisma.employeeTask.findFirst({
-      where: { task_id, company_branch_id },
-    });
-
-    if (!isTaskExist)
-      throw new ErrorResponse("Task not found", 400, ["task_id", "company_branch_id"]);
-
     const task = await prisma.employeeTask.delete({
       where: { task_id, company_branch_id },
     });

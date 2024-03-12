@@ -1,6 +1,8 @@
 import { prisma } from "../../applications";
 import { Validation } from "../../validations";
 import {
+  GetSubmissionHistoryRequest,
+  GetSubmissionHistoryResponse,
   LeaveSubmissionRequest,
   LeaveSubmissionResponse,
   MutationSubmissionRequest,
@@ -12,41 +14,43 @@ import { SubmissionValidation } from "./submission-validation";
 
 export class SubmissionService {
   static async createSickLetter({
-    date_and_time,
+    from,
+    to,
     permission_reason,
     type,
-    unique_id,
+    employee_id,
     permission_file,
   }: PermissionSubmissionRequest): Promise<PermissionSubmissionResponse> {
     const request = Validation.validate(SubmissionValidation.SICK_LETTER, {
       permission_reason,
       type,
     });
-    const employee_id = await prisma.employee.findUnique({
-      where: {
-        unique_id,
-      },
-      select: {
-        employee_id: true,
-      },
-    });
+
     const permissionSubmission = await prisma.permissionSubmission.create({
       data: {
-        date_and_time,
+        from,
+        to,
         permission_reason: request.permission_reason,
         type: request.type,
-        status: "PENDING",
+        submission: {
+          create: {
+            status: "PENDING",
+            employee_id: employee_id,
+            submission_date: new Date(),
+            type: type,
+          },
+        },
         employee_file: {
           create: {
             file_name: permission_file?.originalname || "",
             file_size: permission_file?.size || 0,
             file_type: permission_file?.mimetype || "",
             file_url: `/uploads/permission_file/${permission_file?.filename}`,
-            file_for: "pengajuan izin",
+            file_for: `pengajuan ${type}`,
 
             employee: {
               connect: {
-                employee_id: employee_id?.employee_id,
+                employee_id,
               },
             },
           },
@@ -60,29 +64,29 @@ export class SubmissionService {
     to,
     leave_reason,
     leave_type,
-    unique_id,
+    employee_id,
     leave_file,
   }: LeaveSubmissionRequest): Promise<LeaveSubmissionResponse> {
     const request = Validation.validate(SubmissionValidation.LEAVE_LETTER, {
       leave_reason,
       leave_type,
-      unique_id,
+      employee_id,
     });
-    const employee_id = await prisma.employee.findUnique({
-      where: {
-        unique_id,
-      },
-      select: {
-        employee_id: true,
-      },
-    });
+
     const leaveSubmission = await prisma.leaveSubmission.create({
       data: {
         from,
         to,
         leave_reason: request.leave_reason,
         leave_type: request.leave_type,
-        status: "PENDING",
+        submission: {
+          create: {
+            employee_id,
+            status: "PENDING",
+            submission_date: new Date(),
+            type: leave_type,
+          },
+        },
         employee_file: {
           create: {
             file_name: leave_file?.originalname || "",
@@ -92,7 +96,7 @@ export class SubmissionService {
             file_for: "pengajuan cuti",
             employee: {
               connect: {
-                employee_id: employee_id?.employee_id,
+                employee_id: employee_id,
               },
             },
           },
@@ -103,25 +107,25 @@ export class SubmissionService {
   }
   static async createMutationLetter({
     mutation_reason,
-    unique_id,
+    employee_id,
     mutation_file,
   }: MutationSubmissionRequest): Promise<MutationSubmissionResponse> {
     const request = Validation.validate(SubmissionValidation.MUTATION_LETTER, {
       mutation_reason,
-      unique_id,
+      employee_id,
     });
-    const employee_id = await prisma.employee.findUnique({
-      where: {
-        unique_id,
-      },
-      select: {
-        employee_id: true,
-      },
-    });
+
     const mutationSubmission = await prisma.mutationSubmission.create({
       data: {
         mutation_reason: request.mutation_reason,
-        status: "PENDING",
+        submission: {
+          create: {
+            employee_id,
+            status: "PENDING",
+            submission_date: new Date(),
+            type: "mutation",
+          },
+        },
         employee_file: {
           create: {
             file_name: mutation_file?.originalname || "",
@@ -131,7 +135,7 @@ export class SubmissionService {
             file_for: "pengajuan mutasi",
             employee: {
               connect: {
-                employee_id: employee_id?.employee_id,
+                employee_id,
               },
             },
           },
@@ -139,5 +143,20 @@ export class SubmissionService {
       },
     });
     return mutationSubmission;
+  }
+  static async getSubmissionHistory({
+    employee_id,
+  }: GetSubmissionHistoryRequest): Promise<GetSubmissionHistoryResponse[]> {
+    const submission = await prisma.submission.findMany({
+      where: {
+        employee_id,
+      },
+      select: {
+        submission_date: true,
+        status: true,
+        type: true,
+      },
+    });
+    return submission;
   }
 }

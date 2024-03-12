@@ -32,7 +32,7 @@ export class TaskManagementController {
       const data = req.body;
       const task = await TaskManagementService.addTaskManagement(
         data,
-        res.locals.user.employee_id
+        res.locals.user.unique_id
       );
       return res.status(201).json({
         success: true,

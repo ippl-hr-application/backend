@@ -25,4 +25,8 @@ submissionRoute.post("/mutation", [
   upload.single("mutation_file"),
   SubmissionController.createMutationLetter,
 ]);
+submissionRoute.get("/", [
+  JWTMiddleware.verifyToken,
+  SubmissionController.getSubmissionHistory,
+]);
 export default submissionRoute;

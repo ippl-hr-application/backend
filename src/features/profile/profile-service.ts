@@ -7,11 +7,11 @@ import {
 
 export class ProfileService {
   static async getProfile({
-    unique_id,
+    employee_id,
   }: EmployeeProfileRequest): Promise<EmployeeProfileResponse> {
     const profile = await prisma.employee.findUnique({
       where: {
-        unique_id,
+        employee_id,
       },
       select: {
         employee_id: true,

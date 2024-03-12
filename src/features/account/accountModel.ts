@@ -4,7 +4,7 @@ import {
   JobPosition,
   EmployeeTask,
   EmployeeFile,
-} from '@prisma/client';
+} from "@prisma/client";
 
 export type GetEmployeeRequest = {
   company_branch_id: number;

@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from 'express';
-import { AccountService } from './accountService';
+import { NextFunction, Request, Response } from "express";
+import { AccountService } from "./accountService";
 
 export class AccountController {
   static async getAllEmployees(
@@ -18,7 +18,7 @@ export class AccountController {
         data: {
           employees,
         },
-        message: 'Employees retrieved successfully',
+        message: "Employees retrieved successfully",
       });
     } catch (error) {
       next(error);
@@ -32,7 +32,7 @@ export class AccountController {
       res.status(201).json({
         success: true,
         data: employee,
-        message: 'Employee created successfully',
+        message: "Employee created successfully",
       });
     } catch (error) {
       next(error);
@@ -56,7 +56,7 @@ export class AccountController {
       res.status(200).json({
         success: true,
         data: employee,
-        message: 'Employee updated successfully',
+        message: "Employee updated successfully",
       });
     } catch (error) {
       next(error);
@@ -75,7 +75,7 @@ export class AccountController {
       res.status(200).json({
         success: true,
         data: deletingEmployee,
-        message: 'Employee deleted successfully',
+        message: "Employee deleted successfully",
       });
     } catch (error) {
       next(error);
@@ -95,27 +95,35 @@ export class AccountController {
       res.status(200).json({
         success: true,
         data: jobPositions,
-        message: 'Job positions retrieved successfully',
+        message: "Job positions retrieved successfully",
       });
     } catch (error) {
       next(error);
     }
   }
 
-  static async createJobPosition(req: Request, res: Response, next: NextFunction){
+  static async createJobPosition(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const jobPosition = await AccountService.createJobPosition(req.body);
       res.status(201).json({
         success: true,
         data: jobPosition,
-        message: 'Job position created successfully',
+        message: "Job position created successfully",
       });
     } catch (error) {
       next(error);
     }
   }
 
-  static async getEmploymentStatus(req: Request, res: Response, next: NextFunction) {
+  static async getEmploymentStatus(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const company_branch_id = parseInt(req.params.company_branch_id);
       const employmentStatus = await AccountService.employmentStatusList(
@@ -124,20 +132,26 @@ export class AccountController {
       res.status(200).json({
         success: true,
         data: employmentStatus,
-        message: 'Employment status retrieved successfully',
+        message: "Employment status retrieved successfully",
       });
     } catch (error) {
       next(error);
     }
   }
 
-  static async createEmploymentStatus(req: Request, res: Response, next: NextFunction) {
+  static async createEmploymentStatus(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
-      const employmentStatus = await AccountService.createEmploymentStatus(req.body);
+      const employmentStatus = await AccountService.createEmploymentStatus(
+        req.body
+      );
       res.status(201).json({
         success: true,
         data: employmentStatus,
-        message: 'Employment status created successfully',
+        message: "Employment status created successfully",
       });
     } catch (error) {
       next(error);

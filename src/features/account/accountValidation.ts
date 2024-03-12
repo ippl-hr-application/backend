@@ -1,4 +1,4 @@
-import { z, ZodType } from 'zod';
+import { z, ZodType } from "zod";
 
 export class AccountValidation {
   static readonly CREATE_EMPLOYEE: ZodType = z.object({
@@ -65,5 +65,4 @@ export class AccountValidation {
     company_branch_id: z.number(),
     name: z.string(),
   });
-
 }

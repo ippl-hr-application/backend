@@ -11,6 +11,10 @@ const storage = multer.diskStorage({
       dest = "public/uploads/leave_file/";
     }
     if (file.fieldname === "mutation_file") {
+      dest = "public/uploads/mutation_file/";
+    }
+    if (file.fieldname === "attendance_file") {
+      dest = "public/uploads/attendance_file/";
     }
     if (!fs.existsSync(dest)) {
       fs.mkdirSync(dest, { recursive: true });
