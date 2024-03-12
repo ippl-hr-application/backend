@@ -10,14 +10,14 @@ export class EmploymentController {
     try {
       const company_branch_id = parseInt(req.params.company_branch_id);
       const employmentStatus = await EmploymentStatusService.getEmploymentStatus({
-        company_branch_id,
+        company_branch_id
       });
       res.status(200).json({
         success: true,
         data: {
           employmentStatus,
         },
-        message: 'Employment statuses retrieved successfully',
+        message: 'Employment status retrieved successfully',
       });
     } catch (error) {
       next(error);
@@ -44,5 +44,4 @@ export class EmploymentController {
       next(error);
     }
   }  
-
 }
