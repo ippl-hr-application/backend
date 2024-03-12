@@ -1,7 +1,8 @@
 type PermissionType = "SAKIT" | "IZIN";
 type SubmissionStatus = "PENDING" | "ACCEPTED" | "REJECTED";
 export type PermissionSubmissionRequest = {
-  date_and_time: Date;
+  from: Date;
+  to: Date;
   permission_reason: string;
   type: PermissionType;
   employee_id: string;
@@ -9,7 +10,8 @@ export type PermissionSubmissionRequest = {
 };
 
 export type PermissionSubmissionResponse = {
-  date_and_time: Date;
+  from: Date;
+  to: Date;
   permission_reason: string;
   type: PermissionType;
 };

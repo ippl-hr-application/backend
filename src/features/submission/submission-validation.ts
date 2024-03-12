@@ -8,10 +8,10 @@ export class SubmissionValidation {
   static readonly LEAVE_LETTER: ZodType = z.object({
     leave_reason: z.string().max(100),
     leave_type: z.string(),
-    unique_id: z.string(),
+    employee_id: z.string(),
   });
   static readonly MUTATION_LETTER: ZodType = z.object({
     mutation_reason: z.string().max(100),
-    unique_id: z.string(),
+    employee_id: z.string(),
   });
 }

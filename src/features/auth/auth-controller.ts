@@ -19,7 +19,11 @@ export class AuthController {
   static async employeeLogin(req: Request, res: Response, next: NextFunction) {
     try {
       const { company_id, employee_id, password } = req.body;
-      const token = await AuthService.employeeLogin({ company_id, employee_id, password });
+      const token = await AuthService.employeeLogin({
+        company_id,
+        employee_id,
+        password,
+      });
       return res.status(200).json({
         success: true,
         data: { ...token },
@@ -51,7 +55,10 @@ export class AuthController {
   ) {
     try {
       const { user_id, employee_id } = res.locals.user;
-      const user = await AuthService.getCurrentLoggedInUser(user_id, employee_id);
+      const user = await AuthService.getCurrentLoggedInUser(
+        user_id,
+        employee_id
+      );
       return res.status(200).json({
         success: true,
         data: { user },

@@ -14,7 +14,8 @@ import { SubmissionValidation } from "./submission-validation";
 
 export class SubmissionService {
   static async createSickLetter({
-    date_and_time,
+    from,
+    to,
     permission_reason,
     type,
     employee_id,
@@ -27,7 +28,8 @@ export class SubmissionService {
 
     const permissionSubmission = await prisma.permissionSubmission.create({
       data: {
-        date_and_time,
+        from,
+        to,
         permission_reason: request.permission_reason,
         type: request.type,
         submission: {

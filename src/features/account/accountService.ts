@@ -1,6 +1,6 @@
-import { Validation } from '../../validations';
-import { AccountValidation } from './accountValidation';
-import { comparePassword, hashPassword } from '../../utils';
+import { Validation } from "../../validations";
+import { AccountValidation } from "./accountValidation";
+import { comparePassword, hashPassword } from "../../utils";
 import {
   CreateRequest,
   CreateResponse,
@@ -8,10 +8,10 @@ import {
   UpdateResponse,
   DeleteRequest,
   DeleteResponse,
-} from './accountModel';
-import { prisma } from '../../applications';
-import { ErrorResponse } from '../../models';
-import { boolean } from 'zod';
+} from "./accountModel";
+import { prisma } from "../../applications";
+import { ErrorResponse } from "../../models";
+import { boolean } from "zod";
 
 export class AccountService {
   static async getAllEmployees(company_branch_id: number) {
@@ -23,7 +23,9 @@ export class AccountService {
   static async createEmployee(
     employeeData: CreateRequest
   ): Promise<CreateResponse> {
-    employeeData.identity_expired_date = new Date(employeeData.identity_expired_date);
+    employeeData.identity_expired_date = new Date(
+      employeeData.identity_expired_date
+    );
     employeeData.birth_date = new Date(employeeData.birth_date);
 
     const request = Validation.validate(
@@ -31,17 +33,16 @@ export class AccountService {
       employeeData
     );
 
-
     const countEmployee = await prisma.employee.count({
       where: { email: request.email },
     });
 
     if (countEmployee > 0) {
       throw new ErrorResponse(
-        'Email already exists',
+        "Email already exists",
         400,
-        ['email'],
-        'EMAIL_ALREADY_EXISTS'
+        ["email"],
+        "EMAIL_ALREADY_EXISTS"
       );
     }
 
@@ -84,7 +85,7 @@ export class AccountService {
         company_branch_id: request.company_branch_id,
         job_position_id: request.job_position_id,
         employment_status_id: request.employment_status_id,
-        unique_id: request.unique_id,
+
         first_name: request.first_name,
         last_name: request.last_name,
         email: request.email,
@@ -123,8 +124,10 @@ export class AccountService {
   static async updateEmployee(
     employeeData: UpdateRequest
   ): Promise<UpdateResponse> {
-    if (employeeData.identity_expired_date){
-      employeeData.identity_expired_date = new Date(employeeData.identity_expired_date);
+    if (employeeData.identity_expired_date) {
+      employeeData.identity_expired_date = new Date(
+        employeeData.identity_expired_date
+      );
     }
 
     const request = Validation.validate(
@@ -141,10 +144,10 @@ export class AccountService {
 
     if (!findEmployee) {
       throw new ErrorResponse(
-        'Employee not found',
+        "Employee not found",
         404,
-        ['employee_id'],
-        'EMPLOYEE_NOT_FOUND'
+        ["employee_id"],
+        "EMPLOYEE_NOT_FOUND"
       );
     }
 
@@ -176,10 +179,10 @@ export class AccountService {
 
     if (!findEmployee) {
       throw new ErrorResponse(
-        'Employee not found',
+        "Employee not found",
         404,
-        ['employee_id'],
-        'EMPLOYEE_NOT_FOUND'
+        ["employee_id"],
+        "EMPLOYEE_NOT_FOUND"
       );
     }
 

@@ -367,7 +367,8 @@ model PermissionSubmission {
   submission Submission @relation(fields: [submision_id], references: [submission_id])
   submision_id Int              @unique
   employee_file_id  Int              @unique
-  date_and_time     DateTime
+  from     DateTime
+  to     DateTime
   permission_reason String           @db.VarChar(100)
   type              PermissionType
 

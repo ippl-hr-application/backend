@@ -7,11 +7,12 @@ export class SubmissionController {
     next: NextFunction
   ) {
     try {
-      const { date_and_time, permission_reason } = req.body;
+      const { from, to, permission_reason } = req.body;
       const { employee_id } = res.locals.user;
       const permission_file: Express.Multer.File | undefined = req.file;
       const result = await SubmissionService.createSickLetter({
-        date_and_time,
+        from,
+        to,
         permission_reason,
         type: "IZIN",
         employee_id,
@@ -34,11 +35,12 @@ export class SubmissionController {
     next: NextFunction
   ) {
     try {
-      const { date_and_time, permission_reason } = req.body;
+      const { from, to, permission_reason } = req.body;
       const { employee_id } = res.locals.user;
       const permission_file: Express.Multer.File | undefined = req.file;
       const result = await SubmissionService.createSickLetter({
-        date_and_time,
+        from,
+        to,
         permission_reason,
         type: "SAKIT",
         employee_id,
@@ -120,9 +122,7 @@ export class SubmissionController {
       });
       return res.status(200).json({
         success: true,
-        data: {
-          ...result,
-        },
+        data: result,
       });
     } catch (error) {
       next(error);

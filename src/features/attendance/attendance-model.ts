@@ -19,3 +19,10 @@ export type AttendanceCheckRequest = {
   lat: number;
   attendance_file: Express.Multer.File | undefined;
 };
+
+export type AttendanceCheckResponse = {
+  date: Date;
+  from: string | undefined;
+  to: string | undefined;
+  time: string;
+};

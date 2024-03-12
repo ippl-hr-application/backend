@@ -25,10 +25,10 @@ export class AttendanceController {
       const attendance_file: Express.Multer.File | undefined = req.file;
       const result = await AttendanceService.attendanceCheck({
         employee_id,
-        shift_id,
         type: "CHECK_IN",
-        long,
-        lat,
+        shift_id: Number(shift_id),
+        long: Number(long),
+        lat: Number(lat),
         attendance_file,
       });
       return res.status(201).json({
@@ -48,10 +48,12 @@ export class AttendanceController {
       const attendance_file: Express.Multer.File | undefined = req.file;
       const result = await AttendanceService.attendanceCheck({
         employee_id,
-        shift_id,
+
         type: "CHECK_OUT",
-        long,
-        lat,
+        shift_id: Number(shift_id),
+        long: Number(long),
+        lat: Number(lat),
+
         attendance_file,
       });
       return res.status(201).json({

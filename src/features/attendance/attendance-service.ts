@@ -1,6 +1,8 @@
+import { date } from "zod";
 import { prisma } from "../../applications";
 import {
   AttendanceCheckRequest,
+  AttendanceCheckResponse,
   GetShiftInfoRequest,
   GetShiftInfoResponse,
 } from "./attendance-model";
@@ -60,10 +62,11 @@ export class AttendanceService {
     long,
     lat,
     attendance_file,
-  }: AttendanceCheckRequest) {
-    const attendance = await prisma.attendance.create({
+  }: AttendanceCheckRequest): Promise<AttendanceCheckResponse> {
+    const date = new Date().toISOString();
+    await prisma.attendance.create({
       data: {
-        date: new Date(),
+        date: date,
         shift_id,
         employee_id,
         attendance_check: {
@@ -72,7 +75,7 @@ export class AttendanceService {
             long,
             lat,
             status: "PENDING",
-            time: new Date().getTime().toString(),
+            time: date.substring(11, 19),
             employee_file: {
               create: {
                 file_name: attendance_file?.originalname || "",
@@ -91,6 +94,16 @@ export class AttendanceService {
         },
       },
     });
-    return attendance;
+    const shiftInfo = await prisma.shift.findFirst({
+      where: {
+        shift_id,
+      },
+    });
+    return {
+      date: new Date(),
+      from: shiftInfo?.start_time,
+      to: shiftInfo?.end_time,
+      time: date.substring(11, 19),
+    };
   }
 }
