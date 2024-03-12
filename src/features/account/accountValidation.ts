@@ -56,4 +56,12 @@ export class AccountValidation {
     employee_id: z.string(),
     company_branch_id: z.number(),
   });
+  static CREATE_JOB_POSITION: ZodType = z.object({
+    company_branch_id: z.number(),
+    name: z.string(),
+  });
+  static CREATE_EMPLOYMENT_STATUS: ZodType = z.object({
+    company_branch_id: z.number(),
+    name: z.string(),
+  });
 }

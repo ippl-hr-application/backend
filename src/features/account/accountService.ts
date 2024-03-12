@@ -8,18 +8,15 @@ import {
   UpdateResponse,
   DeleteRequest,
   DeleteResponse,
-  GetJobPositionRequest,
-  GetJobPositionResponse,
   CreateJobPositionRequest,
   CreateJobPositionResponse,
-  GetEmploymentStatusRequest,
-  GetEmploymentStatusResponse,
   CreateEmploymentStatusRequest,
   CreateEmploymentStatusResponse,
 } from "./accountModel";
 import { prisma } from "../../applications";
 import { ErrorResponse } from "../../models";
 import { boolean } from "zod";
+import { EmploymentStatusValidation } from "../employment-status/employmentValidation";
 
 export class AccountService {
   static async getAllEmployees(company_branch_id: number) {
@@ -54,37 +51,37 @@ export class AccountService {
       );
     }
 
-    const existingJobPosition = await prisma.jobPosition.findFirst({
-      where: {
-        company_branch_id: request.company_branch_id,
-        job_position_id: request.job_position_id,
-      },
-    });
+    // const existingJobPosition = await prisma.jobPosition.findFirst({
+    //   where: {
+    //     company_branch_id: request.company_branch_id,
+    //     job_position_id: request.job_position_id,
+    //   },
+    // });
 
-    if (!existingJobPosition) {
-      await prisma.jobPosition.create({
-        data: {
-          company_branch_id: request.company_branch_id,
-          name: request.job_position_name,
-        },
-      });
-    }
+    // if (!existingJobPosition) {
+    //   await prisma.jobPosition.create({
+    //     data: {
+    //       company_branch_id: request.company_branch_id,
+    //       name: request.job_position_name,
+    //     },
+    //   });
+    // }
 
-    const existingEmploymentStatus = await prisma.employmentStatus.findFirst({
-      where: {
-        company_branch_id: request.company_branch_id,
-        employment_status_id: request.employment_status_id,
-      },
-    });
+    // const existingEmploymentStatus = await prisma.employmentStatus.findFirst({
+    //   where: {
+    //     company_branch_id: request.company_branch_id,
+    //     employment_status_id: request.employment_status_id,
+    //   },
+    // });
 
-    if (!existingEmploymentStatus) {
-      await prisma.employmentStatus.create({
-        data: {
-          company_branch_id: request.company_branch_id,
-          name: request.employment_status_name,
-        },
-      });
-    }
+    // if (!existingEmploymentStatus) {
+    //   await prisma.employmentStatus.create({
+    //     data: {
+    //       company_branch_id: request.company_branch_id,
+    //       name: request.employment_status_name,
+    //     },
+    //   });
+    // }
 
     const hashedPassword = hashPassword(request.password);
 
