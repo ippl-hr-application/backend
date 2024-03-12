@@ -1,6 +1,4 @@
-import {
-  EmploymentStatus
-} from '@prisma/client'
+import { EmploymentStatus } from '@prisma/client';
 
 export type CreateEmploymentStatusRequest = {
   company_branch_id: number;
@@ -8,7 +6,6 @@ export type CreateEmploymentStatusRequest = {
 };
 
 export type CreateEmploymentStatusResponse = {
-  employment_status_id: number;
   company_branch_id: number;
   name: string;
 };
