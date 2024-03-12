@@ -1,5 +1,9 @@
 import { prisma } from "../../applications";
-import { GetShiftInfoRequest, GetShiftInfoResponse } from "./attendance-model";
+import {
+  AttendanceCheckRequest,
+  GetShiftInfoRequest,
+  GetShiftInfoResponse,
+} from "./attendance-model";
 
 export class AttendanceService {
   static async getShiftInfo({
@@ -10,6 +14,7 @@ export class AttendanceService {
         employee_id,
       },
       select: {
+        shift_id: true,
         start_time: true,
         end_time: true,
         employee: {
@@ -47,5 +52,45 @@ export class AttendanceService {
       from: shiftInfo?.start_time,
       to: shiftInfo?.end_time,
     };
+  }
+  static async attendanceCheck({
+    employee_id,
+    shift_id,
+    type,
+    long,
+    lat,
+    attendance_file,
+  }: AttendanceCheckRequest) {
+    const attendance = await prisma.attendance.create({
+      data: {
+        date: new Date(),
+        shift_id,
+        employee_id,
+        attendance_check: {
+          create: {
+            type,
+            long,
+            lat,
+            status: "PENDING",
+            time: new Date().getTime().toString(),
+            employee_file: {
+              create: {
+                file_name: attendance_file?.originalname || "",
+                file_size: attendance_file?.size || 0,
+                file_type: attendance_file?.mimetype || "",
+                file_url: `/uploads/attendance_file/${attendance_file?.filename}`,
+                file_for: "kehadiran karyawan",
+                employee: {
+                  connect: {
+                    employee_id,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return attendance;
   }
 }

@@ -10,3 +10,12 @@ export type GetShiftInfoResponse = {
   from: string;
   to: string;
 };
+
+export type AttendanceCheckRequest = {
+  employee_id: string;
+  shift_id: number;
+  type: "CHECK_IN" | "CHECK_OUT";
+  long: number;
+  lat: number;
+  attendance_file: Express.Multer.File | undefined;
+};

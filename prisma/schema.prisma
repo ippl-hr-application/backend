@@ -244,7 +244,7 @@ model EmployeeFile {
   file_url              String
   file_for              String?                       @db.VarChar(20)
   reimbursements        ReimbursementFileAttachment[]
-  attendances           AttendanceFileAttachment[]
+  attendance_check      AttendanceCheck?
   permission_submission PermissionSubmission?
   leave_submission      LeaveSubmission?
   mutation_submission   MutationSubmission?
@@ -306,24 +306,36 @@ model Attendance {
   shift_id Int
 
   date      DateTime                   @db.Date
-  check_in  String
-  check_out String
-  status    AttendanceStatus
-  files     AttendanceFileAttachment[]
+  attendance_check  AttendanceCheck?
 
   @@map("attendances")
 }
-
-model AttendanceFileAttachment {
-  attendance    Attendance @relation(fields: [attendance_id], references: [attendance_id])
-  attendance_id Int
-
-  employee_file    EmployeeFile @relation(fields: [employee_file_id], references: [employee_file_id])
-  employee_file_id Int
-
-  @@id([attendance_id, employee_file_id])
-  @@map("attendance_file_attachments")
+enum AttendanceCheckStatus {
+  REJECTED
+  PENDING
+  ACCEPTED
 }
+enum AttendanceCheckType {
+  CHECK_IN
+  CHECK_OUT
+}
+model AttendanceCheck {
+  attendance_check_id Int @id @default(autoincrement())
+  
+  attendance_id Int @unique
+  attendance   Attendance @relation(fields: [attendance_id], references: [attendance_id])
+  
+  employee_file_id Int @unique
+  employee_file   EmployeeFile @relation(fields: [employee_file_id], references: [employee_file_id])
+  type         AttendanceCheckType
+  time String
+  long Float
+  lat  Float
+  status AttendanceCheckStatus
+
+  @@map("attendance_checks")
+}
+
 
 enum PermissionType {
   SAKIT
@@ -346,7 +358,7 @@ model Submission {
   permission_submission PermissionSubmission?
   leave_submission LeaveSubmission?
   mutation_submission MutationSubmission?
-
+  @@map("submissions")
 }
 model PermissionSubmission {
   permission_submission_id Int @id @default(autoincrement())
