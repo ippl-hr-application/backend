@@ -14,4 +14,5 @@ accountRoute.post('/employees/', AccountController.createEmployee);
 accountRoute.patch('/employees/', AccountController.updateEmployee);
 // Delete an employee
 accountRoute.delete('/employees/:company_branch_id/:employee_id', AccountController.deleteEmployee);
+
 export default accountRoute;
