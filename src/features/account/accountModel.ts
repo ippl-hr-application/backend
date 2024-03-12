@@ -18,7 +18,7 @@ export type CreateRequest = {
   // job_position_name: string;
   employment_status_id: number;
   // employment_status_name: string;
-  unique_id: string;
+  // unique_id: string;
   first_name: string;
   last_name: string;
   email: string;

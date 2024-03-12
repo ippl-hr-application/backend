@@ -7,7 +7,7 @@ export class AccountValidation {
     // job_position_name: z.string(),
     employment_status_id: z.number(),
     // employment_status_name: z.string(),
-    unique_id: z.string().min(3).max(20),
+    // unique_id: z.string().min(3).max(20),
     first_name: z.string().min(3).max(50),
     last_name: z.string().min(3).max(50),
     email: z.string().email(),
