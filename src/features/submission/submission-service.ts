@@ -1,6 +1,8 @@
 import { prisma } from "../../applications";
 import { Validation } from "../../validations";
 import {
+  GetSubmissionHistoryRequest,
+  GetSubmissionHistoryResponse,
   LeaveSubmissionRequest,
   LeaveSubmissionResponse,
   MutationSubmissionRequest,
@@ -28,14 +30,21 @@ export class SubmissionService {
         date_and_time,
         permission_reason: request.permission_reason,
         type: request.type,
-        status: "PENDING",
+        submission: {
+          create: {
+            status: "PENDING",
+            employee_id: employee_id,
+            submission_date: new Date(),
+            type: type,
+          },
+        },
         employee_file: {
           create: {
             file_name: permission_file?.originalname || "",
             file_size: permission_file?.size || 0,
             file_type: permission_file?.mimetype || "",
             file_url: `/uploads/permission_file/${permission_file?.filename}`,
-            file_for: "pengajuan izin",
+            file_for: `pengajuan ${type}`,
 
             employee: {
               connect: {
@@ -68,7 +77,14 @@ export class SubmissionService {
         to,
         leave_reason: request.leave_reason,
         leave_type: request.leave_type,
-        status: "PENDING",
+        submission: {
+          create: {
+            employee_id,
+            status: "PENDING",
+            submission_date: new Date(),
+            type: leave_type,
+          },
+        },
         employee_file: {
           create: {
             file_name: leave_file?.originalname || "",
@@ -100,7 +116,14 @@ export class SubmissionService {
     const mutationSubmission = await prisma.mutationSubmission.create({
       data: {
         mutation_reason: request.mutation_reason,
-        status: "PENDING",
+        submission: {
+          create: {
+            employee_id,
+            status: "PENDING",
+            submission_date: new Date(),
+            type: "mutation",
+          },
+        },
         employee_file: {
           create: {
             file_name: mutation_file?.originalname || "",
@@ -118,5 +141,20 @@ export class SubmissionService {
       },
     });
     return mutationSubmission;
+  }
+  static async getSubmissionHistory({
+    employee_id,
+  }: GetSubmissionHistoryRequest): Promise<GetSubmissionHistoryResponse[]> {
+    const submission = await prisma.submission.findMany({
+      where: {
+        employee_id,
+      },
+      select: {
+        submission_date: true,
+        status: true,
+        type: true,
+      },
+    });
+    return submission;
   }
 }

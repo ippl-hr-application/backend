@@ -108,4 +108,24 @@ export class SubmissionController {
       next(error);
     }
   }
+  static async getSubmissionHistory(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { employee_id } = res.locals.user;
+      const result = await SubmissionService.getSubmissionHistory({
+        employee_id,
+      });
+      return res.status(200).json({
+        success: true,
+        data: {
+          ...result,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

@@ -18,4 +18,11 @@ export class AttendanceController {
       next(error);
     }
   }
+  static async checkIn(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { employee_id } = res.locals.user;
+    } catch (error) {
+      next(error);
+    }
+  }
 }

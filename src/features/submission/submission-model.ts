@@ -1,6 +1,5 @@
-import { string } from "zod";
-
 type PermissionType = "SAKIT" | "IZIN";
+type SubmissionStatus = "PENDING" | "ACCEPTED" | "REJECTED";
 export type PermissionSubmissionRequest = {
   date_and_time: Date;
   permission_reason: string;
@@ -39,4 +38,14 @@ export type MutationSubmissionRequest = {
 
 export type MutationSubmissionResponse = {
   mutation_reason: string;
+};
+
+export type GetSubmissionHistoryRequest = {
+  employee_id: string;
+};
+
+export type GetSubmissionHistoryResponse = {
+  submission_date: Date;
+  type: string;
+  status: SubmissionStatus;
 };
