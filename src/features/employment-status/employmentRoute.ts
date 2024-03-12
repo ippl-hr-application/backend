@@ -1,5 +1,5 @@
 import { Router } from "express";
-improt { EmploymentController } from "./employmentController";
+import { EmploymentController } from "./employmentController";
 
 const employmentRoute: Router = Router();
 
