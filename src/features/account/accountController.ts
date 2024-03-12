@@ -8,15 +8,15 @@ export class AccountController {
     next: NextFunction
   ) {
     try {
-      const company_branch_id  = parseInt(req.params.company_branch_id);
+      const company_branch_id = parseInt(req.params.company_branch_id);
       const employees = await AccountService.getAllEmployees(company_branch_id);
       // atau pake local user daripada pake params
       // const { company_branch_id } = res.locals.user;
       // const employees = await AccountService.getAllEmployees(company_branch_id);
       res.status(200).json({
         success: true,
-        data: { 
-          employees 
+        data: {
+          employees,
         },
         message: 'Employees retrieved successfully',
       });
@@ -25,30 +25,22 @@ export class AccountController {
     }
   }
 
-  static async createEmployee(
-    req: Request, 
-    res: Response, 
-    next: NextFunction
-    ) {
+  static async createEmployee(req: Request, res: Response, next: NextFunction) {
     try {
       // const company_branch_id = res.locals.user.company_branch_id;
       const employee = await AccountService.createEmployee(req.body);
       res.status(201).json({
         success: true,
         data: employee,
-        message: "Employee created successfully",
+        message: 'Employee created successfully',
       });
     } catch (error) {
       next(error);
     }
   }
 
-  static async updateEmployee(
-    req: Request, 
-    res: Response, 
-    next: NextFunction
-    ) {
-      try {
+  static async updateEmployee(req: Request, res: Response, next: NextFunction) {
+    try {
       // const employeeId = req.params.employee_id;
       // const companyBranchId = parseInt(req.params.company_branch_id);
 
@@ -57,33 +49,95 @@ export class AccountController {
 
       // kalo pake params
       // const employee = await AccountService.updateEmployee(companyBranchId, employeeId, req.body);
-      
+
       // const employee = await AccountService.updateEmployee(req.body.company_branch_id, req.body.employee_id, req.body);
 
       const employee = await AccountService.updateEmployee(req.body);
       res.status(200).json({
         success: true,
         data: employee,
-        message: "Employee updated successfully",
+        message: 'Employee updated successfully',
       });
     } catch (error) {
       next(error);
     }
   }
 
-  static async deleteEmployee(
-    req: Request, 
-    res: Response, 
-    next: NextFunction) {
-      try {
+  static async deleteEmployee(req: Request, res: Response, next: NextFunction) {
+    try {
       const employee_id = req.params.employee_id;
       const company_branch_id = parseInt(req.params.company_branch_id);
-      const deletingEmployee = await AccountService.deleteEmployee({company_branch_id, employee_id});
+      const deletingEmployee = await AccountService.deleteEmployee({
+        company_branch_id,
+        employee_id,
+      });
       // await AccountService.deleteEmployee(id);
       res.status(200).json({
         success: true,
         data: deletingEmployee,
-        message: "Employee deleted successfully",
+        message: 'Employee deleted successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getJobPositions(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const company_branch_id = parseInt(req.params.company_branch_id);
+      const jobPositions = await AccountService.jobPositionList(
+        company_branch_id
+      );
+      res.status(200).json({
+        success: true,
+        data: jobPositions,
+        message: 'Job positions retrieved successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async createJobPosition(req: Request, res: Response, next: NextFunction){
+    try {
+      const jobPosition = await AccountService.createJobPosition(req.body);
+      res.status(201).json({
+        success: true,
+        data: jobPosition,
+        message: 'Job position created successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getEmploymentStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      const company_branch_id = parseInt(req.params.company_branch_id);
+      const employmentStatus = await AccountService.employmentStatusList(
+        company_branch_id
+      );
+      res.status(200).json({
+        success: true,
+        data: employmentStatus,
+        message: 'Employment status retrieved successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async createEmploymentStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      const employmentStatus = await AccountService.createEmploymentStatus(req.body);
+      res.status(201).json({
+        success: true,
+        data: employmentStatus,
+        message: 'Employment status created successfully',
       });
     } catch (error) {
       next(error);

@@ -4,10 +4,10 @@ export class AccountValidation {
   static readonly CREATE_EMPLOYEE: ZodType = z.object({
     company_branch_id: z.number(),
     job_position_id: z.number(),
-    job_position_name: z.string(),
+    // job_position_name: z.string(),
     employment_status_id: z.number(),
-    employment_status_name: z.string(),
-    unique_id: z.string().min(3).max(20),
+    // employment_status_name: z.string(),
+    // unique_id: z.string().min(3).max(20),
     first_name: z.string().min(3).max(50),
     last_name: z.string().min(3).max(50),
     email: z.string().email(),
@@ -24,8 +24,8 @@ export class AccountValidation {
     postcal_code: z.string().min(3).max(10),
     citizen_id_address: z.string(),
     residential_address: z.string(),
-    bank_account_number: z.string().max(20),
-    bank_type: z.string().max(20),
+    bank_account_number: z.string().max(20).optional(),
+    bank_type: z.string().max(20).optional(),
     wage: z.number(),
   });
 
@@ -59,4 +59,15 @@ export class AccountValidation {
     employee_id: z.string(),
     company_branch_id: z.number(),
   });
+
+  static CREATE_JOB_POSITION: ZodType = z.object({
+    company_branch_id: z.number(),
+    name: z.string(),
+  });
+
+  static CREATE_EMPLOYMENT_STATUS: ZodType = z.object({
+    company_branch_id: z.number(),
+    name: z.string(),
+  });
+
 }
