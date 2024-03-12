@@ -10,8 +10,12 @@ import {
   DeleteResponse,
   GetJobPositionRequest,
   GetJobPositionResponse,
+  CreateJobPositionRequest,
+  CreateJobPositionResponse,
   GetEmploymentStatusRequest,
   GetEmploymentStatusResponse,
+  CreateEmploymentStatusRequest,
+  CreateEmploymentStatusResponse,
 } from './accountModel';
 import { prisma } from '../../applications';
 import { ErrorResponse } from '../../models';
@@ -88,7 +92,6 @@ export class AccountService {
         company_branch_id: request.company_branch_id,
         job_position_id: request.job_position_id,
         employment_status_id: request.employment_status_id,
-        unique_id: request.unique_id,
         first_name: request.first_name,
         last_name: request.last_name,
         email: request.email,
@@ -111,14 +114,7 @@ export class AccountService {
       },
     });
 
-    // const newEmployee = await prisma.employee.create({
-    //   data: {
-    //      ...request ,
-    //   },
-    // });
-
     return {
-      employee_id: request.unique_id,
       first_name: request.first_name,
       last_name: request.last_name,
     };
@@ -235,7 +231,7 @@ export class AccountService {
     return newJobPosition;
   }
 
-  static async employmentStatusList(company_branch_id: number): {
+  static async employmentStatusList(company_branch_id: number) {
     return await prisma.employmentStatus.findMany({
       where: { company_branch_id: company_branch_id },
     });
