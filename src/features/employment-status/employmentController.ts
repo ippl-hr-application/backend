@@ -29,6 +29,7 @@ export class EmploymentController {
     res: Response,
     next: NextFunction
   ) {
+    const {  } = req.body;
     try {
       const employmentStatus = await EmploymentStatusService.createEmploymentStatus(
         req.body
