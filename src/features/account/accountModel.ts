@@ -6,17 +6,6 @@ import {
   EmployeeFile,
 } from "@prisma/client";
 
-// export type EmployeeWithRelations = Employee & {
-//   employment_status: EmploymentStatus;
-//   job_position: JobPosition;
-//   employee_task: EmployeeTask[];
-//   employee_file: EmployeeFile[];
-// };
-
-// type religion_type = "Islam" | "Protestan" | "Catholic" | "Hindu" | "Buddha" | "Konghucu" | "Others";
-// type marital_status_type = "Single" | "Married" | "Widow" | "Widower" | "Others" ;
-// type blood_type = "A" | "B" | "AB" | "O" | "Others";
-
 export type GetEmployeeRequest = {
   company_branch_id: number;
 };
@@ -29,7 +18,6 @@ export type CreateRequest = {
   employment_status_id: number;
   first_name: string;
   last_name: string;
-  address: string;
   email: string;
   password: string;
   phone_number: string;
@@ -44,8 +32,8 @@ export type CreateRequest = {
   postcal_code: string;
   citizen_id_address: string;
   residential_address: string;
-  bank_account_number: string;
-  bank_type: string;
+  bank_account_number?: string;
+  bank_type?: string;
   wage: number;
 };
 

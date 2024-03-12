@@ -8,15 +8,18 @@ import {
   UpdateResponse,
   DeleteRequest,
   DeleteResponse,
+  GetJobPositionRequest,
+  GetJobPositionResponse,
   CreateJobPositionRequest,
   CreateJobPositionResponse,
+  GetEmploymentStatusRequest,
+  GetEmploymentStatusResponse,
   CreateEmploymentStatusRequest,
   CreateEmploymentStatusResponse,
 } from "./accountModel";
 import { prisma } from "../../applications";
 import { ErrorResponse } from "../../models";
 import { boolean } from "zod";
-import { EmploymentStatusValidation } from "../employment-status/employmentValidation";
 
 export class AccountService {
   static async getAllEmployees(company_branch_id: number) {
