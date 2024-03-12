@@ -231,7 +231,7 @@ export class AccountService {
     return newJobPosition;
   }
 
-  static async employmentStatusLise(company_branch_id: number) {
+  static async employmentStatusList(company_branch_id: number) {
     return await prisma.employmentStatus.findMany({
       where: { company_branch_id: company_branch_id },
     });

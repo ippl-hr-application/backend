@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { EmploymentStatusService } from './employmentStatusService';
+import { EmploymentStatusService } from './employmentService';
 
 export class EmploymentController {
   static async getEmploymentStatus(
