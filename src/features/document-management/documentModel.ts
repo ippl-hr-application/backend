@@ -1,7 +1,7 @@
 export type CreateDocumentRequest = {
   company_id: string;
   description?: string;
-  document_file: Express.Multer.File;
+  document_file: Express.Multer.File | undefined;
 };
 
 export type CreateDocumentResponse = {
