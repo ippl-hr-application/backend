@@ -26,4 +26,42 @@ export class DocumentController {
       next(error)
     }
   }
+  // static async getDocuments(
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) {
+  //   try {
+  //     const { company_id } = req.params;
+  //     const documents = await DocumentService.getDocuments({
+  //       company_id: company_id as string
+  //     });
+  //     res.status(200).json({
+  //       success: true,
+  //       data: documents,
+  //       message: "Documents retrieved successfully"
+  //     });
+  //   } catch (error) {
+  //     next(error)
+  //   }
+  // }
+
+  static async updateDocument(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const document = await DocumentService.updateDocument(req.body);
+      res.status(200).json({
+        success: true,
+        data: {
+          ...document
+        },
+        message: "Document updated successfully"
+      });
+    } catch (error) {
+      next(error)
+    }
+  }
 }

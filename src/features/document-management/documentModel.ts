@@ -14,16 +14,16 @@ export type GetDocumentRequest = {
 };
 
 export type GetDocumentResponse = {
-  company_file_id: string;
   company_id: string;
   file_name: string;
   file_size: number;
   file_type: string;
   description?: string;
-  document_file: Express.Multer.File;
+  document_file: [];
 };
 
 export type UpdateDocumentRequest = {
+  company_file_id: number;
   company_id: string;
   file_name?: string;
   description?: string;
@@ -31,8 +31,7 @@ export type UpdateDocumentRequest = {
 
 export type UpdateDocumentResponse = {
   company_id: string;
-  file_name?: string;
-  description?: string;
+  file_name: string;
 };
 
 export type DeleteDocumentRequest = {

@@ -11,4 +11,13 @@ documentRoute.post("/", [
   DocumentController.createDocuments,
 ]);
 
+// documentRoute.get("/:company_id", [
+//   JWTMiddleware.verifyToken,
+//   DocumentController.getDocuments,
+// ]);
+
+documentRoute.patch("/", [
+  JWTMiddleware.verifyToken,
+  DocumentController.updateDocument,
+]);
 export default documentRoute;
