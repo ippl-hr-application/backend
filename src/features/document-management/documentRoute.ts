@@ -20,4 +20,9 @@ documentRoute.patch("/", [
   JWTMiddleware.verifyToken,
   DocumentController.updateDocument,
 ]);
+
+// documentRoute.delete("/:company_id  ", [
+//   JWTMiddleware.verifyToken,
+//   DocumentController.deleteDocument,
+// ]);
 export default documentRoute;
