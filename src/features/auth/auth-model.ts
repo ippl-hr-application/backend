@@ -41,12 +41,12 @@ export type CurrentLoggedInUserResponse = {
 export type CurrentEmployeeLoggedInUserResponse = Employee & {
   job_position: {
     job_position_id: number;
-    company_branch_id: number;
+    company_branch_id: string;
     name: string;
   };
   employment_status: {
     employment_status_id: number;
-    company_branch_id: number;
+    company_branch_id: string;
     name: string;
   };
 };

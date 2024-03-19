@@ -82,8 +82,8 @@ export class AuthService {
       password,
     });
 
-    const company = await prisma.company.findUnique({
-      where: { company_id: request.company_id },
+    const company = await prisma.companyBranches.findUnique({
+      where: { company_branch_id: request.company_id },
     });
 
     if (!company) {
@@ -163,17 +163,30 @@ export class AuthService {
           create: {
             name: request.company_name,
             industry: request.industry,
-            company_branches: {
-              create: {
-                email: request.email,
-                phone_number: request.phone_number,
-                hq_initial: "PUSAT",
-              },
-            },
+            // company_branches: {
+            //   create: {
+            //     email: request.email,
+            //     phone_number: request.phone_number,
+            //     hq_initial: "PUSAT",
+            //   },
+            // },
           },
         },
       },
+      include: {
+        company: true,
+      },
     });
+
+    await prisma.companyBranches.create({
+      data: {
+        company_branch_id: user.company!.company_id,
+        company_id: user.company!.company_id,
+        email: request.email,
+        phone_number: request.phone_number,
+        hq_initial: "PUSAT",
+      },
+    })
 
     return user;
   }
