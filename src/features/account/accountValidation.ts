@@ -2,7 +2,7 @@ import { z, ZodType } from "zod";
 
 export class AccountValidation {
   static readonly CREATE_EMPLOYEE: ZodType = z.object({
-    company_branch_id: z.number(),
+    company_branch_id: z.string(),
     job_position_id: z.number(),
     employment_status_id: z.number(),
     first_name: z.string().min(3).max(50),
@@ -28,7 +28,7 @@ export class AccountValidation {
 
   static readonly UPDATE_EMPLOYEE: ZodType = z.object({
     employee_id: z.string().min(3).max(50),
-    company_branch_id: z.number().optional(),
+    company_branch_id: z.string().optional(),
     job_position_id: z.number().optional(),
     employment_status_id: z.number().optional(),
     first_name: z.string().min(3).max(50).optional(),
@@ -53,6 +53,6 @@ export class AccountValidation {
 
   static DELETE_EMPLOYEE: ZodType = z.object({
     employee_id: z.string(),
-    company_branch_id: z.number(),
+    company_branch_id: z.string(),
   });
 }

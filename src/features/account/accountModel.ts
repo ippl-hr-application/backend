@@ -7,13 +7,13 @@ import {
 } from "@prisma/client";
 
 export type GetEmployeeRequest = {
-  company_branch_id: number;
+  company_branch_id: string;
 };
 
 export type GetEmployeeResponse = Employee[];
 
 export type CreateRequest = {
-  company_branch_id: number;
+  company_branch_id: string;
   job_position_id: number;
   employment_status_id: number;
   first_name: string;
@@ -44,7 +44,7 @@ export type CreateResponse = {
 
 export type UpdateRequest = {
   employee_id: string;
-  company_branch_id?: number;
+  company_branch_id?: string;
   job_position_id?: number;
   employment_status_id?: number;
   first_name?: string;
@@ -75,7 +75,7 @@ export type UpdateResponse = {
 
 export type DeleteRequest = {
   employee_id: string;
-  company_branch_id: number;
+  company_branch_id: string;
 };
 
 export type DeleteResponse = {
