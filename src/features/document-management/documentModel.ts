@@ -35,11 +35,12 @@ export type UpdateDocumentResponse = {
 };
 
 export type DeleteDocumentRequest = {
-  company_file_id: string;
+  company_file_id: number;
+  company_id: string;
 };
 
 export type DeleteDocumentResponse = {
-  company_file_id: string;
+  company_file_id: number;
   company_id: string;
   file_name: string;
 };

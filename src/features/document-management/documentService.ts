@@ -36,31 +36,31 @@ export class DocumentService {
     return companyFile;
   }
 
-  // static async getDocuments({
-  //   company_id
-  // }: GetDocumentRequest): Promise<GetDocumentResponse[]> {
-  //   const request = Validation.validate(DocumentValidation.GET_DOCUMENT, {
-  //     company_id
-  //   });
+  static async getDocuments({
+    company_id
+  }: GetDocumentRequest): Promise<GetDocumentResponse[]> {
+    const request = Validation.validate(DocumentValidation.GET_DOCUMENT, {
+      company_id
+    });
 
-  //   const companyFiles = await prisma.companyFile.findMany({
-  //     where: {
-  //       company_id: request.company_id
-  //     }
-  //   });
+    const companyFiles = await prisma.companyFile.findMany({
+      where: {
+        company_id: request.company_id
+      }
+    });
 
-  //   // Mapping companyFiles untuk menambahkan properti document_file
-  //   const documents: GetDocumentResponse[] = companyFiles.map(file => ({
-  //     company_id: file.company_id,
-  //     file_name: file.file_name,
-  //     file_size: file.file_size,
-  //     file_type: file.file_type,
-  //     description: file.description || undefined,
-  //     document_file: [] // Fix: Set document_file as an empty array
-  //   }));
+    // Mapping companyFiles untuk menambahkan properti document_file
+    const documents: GetDocumentResponse[] = companyFiles.map(file => ({
+      company_id: file.company_id,
+      file_name: file.file_name,
+      file_size: file.file_size,
+      file_type: file.file_type,
+      description: file.description || undefined,
+      document_file: [] // Fix: Set document_file as an empty array
+    }));
 
-  //   return documents;
-  // }
+    return documents;
+  }
 
   static async updateDocument(
     requestUpdate
@@ -76,6 +76,28 @@ export class DocumentService {
       },
       data: { ... request}
     });
+
+    return companyFile;
+  }
+
+  static async deleteDocument({
+    company_id,
+    company_file_id
+  }: DeleteDocumentRequest): Promise<DeleteDocumentResponse> {
+    const request = Validation.validate(DocumentValidation.DELETE_DOCUMENT, {
+      company_id,
+      company_file_id
+    });
+
+    const companyFile = await prisma.companyFile.delete({
+      where: {
+        company_file_id: request.company_file_id,
+        company_id: request.company_id
+      }
+    });
+
+    // Hapus file dari sistem
+    fs.unlinkSync(`./uploads/company_file/${companyFile.file_name}`);
 
     return companyFile;
   }

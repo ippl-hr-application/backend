@@ -11,18 +11,18 @@ documentRoute.post("/", [
   DocumentController.createDocuments,
 ]);
 
-// documentRoute.get("/:company_id", [
-//   JWTMiddleware.verifyToken,
-//   DocumentController.getDocuments,
-// ]);
+documentRoute.get("/:company_id", [
+  JWTMiddleware.verifyToken,
+  DocumentController.getDocuments,
+]);
 
 documentRoute.patch("/", [
   JWTMiddleware.verifyToken,
   DocumentController.updateDocument,
 ]);
 
-// documentRoute.delete("/:company_id  ", [
-//   JWTMiddleware.verifyToken,
-//   DocumentController.deleteDocument,
-// ]);
+documentRoute.delete("/:company_id  ", [
+  JWTMiddleware.verifyToken,
+  DocumentController.deleteDocument,
+]);
 export default documentRoute;
