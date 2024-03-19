@@ -7,15 +7,16 @@ import {
   UpdateRequest,
   UpdateResponse,
   DeleteRequest,
-  DeleteResponse
+  DeleteResponse,
+  GetEmployeeRequest,
 } from './accountModel';
 import { prisma } from '../../applications';
 import { ErrorResponse } from '../../models';
 
 export class AccountService {
-  static async getAllEmployees(company_branch_id: number) {
+  static async getAllEmployees(company_branch_id: GetEmployeeRequest) {
     return await prisma.employee.findMany({
-      where: { company_branch_id: company_branch_id },
+      where: { company_branch_id: company_branch_id.company_branch_id },
     });
   }
 
