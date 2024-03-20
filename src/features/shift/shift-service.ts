@@ -83,7 +83,7 @@ export class ShiftService {
     const shifts = await prisma.shift.findMany({
       where: {
         employee: {
-          company_branch_id,
+          company_branch_id: company_branch_id,
         },
       },
     });
