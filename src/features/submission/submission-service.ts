@@ -152,6 +152,7 @@ export class SubmissionService {
         employee_id,
       },
       select: {
+        submission_id: true,
         submission_date: true,
         status: true,
         type: true,
