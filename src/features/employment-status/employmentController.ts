@@ -8,7 +8,7 @@ export class EmploymentController {
     next: NextFunction
   ) {
     try {
-      const company_branch_id = parseInt(req.params.company_branch_id);
+      const company_branch_id = req.params.company_branch_id;
       const employmentStatus = await EmploymentStatusService.getEmploymentStatus({
         company_branch_id
       });

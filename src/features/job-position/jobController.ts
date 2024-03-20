@@ -4,7 +4,7 @@ import { JobPositionService } from "./jobService";
 export class JobPositionController {
   static async getJobPosition(req: Request, res: Response, next: NextFunction) {
     try {
-      const company_branch_id = parseInt(req.params.company_branch_id);
+      const company_branch_id = req.params.company_branch_id;
       const jobPosition = await JobPositionService.getJobPosition({company_branch_id});
       res.status(200).json({
         success: true,
