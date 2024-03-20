@@ -8,8 +8,8 @@ export class AccountController {
     next: NextFunction
   ) {
     try {
-      const company_branch_id = parseInt(req.params.company_branch_id);
-      const employees = await AccountService.getAllEmployees(company_branch_id);
+      const company_branch_id = req.params.company_branch_id;
+      const employees = await AccountService.getAllEmployees({ company_branch_id });
       // atau pake local user daripada pake params
       // const { company_branch_id } = res.locals.user;
       // const employees = await AccountService.getAllEmployees(company_branch_id);
@@ -66,7 +66,7 @@ export class AccountController {
   static async deleteEmployee(req: Request, res: Response, next: NextFunction) {
     try {
       const employee_id = req.params.employee_id;
-      const company_branch_id = parseInt(req.params.company_branch_id);
+      const company_branch_id = req.params.company_branch_id;
       const deletingEmployee = await AccountService.deleteEmployee({
         company_branch_id,
         employee_id,

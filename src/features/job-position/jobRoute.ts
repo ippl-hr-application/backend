@@ -3,7 +3,7 @@ import { JobPositionController } from "./jobController";
 
 const jobPositionRoute: Router = Router();
 
-jobPositionRoute.get('/job-position/:company_branch_id', JobPositionController.getJobPosition);
-jobPositionRoute.post('/job-position/', JobPositionController.createJobPosition);
+jobPositionRoute.get('/:company_branch_id', JobPositionController.getJobPosition);
+jobPositionRoute.post('/', JobPositionController.createJobPosition);
 
 export default jobPositionRoute;
