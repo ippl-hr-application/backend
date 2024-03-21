@@ -1,3 +1,5 @@
+import { CompanyFile } from '@prisma/client';
+
 export type CreateDocumentRequest = {
   company_id: string;
   description?: string;
@@ -7,20 +9,13 @@ export type CreateDocumentRequest = {
 export type CreateDocumentResponse = {
   company_id: string;
   file_name: string;
-}
+};
 
 export type GetDocumentRequest = {
   company_id: string;
 };
 
-export type GetDocumentResponse = {
-  company_id: string;
-  file_name: string;
-  file_size: number;
-  file_type: string;
-  description?: string;
-  document_file: [];
-};
+export type GetDocumentResponse = CompanyFile;
 
 export type UpdateDocumentRequest = {
   company_file_id: number;

@@ -1,28 +1,29 @@
-import { Router } from "express";
-import { DocumentController } from "./documentController";
-import { upload } from "../../middlewares/multer";
-import { JWTMiddleware } from "../../middlewares/jwt_middleware";
+import { Router } from 'express';
+import { DocumentController } from './documentController';
+import { upload } from '../../middlewares/multer';
+import { JWTMiddleware } from '../../middlewares/jwt_middleware';
 
 const documentRoute: Router = Router();
 
-documentRoute.post("/", [
+documentRoute.post('/', [
   JWTMiddleware.verifyToken,
-  upload.single("document_file"),
+  upload.single('document_file'),
   DocumentController.createDocuments,
 ]);
 
-documentRoute.get("/:company_id", [
+documentRoute.get('/:company_id', [
   JWTMiddleware.verifyToken,
   DocumentController.getDocuments,
 ]);
 
-documentRoute.patch("/", [
+documentRoute.patch('/', [
   JWTMiddleware.verifyToken,
   DocumentController.updateDocument,
 ]);
 
-documentRoute.delete("/:company_id  ", [
+documentRoute.delete(
+  '/:company_id/:company_file_id',
   JWTMiddleware.verifyToken,
-  DocumentController.deleteDocument,
-]);
+  DocumentController.deleteDocument
+);
 export default documentRoute;

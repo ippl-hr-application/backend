@@ -1,4 +1,4 @@
-import { z, ZodType } from "zod";
+import { z, ZodType } from 'zod';
 
 export class DocumentValidation {
   static readonly CREATE_DOCUMENT: ZodType = z.object({
@@ -18,6 +18,6 @@ export class DocumentValidation {
   });
 
   static readonly DELETE_DOCUMENT: ZodType = z.object({
-    company_file_id: z.string(),
+    company_file_id: z.number(),
   });
 }
