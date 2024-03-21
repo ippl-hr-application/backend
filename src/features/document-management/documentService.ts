@@ -28,27 +28,27 @@ export class DocumentService {
     const lastDotIndex = baseFileName.lastIndexOf('.');
     const baseFileNameWithoutExtension = baseFileName.slice(0, lastDotIndex);
     const fileExtension = baseFileName.slice(lastDotIndex + 1);
-    
+
     let fileName = baseFileNameWithoutExtension;
     let fileNameWithType = baseFileName;
     let count = 1;
-    
+
     while (true) {
       const name_file = await prisma.companyFile.findMany({
         where: {
           file_name: fileNameWithType,
         },
       });
-  
+
       if (!name_file.length) {
         break;
       }
-   
+
       fileName = baseFileNameWithoutExtension; // Reset nama file
       fileNameWithType = `${fileName}(${count}).${fileExtension}`;
       count++;
     }
-  
+
     const companyFile = await prisma.companyFile.create({
       data: {
         company_id: request.company_id,
@@ -59,10 +59,10 @@ export class DocumentService {
         description: request.description,
       },
     });
-  
+
     return companyFile;
   }
-  
+
   static async getDocuments({
     company_id,
   }: GetDocumentRequest): Promise<GetDocumentResponse[]> {
@@ -112,9 +112,14 @@ export class DocumentService {
         company_id: request.company_id,
       },
     });
-    
+
     if (!companyFile) {
-      throw new ErrorResponse('File not found', 404, ['company_file_id'], 'FILE_NOT_FOUND');
+      throw new ErrorResponse(
+        'File not found',
+        404,
+        ['company_file_id'],
+        'FILE_NOT_FOUND'
+      );
     }
     // fs.unlinkSync(`./public/uploads/company_file/${companyFile.file_name}`);
     await prisma.companyFile.delete({
@@ -123,7 +128,6 @@ export class DocumentService {
         company_id: request.company_id,
       },
     });
-
 
     // Hapus file dari sistem
 

@@ -1,4 +1,4 @@
-import { z, ZodType } from "zod";
+import { z, ZodType } from 'zod';
 
 export class DocumentValidation {
   static readonly CREATE_DOCUMENT: ZodType = z.object({
