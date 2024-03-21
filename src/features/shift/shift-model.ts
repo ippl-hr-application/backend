@@ -28,6 +28,6 @@ export type GetShiftEmployeeRequest = {
 export type GetShiftEmployeeResponse = AddShiftResponse;
 
 export type GetAllShiftRequest = {
-  company_branch_id: number;
+  company_branch_id: string;
 };
 export type GetAllShiftResponse = AddShiftResponse[];

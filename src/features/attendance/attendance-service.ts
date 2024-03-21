@@ -64,11 +64,24 @@ export class AttendanceService {
     attendance_file,
   }: AttendanceCheckRequest): Promise<AttendanceCheckResponse> {
     const date = new Date().toISOString();
+    const employee = await prisma.employee.findUnique({
+      where: {
+        employee_id,
+      },
+      select: {
+        company_branch_id: true,
+      },
+    });
+    if (!employee) {
+      throw new Error("Employee not found");
+    }
     await prisma.attendance.create({
       data: {
         date: date,
         shift_id,
         employee_id,
+        company_branch_id: employee?.company_branch_id,
+
         attendance_check: {
           create: {
             type,
@@ -84,9 +97,7 @@ export class AttendanceService {
                 file_url: `/uploads/attendance_file/${attendance_file?.filename}`,
                 file_for: "kehadiran karyawan",
                 employee: {
-                  connect: {
-                    employee_id,
-                  },
+                  connect: { employee_id },
                 },
               },
             },

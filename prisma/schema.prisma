@@ -79,6 +79,7 @@ model CompanyBranches {
   employment_statuses     EmploymentStatus[]
   employee_tasks          EmployeeTask[]
   reimbursement           Reimbursement[]
+  attendances             Attendance[]
 
   @@map("company_branches")
 }
@@ -305,7 +306,8 @@ model Attendance {
 
   shift    Shift @relation(fields: [shift_id], references: [shift_id])
   shift_id Int
-
+  company_branch    CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
+  company_branch_id String
   date             DateTime         @db.Date
   attendance_check AttendanceCheck?
 

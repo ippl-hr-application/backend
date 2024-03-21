@@ -1,6 +1,7 @@
 import { prisma } from '../../applications';
 import { Validation } from '../../validations';
 import { DocumentValidation } from './documentValidation';
+
 import {
   CreateDocumentRequest,
   CreateDocumentResponse,
@@ -13,6 +14,7 @@ import {
 } from './documentModel';
 import fs from 'fs';
 import { ErrorResponse } from '../../models';
+
 export class DocumentService {
   static async createDocument({
     company_id,

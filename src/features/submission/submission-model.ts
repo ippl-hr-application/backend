@@ -47,6 +47,7 @@ export type GetSubmissionHistoryRequest = {
 };
 
 export type GetSubmissionHistoryResponse = {
+  submission_id: number;
   submission_date: Date;
   type: string;
   status: SubmissionStatus;
