@@ -21,8 +21,8 @@ documentRoute.patch("/", [
   DocumentController.updateDocument,
 ]);
 
-documentRoute.delete("/:company_id  ", [
+documentRoute.delete("/:company_id/:company_file_id",
   JWTMiddleware.verifyToken,
   DocumentController.deleteDocument,
-]);
+);
 export default documentRoute;

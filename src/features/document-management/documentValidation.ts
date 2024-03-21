@@ -18,6 +18,6 @@ export class DocumentValidation {
   });
 
   static readonly DELETE_DOCUMENT: ZodType = z.object({
-    company_file_id: z.string(),
+    company_file_id: z.number(),
   });
 }
