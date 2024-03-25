@@ -15,6 +15,8 @@ export type CreateCompanyBranch = {
   bpjs: string | null;
 };
 
-export interface CreateBranchResponse extends CreateCompanyBranch {
+export interface BranchResponse extends CreateCompanyBranch {
   company_branch_id: string;
 }
+
+export type EditCompanyBranch = CreateCompanyBranch

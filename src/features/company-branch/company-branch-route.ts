@@ -11,4 +11,10 @@ companyBranchRoute.post("/create", [
   CompanyBranchController.addNewBranch,
 ]);
 
+companyBranchRoute.put("/edit/:company_branch_id", [
+  JWTMiddleware.verifyToken,
+  PackageTypeMiddleware.isPackagePremium,
+  CompanyBranchController.editBranch,
+]);
+
 export default companyBranchRoute;
