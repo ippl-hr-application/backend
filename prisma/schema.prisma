@@ -15,7 +15,6 @@ model RegisteredUser {
   full_name    String @db.VarChar(50)
   email        String @unique
   phone_number String
-  package_type String
   password     String
 
   role    Role @relation(fields: [role_id], references: [role_id])
@@ -45,6 +44,7 @@ model Company {
   name       String
   industry   String?
   npwp_digit String? @db.VarChar(16)
+  package_type String @default("free")
 
   company_logo          CompanyLogo?
   company_branches      CompanyBranches[]
@@ -58,7 +58,7 @@ model CompanyBranches {
   company_branch_id String @id @default(uuid())
 
   company    Company @relation(fields: [company_id], references: [company_id])
-  company_id String  @unique
+  company_id String 
 
   email        String?
   phone_number String? @db.VarChar(15)

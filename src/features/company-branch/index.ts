@@ -1,0 +1,1 @@
+export { default as companyBranchRoute } from './company-branch-route';

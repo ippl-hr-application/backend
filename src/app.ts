@@ -14,6 +14,7 @@ import { attendanceRoute } from './features/attendance';
 import { jobPositionRoute } from './features/job-position';
 import { employmentRoute } from './features/employment-status';
 import { documentRoute } from './features/document-management';
+import { companyBranchRoute } from './features/company-branch';
 
 dotenv.config();
 const app: Express = express();
@@ -38,6 +39,7 @@ app.use('/account', accountRoute);
 app.use('/job-position', jobPositionRoute);
 app.use('/employment-status', employmentRoute);
 app.use('/doc', documentRoute);
+app.use('/company-branch', companyBranchRoute);
 
 app.use(ErrorMiddleware.notFound);
 app.use(ErrorMiddleware.returnError);

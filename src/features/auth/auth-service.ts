@@ -31,11 +31,11 @@ export class AuthService {
         company: {
           select: {
             company_id: true,
+            package_type: true,
           },
         },
         password: true,
         role_id: true,
-        package_type: true,
       },
     });
 
@@ -59,7 +59,7 @@ export class AuthService {
     }
 
     const token = jwt.sign(
-      { user_id: user.user_id, company_id: user.company?.company_id },
+      { user_id: user.user_id, company_id: user.company?.company_id, package_type: user.company?.package_type },
       process.env.JWT_SECRET!,
       {
         expiresIn: "1d",
@@ -157,7 +157,6 @@ export class AuthService {
         full_name: request.full_name,
         phone_number: request.phone_number,
         role_id: 1,
-        package_type: "free",
         password: hashedPassword,
         company: {
           create: {
@@ -230,9 +229,9 @@ export class AuthService {
             company_id: true,
             name: true,
             industry: true,
+            package_type: true,
           },
         },
-        package_type: true,
       },
     });
 
