@@ -31,10 +31,10 @@ export type CurrentLoggedInUserResponse = {
   user_id: string;
   full_name: string;
   phone_number: string;
-  package_type: string;
   company: {
     name: string;
     industry: string | null;
+    package_type: string;
   } | null;
 };
 
