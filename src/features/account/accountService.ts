@@ -9,14 +9,18 @@ import {
   DeleteRequest,
   DeleteResponse,
   GetEmployeeRequest,
-} from './accountModel';
-import { prisma } from '../../applications';
-import { ErrorResponse } from '../../models';
+  ResignRequest,
+} from "./accountModel";
+import { prisma } from "../../applications";
+import { ErrorResponse } from "../../models";
 
 export class AccountService {
   static async getAllEmployees(company_branch_id: GetEmployeeRequest) {
     return await prisma.employee.findMany({
-      where: { company_branch_id: company_branch_id.company_branch_id },
+      where: {
+        company_branch_id: company_branch_id.company_branch_id,
+        hasResigned: false,
+      },
     });
   }
 
@@ -154,5 +158,38 @@ export class AccountService {
     });
 
     return employeeDelete;
+  }
+
+  static async employeeResign({
+    employee_id,
+    company_branch_id,
+  }: ResignRequest) {
+    const findEmployee = await prisma.employee.findUnique({
+      where: {
+        company_branch_id,
+        employee_id,
+      },
+    });
+
+    if (!findEmployee) {
+      throw new ErrorResponse(
+        "Employee not found",
+        404,
+        ["employee_id"],
+        "EMPLOYEE_NOT_FOUND"
+      );
+    }
+
+    const employeeResign = await prisma.employee.update({
+      where: {
+        company_branch_id,
+        employee_id,
+      },
+      data: {
+        hasResigned: true,
+      },
+    });
+
+    return employeeResign;
   }
 }

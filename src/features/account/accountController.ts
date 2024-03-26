@@ -81,4 +81,21 @@ export class AccountController {
       next(error);
     }
   }
+
+  static async employeeResign(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { employee_id, company_branch_id } = req.body;
+      const resignEmployee = await AccountService.employeeResign({
+        employee_id,
+        company_branch_id,
+      });
+      return res.status(200).json({
+        success: true,
+        data: resignEmployee,
+        message: "Successfully make employee resign",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

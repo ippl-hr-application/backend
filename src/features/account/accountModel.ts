@@ -78,7 +78,10 @@ export type DeleteRequest = {
   company_branch_id: string;
 };
 
+
 export type DeleteResponse = {
   employee_id: string;
   first_name: string;
 };
+
+export type ResignRequest = DeleteRequest;

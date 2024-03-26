@@ -59,7 +59,11 @@ export class AuthService {
     }
 
     const token = jwt.sign(
-      { user_id: user.user_id, company_id: user.company?.company_id, package_type: user.company?.package_type },
+      {
+        user_id: user.user_id,
+        company_id: user.company?.company_id,
+        package_type: user.company?.package_type,
+      },
       process.env.JWT_SECRET!,
       {
         expiresIn: "1d",
@@ -177,7 +181,7 @@ export class AuthService {
       },
     });
 
-    await prisma.companyBranches.create({
+    const companyBranch = await prisma.companyBranches.create({
       data: {
         company_branch_id: user.company!.company_id,
         company_id: user.company!.company_id,
@@ -185,7 +189,7 @@ export class AuthService {
         phone_number: request.phone_number,
         hq_initial: "PUSAT",
       },
-    })
+    });
 
     return user;
   }

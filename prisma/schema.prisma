@@ -66,7 +66,7 @@ model CompanyBranches {
   province     String? @db.VarChar(50)
   city         String? @db.VarChar(50)
   size         Int?    @db.Integer()
-  hq_initial   String? @db.VarChar(50)
+  hq_initial   String @db.VarChar(50)
   hq_code      String? @db.VarChar(50)
   umr          Float?
   umr_province Float?
@@ -205,6 +205,7 @@ model Employee {
   bank_type             String?         @db.VarChar(20)
   wage                  Float
   password              String
+  hasResigned           Boolean         @default(false)
   tasks                 EmployeeTask[]  @relation("employee")
   give_tasks            EmployeeTask[]  @relation("manager")
   files                 EmployeeFile[]
