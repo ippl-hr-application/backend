@@ -128,4 +128,22 @@ export class SubmissionController {
       next(error);
     }
   }
+  static async deleteSubmission(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { submission_id } = req.params;
+      const result = await SubmissionService.deleteSubmission({
+        submission_id: Number(submission_id),
+      });
+      return res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

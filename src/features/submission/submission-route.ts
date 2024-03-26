@@ -25,6 +25,10 @@ submissionRoute.post("/mutation", [
   upload.single("mutation_file"),
   SubmissionController.createMutationLetter,
 ]);
+submissionRoute.delete("/:id", [
+  JWTMiddleware.verifyToken,
+  SubmissionController.deleteSubmission,
+]);
 submissionRoute.get("/", [
   JWTMiddleware.verifyToken,
   SubmissionController.getSubmissionHistory,

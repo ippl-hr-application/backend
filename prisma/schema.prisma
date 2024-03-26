@@ -248,9 +248,7 @@ model EmployeeFile {
   file_for              String?                       @db.VarChar(20)
   reimbursements        ReimbursementFileAttachment[]
   attendance_check      AttendanceCheck?
-  permission_submission PermissionSubmission?
-  leave_submission      LeaveSubmission?
-  mutation_submission   MutationSubmission?
+  submission            Submission?
 
   @@map("employee_files")
 }
@@ -358,8 +356,10 @@ model Submission {
   submission_id         Int                   @id @default(autoincrement())
   submission_date       DateTime
   type                  String                @db.VarChar(30)
-  employee              Employee              @relation(fields: [employee_id], references: [employee_id])
   employee_id           String
+  employee              Employee              @relation(fields: [employee_id], references: [employee_id])
+  employee_file_id  Int            @unique
+  employee_file     EmployeeFile   @relation(fields: [employee_file_id], references: [employee_file_id] ,onDelete: Cascade)
   status                SubmissionStatus
   permission_submission PermissionSubmission?
   leave_submission      LeaveSubmission?
@@ -371,10 +371,9 @@ model Submission {
 model PermissionSubmission {
   permission_submission_id Int @id @default(autoincrement())
 
-  employee_file     EmployeeFile   @relation(fields: [employee_file_id], references: [employee_file_id])
-  submission        Submission     @relation(fields: [submision_id], references: [submission_id])
+  submission        Submission     @relation(fields: [submision_id], references: [submission_id],onDelete: Cascade)
   submision_id      Int            @unique
-  employee_file_id  Int            @unique
+
   from              DateTime
   to                DateTime
   permission_reason String         @db.VarChar(100)
@@ -385,9 +384,8 @@ model PermissionSubmission {
 
 model LeaveSubmission {
   leave_permission_id Int          @id @default(autoincrement())
-  employee_file_id    Int          @unique
-  employee_file       EmployeeFile @relation(fields: [employee_file_id], references: [employee_file_id])
-  submission          Submission   @relation(fields: [submision_id], references: [submission_id])
+ 
+  submission          Submission   @relation(fields: [submision_id], references: [submission_id], onDelete: Cascade)
   submision_id        Int          @unique
 
   from         DateTime
@@ -400,11 +398,8 @@ model LeaveSubmission {
 
 model MutationSubmission {
   mutation_permission_id Int          @id @default(autoincrement())
-  employee_file          EmployeeFile @relation(fields: [employee_file_id], references: [employee_file_id])
-  submission             Submission   @relation(fields: [submision_id], references: [submission_id])
+  submission             Submission   @relation(fields: [submision_id], references: [submission_id], onDelete: Cascade)
   submision_id           Int          @unique
-
-  employee_file_id Int    @unique
   mutation_reason  String @db.VarChar(100)
 
   @@map("mutation_submission")
