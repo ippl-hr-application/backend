@@ -7,7 +7,7 @@ export type CreateCompanyBranch = {
   province: string | null;
   city: string | null;
   size: number | null;
-  hq_initial: string | null;
+  hq_initial: string;
   hq_code: string | null;
   umr: number | null;
   umr_province: number | null;

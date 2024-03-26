@@ -8,7 +8,7 @@ export class CompanyBranchValidation {
     province: z.string().min(3).max(50).optional(),
     city: z.string().min(3).max(50).optional(),
     size: z.number().int().optional(),
-    hq_initial: z.string().min(3).max(50).optional(),
+    hq_initial: z.string().min(3).max(50),
     hq_code: z.string().min(3).max(50).optional(),
     umr: z.number().int().optional(),
     umr_province: z.number().int().optional(),
