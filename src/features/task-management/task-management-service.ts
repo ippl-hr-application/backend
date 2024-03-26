@@ -9,7 +9,7 @@ export class TaskManagementService {
   static async getTaskManagementFromCompany({
     company_branch_id,
   }: {
-    company_branch_id: number;
+    company_branch_id: string;
   }): Promise<EmployeeTask[]> {
     const tasks = await prisma.employeeTask.findMany({
       where: { company_branch_id },
@@ -28,7 +28,7 @@ export class TaskManagementService {
     );
 
     const userGive = await prisma.employee.findFirst({
-      where: { unique_id: from },
+      where: { company_branch_id: from },
     });
 
     if (!userGive)
@@ -50,7 +50,7 @@ export class TaskManagementService {
       company_branch_id,
     }: {
       task_id: number;
-      company_branch_id: number;
+      company_branch_id: string;
     },
     data: UpdateTaskRequest
   ): Promise<EmployeeTask> {
@@ -69,7 +69,7 @@ export class TaskManagementService {
 
   static async deleteTaskManagement(
     task_id: number,
-    company_branch_id: number
+    company_branch_id: string
   ): Promise<EmployeeTask> {
     const task = await prisma.employeeTask.delete({
       where: { task_id, company_branch_id },
