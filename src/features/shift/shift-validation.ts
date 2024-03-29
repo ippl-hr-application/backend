@@ -13,4 +13,8 @@ export class ShiftValidation {
     shift_id: z.number(),
     employee_id: z.string(),
   });
+  static readonly UPDATE_ASSIGN_SHIFT: ZodType = z.object({
+    shift_id: z.number(),
+    employee_id: z.string(),
+  });
 }

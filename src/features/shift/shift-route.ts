@@ -13,4 +13,13 @@ shiftRoute.post("/assign-shift", [
   JWTMiddleware.verifyToken,
   ShiftController.addAssignShift,
 ]);
+shiftRoute.get("/assign-shift", [
+  JWTMiddleware.verifyToken,
+  ShiftController.getAllAssignShifts,
+]);
+shiftRoute.put("/assign-shift/:employee_id", [
+  JWTMiddleware.verifyToken,
+  ShiftController.updateAssignShift,
+]);
+
 export default shiftRoute;

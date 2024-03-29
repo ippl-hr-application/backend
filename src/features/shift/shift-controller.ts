@@ -53,14 +53,58 @@ export class ShiftController {
   static async addAssignShift(req: Request, res: Response, next: NextFunction) {
     try {
       const { shift_id, employee_id } = req.body;
+      const { company_branch_id } = res.locals.user;
       const assignShift = await ShiftService.addAssignShift({
         employee_id,
+        company_branch_id,
         shift_id: Number(shift_id),
       });
       return res.status(201).json({
         success: true,
         data: { assignShift },
         message: "Assign Shift Added",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async updateAssignShift(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { shift_id } = req.body;
+      const { company_branch_id } = res.locals.user;
+      const { employee_id } = req.params;
+      const assignShift = await ShiftService.updateAssignShift({
+        employee_id,
+        company_branch_id,
+        shift_id: Number(shift_id),
+      });
+      return res.status(201).json({
+        success: true,
+        data: { assignShift },
+        message: "Assign Shift Updated",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async getAllAssignShifts(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { company_branch_id } = res.locals.user;
+      const assignShift = await ShiftService.getAllAsignShifts({
+        company_branch_id,
+      });
+      return res.status(200).json({
+        success: true,
+        data: { assignShift },
+        message: "Get All Assign Shift Success",
       });
     } catch (error) {
       next(error);

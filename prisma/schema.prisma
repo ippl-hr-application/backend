@@ -81,6 +81,7 @@ model CompanyBranches {
   reimbursement           Reimbursement[]
   attendances             Attendance[]
   shift Shift[] 
+  assignShift AssignShift[]
 
   @@map("company_branches")
 }
@@ -299,6 +300,8 @@ model AssignShift {
   shift_id Int
   employee    Employee @relation(fields: [employee_id], references: [employee_id])
   employee_id String
+  company_branch    CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
+  company_branch_id String
 }
 
 model Attendance {
