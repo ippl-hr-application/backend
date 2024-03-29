@@ -16,8 +16,4 @@ export type GetShiftRequest = {
   company_branch_id: string;
 };
 
-export type GetShiftResponse = {
-  name: string;
-  start_time: string;
-  end_time: string;
-};
+export type GetShiftResponse = AddShiftResponse;
