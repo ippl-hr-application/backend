@@ -1,3 +1,4 @@
+import fs from "fs";
 import { NextFunction, Request, Response } from "express";
 import { SubmissionService } from "./submission-service";
 export class SubmissionController {
@@ -7,16 +8,26 @@ export class SubmissionController {
     next: NextFunction
   ) {
     try {
-      const { from, to, permission_reason } = req.body;
+      const {
+        from,
+        to,
+        permission_reason,
+        file_name,
+        file_size,
+        file_type,
+        file_url,
+      } = req.body;
       const { employee_id } = res.locals.user;
-      const permission_file: Express.Multer.File | undefined = req.file;
       const result = await SubmissionService.createSickLetter({
         from,
         to,
         permission_reason,
         type: "IZIN",
         employee_id,
-        permission_file,
+        file_name,
+        file_size: Number(file_size),
+        file_type,
+        file_url,
       });
       return res.status(201).json({
         success: true,
@@ -35,16 +46,26 @@ export class SubmissionController {
     next: NextFunction
   ) {
     try {
-      const { from, to, permission_reason } = req.body;
+      const {
+        from,
+        permission_reason,
+        file_name,
+        file_size,
+        file_type,
+        file_url,
+      } = req.body;
       const { employee_id } = res.locals.user;
-      const permission_file: Express.Multer.File | undefined = req.file;
+
       const result = await SubmissionService.createSickLetter({
         from,
-        to,
+        to: from,
         permission_reason,
         type: "SAKIT",
         employee_id,
-        permission_file,
+        file_name,
+        file_size: Number(file_size),
+        file_type,
+        file_url,
       });
       return res.status(201).json({
         success: true,
@@ -63,16 +84,27 @@ export class SubmissionController {
     next: NextFunction
   ) {
     try {
-      const { from, to, leave_reason, leave_type } = req.body;
+      const {
+        from,
+        to,
+        leave_reason,
+        leave_type,
+        file_name,
+        file_size,
+        file_type,
+        file_url,
+      } = req.body;
       const { employee_id } = res.locals.user;
-      const leave_file: Express.Multer.File | undefined = req.file;
       const result = await SubmissionService.createLeaveLetter({
         from,
         to,
         leave_reason,
         leave_type,
         employee_id,
-        leave_file,
+        file_name,
+        file_size: Number(file_size),
+        file_type,
+        file_url,
       });
       return res.status(201).json({
         success: true,
@@ -91,13 +123,17 @@ export class SubmissionController {
     next: NextFunction
   ) {
     try {
-      const { mutation_reason } = req.body;
+      const { mutation_reason, file_name, file_size, file_type, file_url } =
+        req.body;
       const { employee_id } = res.locals.user;
-      const mutation_file: Express.Multer.File | undefined = req.file;
+
       const result = await SubmissionService.createMutationLetter({
         mutation_reason,
         employee_id,
-        mutation_file,
+        file_name,
+        file_size: Number(file_size),
+        file_type,
+        file_url,
       });
       return res.status(201).json({
         success: true,
@@ -119,6 +155,24 @@ export class SubmissionController {
       const { employee_id } = res.locals.user;
       const result = await SubmissionService.getSubmissionHistory({
         employee_id,
+      });
+      return res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async deleteSubmission(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { submission_id } = req.params;
+      const result = await SubmissionService.deleteSubmission({
+        submission_id: Number(submission_id),
       });
       return res.status(200).json({
         success: true,

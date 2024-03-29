@@ -4,10 +4,11 @@ import { ShiftService } from "./shift-service";
 export class ShiftController {
   static async addShift(req: Request, res: Response, next: NextFunction) {
     try {
-      const { start_time, end_time } = req.body;
-      const { employee_id } = res.locals.user;
+      const { name, start_time, end_time } = req.body;
+      const { company_branch_id } = res.locals.user;
       const shift = await ShiftService.addShift({
-        employee_id,
+        company_branch_id,
+        name,
         start_time,
         end_time,
       });
@@ -28,59 +29,82 @@ export class ShiftController {
       });
       return res.status(201).json({
         success: true,
-        data: { ...shift },
+        data: { shift },
         message: "Shifted Deleted",
       });
     } catch (error) {
       next(error);
     }
   }
-  static async updateShift(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { shift_id } = req.params;
-      const { employee_id, start_time, end_time } = req.body;
-      const shift = await ShiftService.updateShift({
-        shift_id: Number(shift_id),
-        employee_id,
-        start_time,
-        end_time,
-      });
-      return res.status(201).json({
-        success: true,
-        data: { ...shift },
-        message: "shift Updated",
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-  static async getShiftEmployee(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
-    try {
-      const { employee_id } = req.params;
-      const shift = await ShiftService.getShiftEmployee({
-        employee_id,
-      });
-      return res.status(201).json({
-        success: true,
-        data: { ...shift },
-        message: "shift Found",
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
+
   static async getAllshifts(req: Request, res: Response, next: NextFunction) {
     try {
       const { company_branch_id } = res.locals.user;
       const shifts = await ShiftService.getAllShifts(company_branch_id);
       return res.status(201).json({
         success: true,
-        data: { ...shifts },
+        data: { shifts },
         message: "shifts Found",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async addAssignShift(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { shift_id, employee_id } = req.body;
+      const { company_branch_id } = res.locals.user;
+      const assignShift = await ShiftService.addAssignShift({
+        employee_id,
+        company_branch_id,
+        shift_id: Number(shift_id),
+      });
+      return res.status(201).json({
+        success: true,
+        data: { assignShift },
+        message: "Assign Shift Added",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async updateAssignShift(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { shift_id } = req.body;
+      const { company_branch_id } = res.locals.user;
+      const { employee_id } = req.params;
+      const assignShift = await ShiftService.updateAssignShift({
+        employee_id,
+        company_branch_id,
+        shift_id: Number(shift_id),
+      });
+      return res.status(201).json({
+        success: true,
+        data: { assignShift },
+        message: "Assign Shift Updated",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async getAllAssignShifts(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { company_branch_id } = res.locals.user;
+      const assignShift = await ShiftService.getAllAsignShifts({
+        company_branch_id,
+      });
+      return res.status(200).json({
+        success: true,
+        data: { assignShift },
+        message: "Get All Assign Shift Success",
       });
     } catch (error) {
       next(error);

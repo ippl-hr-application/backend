@@ -1,3 +1,4 @@
+import fs from "fs";
 import { prisma } from "../../applications";
 import { Validation } from "../../validations";
 import {
@@ -19,81 +20,46 @@ export class SubmissionService {
     permission_reason,
     type,
     employee_id,
-    permission_file,
+    file_name,
+    file_size,
+    file_type,
+    file_url,
   }: PermissionSubmissionRequest): Promise<PermissionSubmissionResponse> {
     const request = Validation.validate(SubmissionValidation.SICK_LETTER, {
       permission_reason,
       type,
+      from,
+      to,
+      file_name,
+      file_size,
+      file_type,
+      file_url,
     });
-
-    const permissionSubmission = await prisma.permissionSubmission.create({
+    await prisma.submission.create({
       data: {
-        from,
-        to,
-        permission_reason: request.permission_reason,
+        submission_date: new Date(),
+        status: "PENDING",
         type: request.type,
-        submission: {
+        permission_submission: {
           create: {
-            status: "PENDING",
+            from: request.from,
+            to: request.to,
+            permission_reason: request.permission_reason,
+            type: request.type,
+          },
+        },
+        employee: {
+          connect: {
             employee_id: employee_id,
-            submission_date: new Date(),
-            type: type,
           },
         },
         employee_file: {
           create: {
-            file_name: permission_file?.originalname || "",
-            file_size: permission_file?.size || 0,
-            file_type: permission_file?.mimetype || "",
-            file_url: `/uploads/permission_file/${permission_file?.filename}`,
-            file_for: `pengajuan ${type}`,
-
-            employee: {
-              connect: {
-                employee_id,
-              },
-            },
-          },
-        },
-      },
-    });
-    return permissionSubmission;
-  }
-  static async createLeaveLetter({
-    from,
-    to,
-    leave_reason,
-    leave_type,
-    employee_id,
-    leave_file,
-  }: LeaveSubmissionRequest): Promise<LeaveSubmissionResponse> {
-    const request = Validation.validate(SubmissionValidation.LEAVE_LETTER, {
-      leave_reason,
-      leave_type,
-      employee_id,
-    });
-
-    const leaveSubmission = await prisma.leaveSubmission.create({
-      data: {
-        from,
-        to,
-        leave_reason: request.leave_reason,
-        leave_type: request.leave_type,
-        submission: {
-          create: {
-            employee_id,
-            status: "PENDING",
-            submission_date: new Date(),
-            type: leave_type,
-          },
-        },
-        employee_file: {
-          create: {
-            file_name: leave_file?.originalname || "",
-            file_size: leave_file?.size || 0,
-            file_type: leave_file?.mimetype || "",
-            file_url: `/uploads/leave_file/${leave_file?.filename}`,
-            file_for: "pengajuan cuti",
+            file_name: request.file_name,
+            file_size: request.file_size,
+            file_type: request.file_type,
+            file_url: request.file_url,
+            file_for: `SURAT ${request.type}`,
             employee: {
               connect: {
                 employee_id: employee_id,
@@ -103,46 +69,127 @@ export class SubmissionService {
         },
       },
     });
-    return leaveSubmission;
+    return {
+      from: from,
+      to: to,
+      permission_reason: permission_reason,
+      type: type,
+    };
   }
-  static async createMutationLetter({
-    mutation_reason,
-    employee_id,
-    mutation_file,
-  }: MutationSubmissionRequest): Promise<MutationSubmissionResponse> {
-    const request = Validation.validate(SubmissionValidation.MUTATION_LETTER, {
-      mutation_reason,
-      employee_id,
-    });
 
-    const mutationSubmission = await prisma.mutationSubmission.create({
+  static async createLeaveLetter({
+    from,
+    to,
+    leave_reason,
+    leave_type,
+    employee_id,
+    file_name,
+    file_size,
+    file_type,
+    file_url,
+  }: LeaveSubmissionRequest): Promise<LeaveSubmissionResponse> {
+    const request = Validation.validate(SubmissionValidation.LEAVE_LETTER, {
+      from,
+      to,
+      leave_reason,
+      leave_type,
+      employee_id,
+      file_name,
+      file_size,
+      file_type,
+      file_url,
+    });
+    await prisma.submission.create({
       data: {
-        mutation_reason: request.mutation_reason,
-        submission: {
-          create: {
-            employee_id,
-            status: "PENDING",
-            submission_date: new Date(),
-            type: "mutation",
+        status: "PENDING",
+        submission_date: new Date(),
+        type: request.leave_type,
+        employee: {
+          connect: {
+            employee_id: employee_id,
           },
         },
         employee_file: {
           create: {
-            file_name: mutation_file?.originalname || "",
-            file_size: mutation_file?.size || 0,
-            file_type: mutation_file?.mimetype || "",
-            file_url: `/uploads/mutation_file/${mutation_file?.filename}`,
-            file_for: "pengajuan mutasi",
+            file_name: request.file_name,
+            file_size: request.file_size,
+            file_type: request.file_type,
+            file_url: request.file_url,
+            file_for: "SURAT CUTI ",
             employee: {
               connect: {
-                employee_id,
+                employee_id: employee_id,
+              },
+            },
+          },
+        },
+        leave_submission: {
+          create: {
+            from: request.from,
+            to: request.to,
+            leave_reason: request.leave_reason,
+          },
+        },
+      },
+    });
+    return {
+      from: request.from,
+      leave_reason: request.leave_reason,
+      leave_type: request.leave_type,
+      to: request.to,
+    };
+  }
+  static async createMutationLetter({
+    mutation_reason,
+    employee_id,
+    file_name,
+    file_size,
+    file_type,
+    file_url,
+  }: MutationSubmissionRequest): Promise<MutationSubmissionResponse> {
+    const request = Validation.validate(SubmissionValidation.MUTATION_LETTER, {
+      mutation_reason,
+      employee_id,
+      file_name,
+      file_size,
+      file_type,
+      file_url,
+    });
+
+    await prisma.submission.create({
+      data: {
+        status: "PENDING",
+        submission_date: new Date(),
+        type: "mutasi",
+        employee: {
+          connect: {
+            employee_id: employee_id,
+          },
+        },
+        mutation_submission: {
+          create: {
+            mutation_reason: request.mutation_reason,
+          },
+        },
+        employee_file: {
+          create: {
+            file_name: request.file_name,
+            file_size: request.file_size,
+            file_type: request.file_type,
+            file_url: request.file_url,
+            file_for: "SURAT MUTASI",
+            employee: {
+              connect: {
+                employee_id: employee_id,
               },
             },
           },
         },
       },
     });
-    return mutationSubmission;
+    return {
+      mutation_reason: request.mutation_reason,
+    };
   }
   static async getSubmissionHistory({
     employee_id,
@@ -159,5 +206,40 @@ export class SubmissionService {
       },
     });
     return submission;
+  }
+  static async deleteSubmission({
+    submission_id,
+  }: {
+    submission_id: number;
+  }): Promise<void> {
+    const submission = await prisma.submission.findUnique({
+      where: {
+        submission_id,
+      },
+      select: {
+        employee_file: {
+          select: {
+            file_url: true,
+          },
+        },
+      },
+    });
+    if (!submission) throw new Error("Submission not found");
+
+    if (submission.employee_file) {
+      const file_path = submission.employee_file.file_url;
+      fs.unlink(file_path, (err) => {
+        if (err) {
+          console.error("Error deleting file:", err);
+          return;
+        }
+        console.log("File deleted successfully");
+      });
+    }
+    await prisma.submission.delete({
+      where: {
+        submission_id,
+      },
+    });
   }
 }

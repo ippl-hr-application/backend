@@ -1,3 +1,5 @@
+import { number } from "zod";
+
 type PermissionType = "SAKIT" | "IZIN";
 type SubmissionStatus = "PENDING" | "ACCEPTED" | "REJECTED";
 export type PermissionSubmissionRequest = {
@@ -6,7 +8,10 @@ export type PermissionSubmissionRequest = {
   permission_reason: string;
   type: PermissionType;
   employee_id: string;
-  permission_file: Express.Multer.File | undefined;
+  file_name: string;
+  file_size: number;
+  file_type: string;
+  file_url: string;
 };
 
 export type PermissionSubmissionResponse = {
@@ -22,7 +27,10 @@ export type LeaveSubmissionRequest = {
   leave_reason: string;
   leave_type: string;
   employee_id: string;
-  leave_file: Express.Multer.File | undefined;
+  file_name: string;
+  file_size: number;
+  file_type: string;
+  file_url: string;
 };
 
 export type LeaveSubmissionResponse = {
@@ -35,7 +43,10 @@ export type LeaveSubmissionResponse = {
 export type MutationSubmissionRequest = {
   mutation_reason: string;
   employee_id: string;
-  mutation_file: Express.Multer.File | undefined;
+  file_name: string;
+  file_size: number;
+  file_type: string;
+  file_url: string;
 };
 
 export type MutationSubmissionResponse = {
