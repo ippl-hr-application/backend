@@ -15,6 +15,7 @@ import { jobPositionRoute } from "./features/job-position";
 import { employmentRoute } from "./features/employment-status";
 import { documentRoute } from "./features/document-management";
 import { companyBranchRoute } from "./features/company-branch";
+import { imagekit } from "./utils/image-kit";
 
 dotenv.config();
 const app: Express = express();
@@ -40,6 +41,10 @@ app.use("/job-position", jobPositionRoute);
 app.use("/employment-status", employmentRoute);
 app.use("/doc", documentRoute);
 app.use("/company-branch", companyBranchRoute);
+app.get("/auth-imagekit", function (req, res) {
+  const result = imagekit.getAuthenticationParameters();
+  res.send(result);
+});
 
 app.use(ErrorMiddleware.notFound);
 app.use(ErrorMiddleware.returnError);
