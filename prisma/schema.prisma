@@ -80,6 +80,7 @@ model CompanyBranches {
   employee_tasks          EmployeeTask[]
   reimbursement           Reimbursement[]
   attendances             Attendance[]
+  shift Shift[] 
 
   @@map("company_branches")
 }
@@ -210,9 +211,9 @@ model Employee {
   give_tasks            EmployeeTask[]  @relation("manager")
   files                 EmployeeFile[]
   reimbursement         Reimbursement[]
-  shifts                Shift[]
   attendances           Attendance[]
   submissions           Submission[]
+  assign_shift  AssignShift[]
 
   @@map("employees")
 }
@@ -283,18 +284,21 @@ model ReimbursementFileAttachment {
 
 model Shift {
   shift_id    Int          @id @default(autoincrement())
-  employee    Employee     @relation(fields: [employee_id], references: [employee_id])
-  employee_id String
-  start_time  String
+  company_branch CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
+  company_branch_id String
+  name  String
+  start_time String
   end_time    String
   attendance  Attendance[]
-
+  assign_shift AssignShift[]
   @@map("shifts")
 }
-
-enum AttendanceStatus {
-  ACCEPTED
-  REJECTED
+model AssignShift {
+  assign_shift_id Int @id @default(autoincrement())
+  shift    Shift @relation(fields: [shift_id], references: [shift_id])
+  shift_id Int
+  employee    Employee @relation(fields: [employee_id], references: [employee_id])
+  employee_id String
 }
 
 model Attendance {
@@ -355,7 +359,7 @@ enum SubmissionStatus {
 model Submission {
   submission_id         Int                   @id @default(autoincrement())
   submission_date       DateTime
-  type                  String                @db.VarChar(30)
+  type                  String                @db.VarChar(50)
   employee_id           String
   employee              Employee              @relation(fields: [employee_id], references: [employee_id])
   employee_file_id  Int            @unique
@@ -391,9 +395,7 @@ model LeaveSubmission {
   from         DateTime
   to           DateTime
   leave_reason String   @db.VarChar(100)
-  leave_type   String   @db.VarChar(10)
-
-  @@map("leave_permission")
+  @@map("leave_submission")
 }
 
 model MutationSubmission {

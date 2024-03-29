@@ -20,25 +20,30 @@ export class SubmissionService {
     permission_reason,
     type,
     employee_id,
-    permission_file,
+    file_name,
+    file_size,
+    file_type,
+    file_url,
   }: PermissionSubmissionRequest): Promise<PermissionSubmissionResponse> {
     const request = Validation.validate(SubmissionValidation.SICK_LETTER, {
       permission_reason,
       type,
+      from,
+      to,
+      file_name,
+      file_size,
+      file_type,
+      file_url,
     });
-
-    if (!permission_file) {
-      throw new Error("File is required");
-    }
-    const permissionSubmission = await prisma.submission.create({
+    await prisma.submission.create({
       data: {
         submission_date: new Date(),
         status: "PENDING",
         type: request.type,
         permission_submission: {
           create: {
-            from,
-            to,
+            from: request.from,
+            to: request.to,
             permission_reason: request.permission_reason,
             type: request.type,
           },
@@ -50,11 +55,11 @@ export class SubmissionService {
         },
         employee_file: {
           create: {
-            file_name: permission_file?.originalname || "",
-            file_size: permission_file?.size || 0,
-            file_type: permission_file?.mimetype || "",
-            file_url: `/uploads/permission_file/${permission_file?.filename}`,
-            file_for: "pengajuan surat izin atau sakit",
+            file_name: request.file_name,
+            file_size: request.file_size,
+            file_type: request.file_type,
+            file_url: request.file_url,
+            file_for: `SURAT ${request.type}`,
             employee: {
               connect: {
                 employee_id: employee_id,
@@ -65,10 +70,10 @@ export class SubmissionService {
       },
     });
     return {
-      from,
-      to,
-      permission_reason: request.permission_reason,
-      type: request.type,
+      from: from,
+      to: to,
+      permission_reason: permission_reason,
+      type: type,
     };
   }
 
@@ -78,15 +83,23 @@ export class SubmissionService {
     leave_reason,
     leave_type,
     employee_id,
-    leave_file,
+    file_name,
+    file_size,
+    file_type,
+    file_url,
   }: LeaveSubmissionRequest): Promise<LeaveSubmissionResponse> {
     const request = Validation.validate(SubmissionValidation.LEAVE_LETTER, {
+      from,
+      to,
       leave_reason,
       leave_type,
       employee_id,
+      file_name,
+      file_size,
+      file_type,
+      file_url,
     });
-
-    const leaveSubmission = await prisma.submission.create({
+    await prisma.submission.create({
       data: {
         status: "PENDING",
         submission_date: new Date(),
@@ -98,11 +111,11 @@ export class SubmissionService {
         },
         employee_file: {
           create: {
-            file_name: leave_file?.originalname || "",
-            file_size: leave_file?.size || 0,
-            file_type: leave_file?.mimetype || "",
-            file_url: `/uploads/leave_file/${leave_file?.filename}`,
-            file_for: "pengajuan cuti",
+            file_name: request.file_name,
+            file_size: request.file_size,
+            file_type: request.file_type,
+            file_url: request.file_url,
+            file_for: "SURAT CUTI ",
             employee: {
               connect: {
                 employee_id: employee_id,
@@ -112,32 +125,38 @@ export class SubmissionService {
         },
         leave_submission: {
           create: {
-            from,
-            to,
+            from: request.from,
+            to: request.to,
             leave_reason: request.leave_reason,
-            leave_type: request.leave_type,
           },
         },
       },
     });
     return {
-      from,
-      leave_reason,
-      leave_type,
-      to,
+      from: request.from,
+      leave_reason: request.leave_reason,
+      leave_type: request.leave_type,
+      to: request.to,
     };
   }
   static async createMutationLetter({
     mutation_reason,
     employee_id,
-    mutation_file,
+    file_name,
+    file_size,
+    file_type,
+    file_url,
   }: MutationSubmissionRequest): Promise<MutationSubmissionResponse> {
     const request = Validation.validate(SubmissionValidation.MUTATION_LETTER, {
       mutation_reason,
       employee_id,
+      file_name,
+      file_size,
+      file_type,
+      file_url,
     });
 
-    const mutationSubmission = await prisma.submission.create({
+    await prisma.submission.create({
       data: {
         status: "PENDING",
         submission_date: new Date(),
@@ -154,11 +173,11 @@ export class SubmissionService {
         },
         employee_file: {
           create: {
-            file_name: mutation_file?.originalname || "",
-            file_size: mutation_file?.size || 0,
-            file_type: mutation_file?.mimetype || "",
-            file_url: `/uploads/mutation_file/${mutation_file?.filename}`,
-            file_for: "pengajuan mutasi",
+            file_name: request.file_name,
+            file_size: request.file_size,
+            file_type: request.file_type,
+            file_url: request.file_url,
+            file_for: "SURAT MUTASI",
             employee: {
               connect: {
                 employee_id: employee_id,
