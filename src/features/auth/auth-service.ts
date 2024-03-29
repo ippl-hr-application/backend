@@ -204,6 +204,7 @@ export class AuthService {
       const employee = await prisma.employee.findUnique({
         where: { employee_id: employee_id },
         include: {
+          company_branch: true,
           employment_status: true,
           job_position: true,
         },
@@ -234,6 +235,15 @@ export class AuthService {
             name: true,
             industry: true,
             package_type: true,
+            company_branches: {
+              select: {
+                company_branch_id: true,
+                address: true,
+                city: true,
+                hq_code: true,
+                hq_initial: true,
+              }
+            }
           },
         },
       },

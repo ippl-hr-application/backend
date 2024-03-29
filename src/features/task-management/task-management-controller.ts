@@ -10,7 +10,7 @@ export class TaskManagementController {
     try {
       const { company_branch_id } = req.params;
       const tasks = await TaskManagementService.getTaskManagementFromCompany({
-        company_branch_id: Number(company_branch_id),
+        company_branch_id: company_branch_id,
       });
 
       return res.status(201).json({
@@ -32,7 +32,7 @@ export class TaskManagementController {
       const data = req.body;
       const task = await TaskManagementService.addTaskManagement(
         data,
-        res.locals.user.unique_id
+        res.locals.user.company_branch_id
       );
       return res.status(201).json({
         success: true,
@@ -55,7 +55,7 @@ export class TaskManagementController {
       const task = await TaskManagementService.updateTaskManagement(
         {
           task_id: Number(task_id),
-          company_branch_id: Number(company_branch_id),
+          company_branch_id: company_branch_id,
         },
         data
       );
@@ -79,7 +79,7 @@ export class TaskManagementController {
       const { company_branch_id, task_id } = req.params;
       await TaskManagementService.deleteTaskManagement(
         Number(task_id),
-        Number(company_branch_id)
+        company_branch_id
       );
 
       return res.status(200).json({
