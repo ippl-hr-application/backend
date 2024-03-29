@@ -17,3 +17,10 @@ export type GetShiftRequest = {
 };
 
 export type GetShiftResponse = AddShiftResponse;
+
+export type AddAssignShiftRequest = {
+  shift_id: number;
+  employee_id: string;
+};
+
+export type AddAssignShiftResponse = AddAssignShiftRequest;

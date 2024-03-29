@@ -50,4 +50,20 @@ export class ShiftController {
       next(error);
     }
   }
+  static async addAssignShift(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { shift_id, employee_id } = req.body;
+      const assignShift = await ShiftService.addAssignShift({
+        employee_id,
+        shift_id: Number(shift_id),
+      });
+      return res.status(201).json({
+        success: true,
+        data: { assignShift },
+        message: "Assign Shift Added",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

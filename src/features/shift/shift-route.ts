@@ -8,6 +8,9 @@ shiftRoute.delete("/:shift_id", [
   JWTMiddleware.verifyToken,
   ShiftController.deleteShift,
 ]);
-
 shiftRoute.get("/", [JWTMiddleware.verifyToken, ShiftController.getAllshifts]);
+shiftRoute.post("/assign-shift", [
+  JWTMiddleware.verifyToken,
+  ShiftController.addAssignShift,
+]);
 export default shiftRoute;

@@ -8,6 +8,8 @@ import {
   GetShiftResponse,
   DeleteShiftRequest,
   DeleteShiftResponse,
+  AddAssignShiftRequest,
+  AddAssignShiftResponse,
 } from "./shift-model";
 import { ShiftValidation } from "./shift-validation";
 
@@ -19,7 +21,6 @@ export class ShiftService {
     end_time,
   }: AddShiftRequest): Promise<AddShiftResponse> {
     const request = Validation.validate(ShiftValidation.ADD_SHIFT, {
-      company_branch_id,
       name,
       start_time,
       end_time,
@@ -31,7 +32,7 @@ export class ShiftService {
         name: request.name,
         company_branch: {
           connect: {
-            company_branch_id: request.company_branch_id,
+            company_branch_id,
           },
         },
       },
@@ -63,5 +64,31 @@ export class ShiftService {
       throw new ErrorResponse("Shift not found", 404, ["employee_id"]);
     }
     return shift;
+  }
+  static async addAssignShift({
+    shift_id,
+    employee_id,
+  }: AddAssignShiftRequest): Promise<AddAssignShiftResponse> {
+    const request = Validation.validate(ShiftValidation.ADD_ASSIGN_SHIFT, {
+      shift_id,
+      employee_id,
+    });
+    const employee = await prisma.assignShift.findFirst({
+      where: {
+        employee_id,
+      },
+    });
+    if (employee) {
+      throw new ErrorResponse("Employee already assigned", 400, [
+        "employee_id",
+      ]);
+    }
+    const assignShift = await prisma.assignShift.create({
+      data: {
+        employee_id: request.employee_id,
+        shift_id: request.shift_id,
+      },
+    });
+    return assignShift;
   }
 }

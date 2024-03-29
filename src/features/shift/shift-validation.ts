@@ -9,4 +9,8 @@ export class ShiftValidation {
   static readonly DELETE_SHIFT: ZodType = z.object({
     shift_id: z.number(),
   });
+  static readonly ADD_ASSIGN_SHIFT: ZodType = z.object({
+    shift_id: z.number(),
+    employee_id: z.string(),
+  });
 }
