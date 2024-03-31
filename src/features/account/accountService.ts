@@ -15,13 +15,36 @@ import { prisma } from "../../applications";
 import { ErrorResponse } from "../../models";
 
 export class AccountService {
-  static async getAllEmployees(company_branch_id: GetEmployeeRequest) {
+  static async getAllEmployees(company_branch_id: string) {
     return await prisma.employee.findMany({
       where: {
-        company_branch_id: company_branch_id.company_branch_id,
+        company_branch_id: company_branch_id,
         hasResigned: false,
       },
     });
+  }
+
+  static async searchEmployee({
+    company_branch_id,
+    employee_id,
+  }: GetEmployeeRequest) {
+    const findEmployee = await prisma.employee.findUnique({
+      where: {
+        company_branch_id: company_branch_id,
+        employee_id: employee_id,
+      },
+    });
+
+    if (!findEmployee) {
+      throw new ErrorResponse(
+        "Employee not found",
+        404,
+        ["employee_id"],
+        "EMPLOYEE_NOT_FOUND"
+      );
+    }
+
+    return findEmployee;
   }
 
   static async createEmployee(
