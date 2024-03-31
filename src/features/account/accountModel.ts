@@ -8,9 +8,10 @@ import {
 
 export type GetEmployeeRequest = {
   company_branch_id: string;
+  employee_id: string;
 };
 
-export type GetEmployeeResponse = Employee[];
+export type GetAllEmployeeResponse = Employee[];
 
 export type CreateRequest = {
   company_branch_id: string;
@@ -51,8 +52,6 @@ export type UpdateRequest = {
   last_name?: string;
   email?: string;
   phone_number?: string;
-  // place_of_birth: string;
-  // birth_date: Date;
   marital_status?: string;
   blood_type?: string;
   religion?: string;
@@ -65,6 +64,7 @@ export type UpdateRequest = {
   bank_account_number?: string;
   bank_type?: string;
   wage?: number;
+  hasresigned?: boolean;
 };
 
 export type UpdateResponse = {

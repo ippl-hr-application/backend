@@ -16,6 +16,7 @@ import { employmentRoute } from "./features/employment-status";
 import { documentRoute } from "./features/document-management";
 import { companyBranchRoute } from "./features/company-branch";
 import { imagekit } from "./utils/image-kit";
+import { announcementRoute } from './features/announcement';
 
 dotenv.config();
 const app: Express = express();
@@ -45,6 +46,7 @@ app.get("/auth-imagekit", function (req, res) {
   const result = imagekit.getAuthenticationParameters();
   res.send(result);
 });
+app.use('/announcement', announcementRoute);
 
 app.use(ErrorMiddleware.notFound);
 app.use(ErrorMiddleware.returnError);
