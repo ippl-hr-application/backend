@@ -59,4 +59,25 @@ export class AnnouncementController {
       next(error);
     }
   }
+
+  static async deleteAnnouncement(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { company_id, announcement_id } = req.params;
+      await AnnouncementService.deleteAnnouncement(
+        announcement_id,
+        company_id,
+      );
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Announcement deleted successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

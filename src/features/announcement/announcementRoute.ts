@@ -14,4 +14,6 @@ announcementRoute.get('/:company_id', [
   AnnouncementController.getAnnouncementCompany,
 ]);
 
+announcementRoute.delete('/company/:company_id/announcement/:announcement_id', AnnouncementController.deleteAnnouncement)
+
 export default announcementRoute;

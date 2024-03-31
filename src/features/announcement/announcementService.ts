@@ -68,11 +68,11 @@ export class AnnouncementService {
       AnnouncementValidation.CREATE_ANNOUNCEMENT,
       { company_id, title, description }
     );
-    const userGive = await prisma.company.findFirst({
+    const company = await prisma.company.findFirst({
       where: { company_id: request.company_id },
     });
 
-    if (!userGive)
+    if (!company)
       throw new ErrorResponse('Invalid Company Id', 400, [
         'from',
         'company_id',
@@ -239,60 +239,31 @@ export class AnnouncementService {
   //   return announcementFileAttachment;
   // }
 
-  // static async deleteAnnouncement(
-  //   announcement_id: string,
-  //   company_id: string
-  // ): Promise<CompanyAnnouncement> {
-  //   const announcement = await prisma.companyAnnouncement.delete({
-  //     where: { company_announcement_id: parseInt(announcement_id) },
-  //   });
+  static async deleteAnnouncement(
+    announcement_id: string,
+    company_id: string
+  ) {
 
-  //   return announcement;
-  // }
-
-  // static async deleteAnnouncementTo(
-  //   announcement_to_id: string
-  // ): Promise<CompanyAnnouncementTo> {
-  //   const announcementTo = await prisma.companyAnnouncementTo.delete({
-  //     where: { company_announcement_to_id: parseInt(announcement_to_id) },
-  //   });
-
-  //   return announcementTo;
-  // }
-
-  // static async deleteAnnouncementFileAttachment(
-  //   announcement_file_attachment_id: string
-  // ): Promise<CompanyAnnouncementFileAttachment> {
-  //   const announcementFileAttachment =
-  //     await prisma.companyAnnouncementFileAttachment.delete({
-  //       where: {
-  //         company_announcement_file_attachment_id: parseInt(
-  //           announcement_file_attachment_id
-  //         ),
-  //       },
-  //     });
-
-  //   return announcementFileAttachment;
-  // }
-
-  // static async getAnnouncementTo(
-  //   announcement_id: string
-  // ): Promise<CompanyAnnouncementTo[]> {
-  //   const announcementTo = await prisma.companyAnnouncementTo.findMany({
-  //     where: { company_announcement_id: parseInt(announcement_id) },
-  //   });
-
-  //   return announcementTo;
-  // }
-
-  // static async getAnnouncementFileAttachment(
-  //   announcement_id: string
-  // ): Promise<CompanyAnnouncementFileAttachment[]> {
-  //   const announcementFileAttachment =
-  //     await prisma.companyAnnouncementFileAttachment.findMany({
-  //       where: { company_announcement_id: parseInt(announcement_id) },
-  //     });
-
-  //   return announcementFileAttachment;
-  // }
+    await prisma.companyAnnouncementTo.deleteMany({
+      where: {
+        company_announcement_id: parseInt(announcement_id)
+      }
+    });
+  
+    await prisma.companyAnnouncementFileAttachment.deleteMany({
+      where: {
+        company_announcement_id: parseInt(announcement_id)
+      }
+    });
+  
+    const announcement = await prisma.companyAnnouncement.deleteMany({
+      where: {
+        company_announcement_id: parseInt(announcement_id),
+        company_id: company_id
+      }
+    });
+  
+    return announcement;
+  }
+  
 }
