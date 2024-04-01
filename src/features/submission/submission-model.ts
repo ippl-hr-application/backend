@@ -42,6 +42,8 @@ export type LeaveSubmissionResponse = {
 
 export type MutationSubmissionRequest = {
   mutation_reason: string;
+  current_company_branch_id: string;
+  target_company_branch_id: string;
   employee_id: string;
   file_name: string;
   file_size: number;
@@ -55,6 +57,8 @@ export type MutationSubmissionResponse = {
 
 export type GetSubmissionHistoryRequest = {
   employee_id: string;
+  status: SubmissionStatus;
+  year: number;
 };
 
 export type GetSubmissionHistoryResponse = {
@@ -63,3 +67,12 @@ export type GetSubmissionHistoryResponse = {
   type: string;
   status: SubmissionStatus;
 };
+
+export type ChangeShiftSubmissionRequest = {
+  employee_id: string;
+  target_shift_id: number;
+  current_shift_id: number;
+  target_date: Date;
+};
+
+export type ChangeShiftSubmissionResponse = ChangeShiftSubmissionRequest;

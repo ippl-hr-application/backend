@@ -19,8 +19,11 @@ submissionRoute.post("/leave", [
 ]);
 submissionRoute.post("/mutation", [
   JWTMiddleware.verifyToken,
-
   SubmissionController.createMutationLetter,
+]);
+submissionRoute.post("/change-shift", [
+  JWTMiddleware.verifyToken,
+  SubmissionController.createChangeShiftLetter,
 ]);
 submissionRoute.delete("/:id", [
   JWTMiddleware.verifyToken,

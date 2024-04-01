@@ -24,6 +24,8 @@ export class SubmissionValidation {
   });
   static readonly MUTATION_LETTER: ZodType = z.object({
     mutation_reason: z.string().max(100),
+    current_company_branch_id: z.string(),
+    target_company_branch_id: z.string(),
     employee_id: z.string(),
     file_name: z.string(),
     file_size: z.number(),

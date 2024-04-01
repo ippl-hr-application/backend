@@ -81,8 +81,10 @@ model CompanyBranches {
   reimbursement           Reimbursement[]
   attendances             Attendance[]
   shift Shift[] 
-  assignShift AssignShift[]
-
+  assign_shift AssignShift[]
+  current_company_branch MutationSubmission[] @relation("current")
+  target_company_branch MutationSubmission[] @relation("target")
+  
   @@map("company_branches")
 }
 
@@ -292,6 +294,8 @@ model Shift {
   end_time    String
   attendance  Attendance[]
   assign_shift AssignShift[]
+  current_shift ChangeShiftSubmission[] @relation("current")
+  target_shift ChangeShiftSubmission[] @relation("target")
   @@map("shifts")
 }
 model AssignShift {
@@ -302,6 +306,7 @@ model AssignShift {
   employee_id String
   company_branch    CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
   company_branch_id String
+  target_date  DateTime?        @db.Date
 }
 
 model Attendance {
@@ -365,12 +370,13 @@ model Submission {
   type                  String                @db.VarChar(50)
   employee_id           String
   employee              Employee              @relation(fields: [employee_id], references: [employee_id])
-  employee_file_id  Int            @unique
-  employee_file     EmployeeFile   @relation(fields: [employee_file_id], references: [employee_file_id] ,onDelete: Cascade)
+  employee_file_id  Int?           @unique
+  employee_file     EmployeeFile?   @relation(fields: [employee_file_id], references: [employee_file_id] ,onDelete: Cascade)
   status                SubmissionStatus
   permission_submission PermissionSubmission?
   leave_submission      LeaveSubmission?
   mutation_submission   MutationSubmission?
+  change_shift_submission ChangeShiftSubmission?
 
   @@map("submissions")
 }
@@ -406,6 +412,21 @@ model MutationSubmission {
   submission             Submission   @relation(fields: [submision_id], references: [submission_id], onDelete: Cascade)
   submision_id           Int          @unique
   mutation_reason  String @db.VarChar(100)
-
+  current_company_branch CompanyBranches @relation( "current" ,fields: [current_company_branch_id], references: [company_branch_id])
+  current_company_branch_id String
+  target_company_branch CompanyBranches @relation("target", fields: [target_company_branch_id], references: [company_branch_id])
+  target_company_branch_id String
+  
   @@map("mutation_submission")
+}
+
+model ChangeShiftSubmission {
+  change_shift_permission_id Int          @id @default(autoincrement())
+  submission             Submission   @relation(fields: [submision_id], references: [submission_id], onDelete: Cascade)
+  submision_id           Int          @unique
+  current_shift Shift @relation( "current",fields: [current_shift_id], references: [shift_id])
+  current_shift_id Int
+  target_shift Shift @relation("target", fields: [target_shift_id], references: [shift_id])
+  target_shift_id Int
+  target_date  DateTime       @db.Date
 }
