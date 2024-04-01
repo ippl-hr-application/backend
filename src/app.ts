@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", authRoute);
-// app.use("/attendance", attendanceRoute);
+app.use("/attendance", attendanceRoute);
 app.use("/submission", submissionRoute);
 app.use("/shift", shiftRoute);
 app.use("/profile", profileRoute);

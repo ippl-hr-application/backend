@@ -188,6 +188,16 @@ export class AuthService {
         email: request.email,
         phone_number: request.phone_number,
         hq_initial: "PUSAT",
+        job_positions: {
+          create: [
+            {
+              name: "Owner",
+            },
+            {
+              name: "Manager",
+            },
+          ],
+        },
       },
     });
 
@@ -242,8 +252,8 @@ export class AuthService {
                 city: true,
                 hq_code: true,
                 hq_initial: true,
-              }
-            }
+              },
+            },
           },
         },
       },
