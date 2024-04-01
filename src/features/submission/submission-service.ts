@@ -2,6 +2,8 @@ import fs from "fs";
 import { prisma } from "../../applications";
 import { Validation } from "../../validations";
 import {
+  ChangeShiftSubmissionRequest,
+  ChangeShiftSubmissionResponse,
   GetSubmissionHistoryRequest,
   GetSubmissionHistoryResponse,
   LeaveSubmissionRequest,
@@ -142,6 +144,8 @@ export class SubmissionService {
   static async createMutationLetter({
     mutation_reason,
     employee_id,
+    current_company_branch_id,
+    target_company_branch_id,
     file_name,
     file_size,
     file_type,
@@ -149,6 +153,8 @@ export class SubmissionService {
   }: MutationSubmissionRequest): Promise<MutationSubmissionResponse> {
     const request = Validation.validate(SubmissionValidation.MUTATION_LETTER, {
       mutation_reason,
+      current_company_branch_id,
+      target_company_branch_id,
       employee_id,
       file_name,
       file_size,
@@ -169,6 +175,8 @@ export class SubmissionService {
         mutation_submission: {
           create: {
             mutation_reason: request.mutation_reason,
+            current_company_branch_id: request.current_company_branch_id,
+            target_company_branch_id: request.target_company_branch_id,
           },
         },
         employee_file: {
@@ -191,12 +199,47 @@ export class SubmissionService {
       mutation_reason: request.mutation_reason,
     };
   }
+  static async createChangeShiftLetter({
+    target_shift_id,
+    current_shift_id,
+    target_date,
+    employee_id,
+  }: ChangeShiftSubmissionRequest): Promise<ChangeShiftSubmissionResponse> {
+    await prisma.submission.create({
+      data: {
+        employee_id,
+        status: "PENDING",
+        submission_date: new Date(),
+        type: "PERUBAHAN SHIFT",
+        change_shift_submission: {
+          create: {
+            target_shift_id: target_shift_id,
+            current_shift_id: current_shift_id,
+            target_date: target_date,
+          },
+        },
+      },
+    });
+    return {
+      employee_id,
+      target_shift_id: target_shift_id,
+      current_shift_id: current_shift_id,
+      target_date: target_date,
+    };
+  }
   static async getSubmissionHistory({
     employee_id,
+    year,
+    status,
   }: GetSubmissionHistoryRequest): Promise<GetSubmissionHistoryResponse[]> {
     const submission = await prisma.submission.findMany({
       where: {
         employee_id,
+        submission_date: {
+          gte: new Date(`${year}-01-01`),
+          lte: new Date(`${year}-12-31`),
+        },
+        status,
       },
       select: {
         submission_id: true,
@@ -226,16 +269,6 @@ export class SubmissionService {
     });
     if (!submission) throw new Error("Submission not found");
 
-    if (submission.employee_file) {
-      const file_path = submission.employee_file.file_url;
-      fs.unlink(file_path, (err) => {
-        if (err) {
-          console.error("Error deleting file:", err);
-          return;
-        }
-        console.log("File deleted successfully");
-      });
-    }
     await prisma.submission.delete({
       where: {
         submission_id,
