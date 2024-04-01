@@ -48,6 +48,7 @@ export class SubmissionController {
     try {
       const {
         from,
+        to,
         permission_reason,
         file_name,
         file_size,
@@ -58,7 +59,7 @@ export class SubmissionController {
 
       const result = await SubmissionService.createSickLetter({
         from,
-        to: from,
+        to,
         permission_reason,
         type: "SAKIT",
         employee_id,
