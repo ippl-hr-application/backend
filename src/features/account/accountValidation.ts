@@ -24,6 +24,7 @@ export class AccountValidation {
     bank_account_number: z.string().max(20).optional(),
     bank_type: z.string().max(20).optional(),
     wage: z.number(),
+    // gender: z.string().max(10),
   });
 
   static readonly UPDATE_EMPLOYEE: ZodType = z.object({

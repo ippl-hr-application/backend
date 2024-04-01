@@ -1,6 +1,6 @@
-import { Validation } from "../../validations";
-import { AccountValidation } from "./accountValidation";
-import { comparePassword, hashPassword } from "../../utils";
+import { Validation } from '../../validations';
+import { AccountValidation } from './accountValidation';
+import { comparePassword, hashPassword } from '../../utils';
 import {
   CreateRequest,
   CreateResponse,
@@ -10,16 +10,17 @@ import {
   DeleteResponse,
   GetEmployeeRequest,
   ResignRequest,
-} from "./accountModel";
-import { prisma } from "../../applications";
-import { ErrorResponse } from "../../models";
+} from './accountModel';
+import { prisma } from '../../applications';
+import { ErrorResponse } from '../../models';
 
 export class AccountService {
-  static async getAllEmployees(company_branch_id: string) {
+  static async getAllEmployees(company_branch_id: string, hasResigned: string) {
+    console.log(hasResigned);
     return await prisma.employee.findMany({
       where: {
         company_branch_id: company_branch_id,
-        hasResigned: false,
+        hasResigned: hasResigned === 'true' ? true : false,
       },
     });
   }
@@ -37,10 +38,10 @@ export class AccountService {
 
     if (!findEmployee) {
       throw new ErrorResponse(
-        "Employee not found",
+        'Employee not found',
         404,
-        ["employee_id"],
-        "EMPLOYEE_NOT_FOUND"
+        ['employee_id'],
+        'EMPLOYEE_NOT_FOUND'
       );
     }
 
@@ -66,10 +67,10 @@ export class AccountService {
 
     if (countEmailEmployee > 0) {
       throw new ErrorResponse(
-        "Email already exists",
+        'Email already exists',
         400,
-        ["email"],
-        "EMAIL_ALREADY_EXISTS"
+        ['email'],
+        'EMAIL_ALREADY_EXISTS'
       );
     }
 
@@ -99,6 +100,7 @@ export class AccountService {
         bank_account_number: request.bank_account_number,
         bank_type: request.bank_type,
         wage: request.wage,
+        // gender: request.gender,
       },
     });
 
@@ -131,10 +133,10 @@ export class AccountService {
 
     if (!findEmployee) {
       throw new ErrorResponse(
-        "Employee not found",
+        'Employee not found',
         404,
-        ["employee_id"],
-        "EMPLOYEE_NOT_FOUND"
+        ['employee_id'],
+        'EMPLOYEE_NOT_FOUND'
       );
     }
 
@@ -149,12 +151,10 @@ export class AccountService {
     return employeeUpdate;
   }
 
-  static async deleteEmployee(
-    employeeId: DeleteRequest
-  ): Promise<DeleteResponse> {
+  static async deleteEmployee(data: DeleteRequest): Promise<DeleteResponse> {
     const request = Validation.validate(
       AccountValidation.DELETE_EMPLOYEE,
-      employeeId
+      data
     );
 
     const findEmployee = await prisma.employee.findUnique({
@@ -166,10 +166,10 @@ export class AccountService {
 
     if (!findEmployee) {
       throw new ErrorResponse(
-        "Employee not found",
+        'Employee not found',
         404,
-        ["employee_id"],
-        "EMPLOYEE_NOT_FOUND"
+        ['employee_id'],
+        'EMPLOYEE_NOT_FOUND'
       );
     }
 
@@ -182,6 +182,40 @@ export class AccountService {
 
     return employeeDelete;
   }
+
+  // static async softDeleteEmployee({
+  //   employee_id,
+  //   company_branch_id,
+  // }: DeleteRequest) {
+  //   const deleteDate = new Date();
+  //   const findEmployee = await prisma.employee.findUnique({
+  //     where: {
+  //       company_branch_id,
+  //       employee_id,
+  //     },
+  //   });
+
+  //   if (!findEmployee) {
+  //     throw new ErrorResponse(
+  //       "Employee not found",
+  //       404,
+  //       ["employee_id"],
+  //       "EMPLOYEE_NOT_FOUND"
+  //     );
+  //   }
+
+  //   const employeeDelete = await prisma.employee.update({
+  //     where: {
+  //       company_branch_id,
+  //       employee_id,
+  //     },
+  //     data: {
+  //       delete_at: deleteDate,
+  //     },
+  //   });
+
+  //   return employeeDelete;
+  // }
 
   static async employeeResign({
     employee_id,
@@ -196,10 +230,10 @@ export class AccountService {
 
     if (!findEmployee) {
       throw new ErrorResponse(
-        "Employee not found",
+        'Employee not found',
         404,
-        ["employee_id"],
-        "EMPLOYEE_NOT_FOUND"
+        ['employee_id'],
+        'EMPLOYEE_NOT_FOUND'
       );
     }
 
@@ -215,4 +249,18 @@ export class AccountService {
 
     return employeeResign;
   }
+
+  // static async getEmployeesByResignedStatus({
+  //   company_branch_id,
+  //   hasResigned,
+  // }: ResignStatusRequest) {
+  //   console.log(hasResigned);
+  //   const employees = await prisma.employee.findMany({
+  //     where: {
+  //       company_branch_id: company_branch_id,
+  //       hasResigned: hasResigned,
+  //     },
+  //   });
+  //   return employees;
+  // }
 }

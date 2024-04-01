@@ -36,6 +36,7 @@ export type CreateRequest = {
   bank_account_number?: string;
   bank_type?: string;
   wage: number;
+  gender: string;
 };
 
 export type CreateResponse = {

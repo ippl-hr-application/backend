@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { AccountService } from "./accountService";
+import { boolean } from "zod";
 
 export class AccountController {
   static async getAllEmployees(
@@ -9,10 +10,8 @@ export class AccountController {
   ) {
     try {
       const company_branch_id = req.params.company_branch_id;
-      const employees = await AccountService.getAllEmployees(company_branch_id);
-      // atau pake local user daripada pake params
-      // const { company_branch_id } = res.locals.user;
-      // const employees = await AccountService.getAllEmployees(company_branch_id);
+      let hasResigned = req.query.hasResigned;
+      const employees = await AccountService.getAllEmployees(company_branch_id, hasResigned as string);
       res.status(200).json({
         success: true,
         data: {
@@ -29,6 +28,7 @@ export class AccountController {
     try {
       const employee_id = req.params.employee_id;
       const company_branch_id = req.params.company_branch_id;
+      const hasResigned = req.query.hasResigned;
       const employee = await AccountService.searchEmployee({
         employee_id,
         company_branch_id,
@@ -89,7 +89,6 @@ export class AccountController {
         company_branch_id,
         employee_id,
       });
-      // await AccountService.deleteEmployee(id);
       res.status(200).json({
         success: true,
         data: deletingEmployee,
@@ -99,6 +98,27 @@ export class AccountController {
       next(error);
     }
   }
+
+  // static async softDeleteEmployee(
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) {
+  //   try {
+  //     const { employee_id, company_branch_id } = req.body;
+  //     const softDeleteEmployee = await AccountService.softDeleteEmployee({
+  //       employee_id,
+  //       company_branch_id,
+  //     });
+  //     return res.status(200).json({
+  //       success: true,
+  //       data: softDeleteEmployee,
+  //       message: "Successfully soft delete employee",
+  //     });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
 
   static async employeeResign(req: Request, res: Response, next: NextFunction) {
     try {
@@ -116,4 +136,26 @@ export class AccountController {
       next(error);
     }
   }
+
+  // static async getEmployeesByResignedStatus(
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) {
+  //   try {
+  //     const  company_branch_id  = req.params.company_branch_id;
+  //     const  hasResigned  = req.params.hasResigned;
+  //     const employees = await AccountService.getEmployeesByResignedStatus({
+  //       company_branch_id,
+  //       hasResigned: hasResigned === "true" ? true : false,
+  //     });
+  //     return res.status(200).json({
+  //       success: true,
+  //       data: employees,
+  //       message: "Successfully get employee by resigned status",
+  //     });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
 }
