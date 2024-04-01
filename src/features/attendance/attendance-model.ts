@@ -17,7 +17,10 @@ export type AttendanceCheckRequest = {
   type: "CHECK_IN" | "CHECK_OUT";
   long: number;
   lat: number;
-  attendance_file: Express.Multer.File | undefined;
+  file_name: string;
+  file_url: string;
+  file_size: number;
+  file_type: string;
 };
 
 export type AttendanceCheckResponse = {

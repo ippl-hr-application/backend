@@ -21,15 +21,18 @@ export class AttendanceController {
   static async checkIn(req: Request, res: Response, next: NextFunction) {
     try {
       const { employee_id } = res.locals.user;
-      const { shift_id, long, lat } = req.body;
-      const attendance_file: Express.Multer.File | undefined = req.file;
+      const { shift_id, long, lat, file_name, file_size, file_type, file_url } =
+        req.body;
       const result = await AttendanceService.attendanceCheck({
         employee_id,
         type: "CHECK_IN",
         shift_id: Number(shift_id),
         long: Number(long),
         lat: Number(lat),
-        attendance_file,
+        file_name,
+        file_size,
+        file_type,
+        file_url,
       });
       return res.status(201).json({
         success: true,
@@ -44,8 +47,9 @@ export class AttendanceController {
   static async checkOut(req: Request, res: Response, next: NextFunction) {
     try {
       const { employee_id } = res.locals.user;
-      const { shift_id, long, lat } = req.body;
-      const attendance_file: Express.Multer.File | undefined = req.file;
+      const { shift_id, long, lat, file_name, file_size, file_type, file_url } =
+        req.body;
+
       const result = await AttendanceService.attendanceCheck({
         employee_id,
 
@@ -53,8 +57,10 @@ export class AttendanceController {
         shift_id: Number(shift_id),
         long: Number(long),
         lat: Number(lat),
-
-        attendance_file,
+        file_name,
+        file_size,
+        file_type,
+        file_url,
       });
       return res.status(201).json({
         success: true,

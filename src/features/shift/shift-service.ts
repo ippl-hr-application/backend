@@ -127,7 +127,10 @@ export class ShiftService {
     company_branch_id,
   }: GetAllAsignShiftRequest) {
     const assignShifts = await prisma.assignShift.findMany({
-      orderBy: [{ assign_shift_id: "desc" }], // Urutkan berdasarkan employee_id secara descending, kemudian berdasarkan id secara descending
+      orderBy: [{ assign_shift_id: "desc" }],
+      where: {
+        company_branch_id,
+      }, // Urutkan berdasarkan employee_id secara descending, kemudian berdasarkan id secara descending
       distinct: ["employee_id"],
       select: {
         assign_shift_id: true,

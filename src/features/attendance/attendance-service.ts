@@ -11,14 +11,20 @@ export class AttendanceService {
   static async getShiftInfo({
     employee_id,
   }: GetShiftInfoRequest): Promise<GetShiftInfoResponse> {
-    const shiftInfo = await prisma.shift.findFirst({
+    const shiftInfo = await prisma.assignShift.findFirst({
+      orderBy: [{ assign_shift_id: "desc" }],
+      distinct: ["employee_id"],
       where: {
         employee_id,
       },
       select: {
-        shift_id: true,
-        start_time: true,
-        end_time: true,
+        shift: {
+          select: {
+            shift_id: true,
+            start_time: true,
+            end_time: true,
+          },
+        },
         employee: {
           select: {
             first_name: true,
@@ -51,8 +57,8 @@ export class AttendanceService {
       logo_url:
         shiftInfo?.employee.company_branch.company.company_logo?.file_url,
       date: new Date(),
-      from: shiftInfo?.start_time,
-      to: shiftInfo?.end_time,
+      from: shiftInfo?.shift.start_time,
+      to: shiftInfo?.shift.end_time,
     };
   }
   static async attendanceCheck({
@@ -61,7 +67,10 @@ export class AttendanceService {
     type,
     long,
     lat,
-    attendance_file,
+    file_name,
+    file_size,
+    file_type,
+    file_url,
   }: AttendanceCheckRequest): Promise<AttendanceCheckResponse> {
     const date = new Date().toISOString();
     const employee = await prisma.employee.findUnique({
@@ -91,11 +100,11 @@ export class AttendanceService {
             time: date.substring(11, 19),
             employee_file: {
               create: {
-                file_name: attendance_file?.originalname || "",
-                file_size: attendance_file?.size || 0,
-                file_type: attendance_file?.mimetype || "",
-                file_url: `/uploads/attendance_file/${attendance_file?.filename}`,
-                file_for: "kehadiran karyawan",
+                file_name,
+                file_size,
+                file_type,
+                file_url,
+                file_for: "BUKTI KEHADIRAN",
                 employee: {
                   connect: { employee_id },
                 },
