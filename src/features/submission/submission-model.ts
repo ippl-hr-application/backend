@@ -8,10 +8,7 @@ export type PermissionSubmissionRequest = {
   permission_reason: string;
   type: PermissionType;
   employee_id: string;
-  file_name: string;
-  file_size: number;
-  file_type: string;
-  file_url: string;
+  sick_file: Express.Multer.File | undefined;
 };
 
 export type PermissionSubmissionResponse = {
@@ -27,10 +24,7 @@ export type LeaveSubmissionRequest = {
   leave_reason: string;
   leave_type: string;
   employee_id: string;
-  file_name: string;
-  file_size: number;
-  file_type: string;
-  file_url: string;
+  leave_file: Express.Multer.File | undefined;
 };
 
 export type LeaveSubmissionResponse = {
@@ -45,10 +39,7 @@ export type MutationSubmissionRequest = {
   current_company_branch_id: string;
   target_company_branch_id: string;
   employee_id: string;
-  file_name: string;
-  file_size: number;
-  file_type: string;
-  file_url: string;
+  mutation_file: Express.Multer.File | undefined;
 };
 
 export type MutationSubmissionResponse = {

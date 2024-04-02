@@ -1,4 +1,3 @@
-import fs from "fs";
 import { prisma } from "../../applications";
 import { Validation } from "../../validations";
 import {
@@ -14,6 +13,7 @@ import {
   PermissionSubmissionResponse,
 } from "./submission-model";
 import { SubmissionValidation } from "./submission-validation";
+import { pathToFileUrl } from "../../utils/format";
 
 export class SubmissionService {
   static async createSickLetter({
@@ -22,21 +22,15 @@ export class SubmissionService {
     permission_reason,
     type,
     employee_id,
-    file_name,
-    file_size,
-    file_type,
-    file_url,
+    sick_file,
   }: PermissionSubmissionRequest): Promise<PermissionSubmissionResponse> {
     const request = Validation.validate(SubmissionValidation.SICK_LETTER, {
       permission_reason,
       type,
       from,
       to,
-      file_name,
-      file_size,
-      file_type,
-      file_url,
     });
+
     await prisma.submission.create({
       data: {
         submission_date: new Date(),
@@ -57,10 +51,13 @@ export class SubmissionService {
         },
         employee_file: {
           create: {
-            file_name: request.file_name,
-            file_size: request.file_size,
-            file_type: request.file_type,
-            file_url: request.file_url,
+            file_name: sick_file?.originalname || "",
+            file_size: sick_file?.size || 0,
+            file_type: sick_file?.mimetype || "",
+            file_url: pathToFileUrl(
+              sick_file?.path || "",
+              process.env.SERVER_URL || "http://localhost:3000"
+            ),
             file_for: `SURAT ${request.type}`,
             employee: {
               connect: {
@@ -71,6 +68,7 @@ export class SubmissionService {
         },
       },
     });
+
     return {
       from: from,
       to: to,
@@ -85,10 +83,7 @@ export class SubmissionService {
     leave_reason,
     leave_type,
     employee_id,
-    file_name,
-    file_size,
-    file_type,
-    file_url,
+    leave_file,
   }: LeaveSubmissionRequest): Promise<LeaveSubmissionResponse> {
     const request = Validation.validate(SubmissionValidation.LEAVE_LETTER, {
       from,
@@ -96,10 +91,6 @@ export class SubmissionService {
       leave_reason,
       leave_type,
       employee_id,
-      file_name,
-      file_size,
-      file_type,
-      file_url,
     });
     await prisma.submission.create({
       data: {
@@ -113,10 +104,13 @@ export class SubmissionService {
         },
         employee_file: {
           create: {
-            file_name: request.file_name,
-            file_size: request.file_size,
-            file_type: request.file_type,
-            file_url: request.file_url,
+            file_name: leave_file?.originalname || "",
+            file_size: leave_file?.size || 0,
+            file_type: leave_file?.mimetype || "",
+            file_url: pathToFileUrl(
+              leave_file?.path || "",
+              process.env.SERVER_URL || "http://localhost:3000"
+            ),
             file_for: "SURAT CUTI ",
             employee: {
               connect: {
@@ -146,20 +140,13 @@ export class SubmissionService {
     employee_id,
     current_company_branch_id,
     target_company_branch_id,
-    file_name,
-    file_size,
-    file_type,
-    file_url,
+    mutation_file,
   }: MutationSubmissionRequest): Promise<MutationSubmissionResponse> {
     const request = Validation.validate(SubmissionValidation.MUTATION_LETTER, {
       mutation_reason,
       current_company_branch_id,
       target_company_branch_id,
       employee_id,
-      file_name,
-      file_size,
-      file_type,
-      file_url,
     });
 
     await prisma.submission.create({
@@ -181,10 +168,13 @@ export class SubmissionService {
         },
         employee_file: {
           create: {
-            file_name: request.file_name,
-            file_size: request.file_size,
-            file_type: request.file_type,
-            file_url: request.file_url,
+            file_name: mutation_file?.originalname || "",
+            file_size: mutation_file?.size || 0,
+            file_type: mutation_file?.mimetype || "",
+            file_url: pathToFileUrl(
+              mutation_file?.path || "",
+              process.env.SERVER_URL || "http://localhost:3000"
+            ),
             file_for: "SURAT MUTASI",
             employee: {
               connect: {

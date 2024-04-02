@@ -7,6 +7,9 @@ const storage = multer.diskStorage({
     if (file.fieldname === "permission_file") {
       dest = "public/uploads/permission_file/";
     }
+    if (file.fieldname === "sick_file") {
+      dest = "public/uploads/sick_file";
+    }
     if (file.fieldname === "leave_file") {
       dest = "public/uploads/leave_file/";
     }

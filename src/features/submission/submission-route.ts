@@ -11,6 +11,7 @@ submissionRoute.post("/permission", [
 ]);
 submissionRoute.post("/sick", [
   JWTMiddleware.verifyToken,
+  upload.single("sick_file"),
   SubmissionController.createSickLetter,
 ]);
 submissionRoute.post("/leave", [
