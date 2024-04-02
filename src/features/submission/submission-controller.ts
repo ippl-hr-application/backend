@@ -11,14 +11,14 @@ export class SubmissionController {
     try {
       const { from, to, permission_reason } = req.body;
       const { employee_id } = res.locals.user;
-      const leave_file: Express.Multer.File | undefined = req.file;
+      const permission_file: Express.Multer.File | undefined = req.file;
       const result = await SubmissionService.createSickLetter({
         from,
         to,
         permission_reason,
         type: "IZIN",
         employee_id,
-        sick_file: leave_file,
+        sick_file: permission_file,
       });
       return res.status(201).json({
         success: true,
