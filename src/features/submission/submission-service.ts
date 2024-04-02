@@ -222,15 +222,25 @@ export class SubmissionService {
     year,
     status,
   }: GetSubmissionHistoryRequest): Promise<GetSubmissionHistoryResponse[]> {
-    const submission = await prisma.submission.findMany({
-      where: {
-        employee_id,
-        submission_date: {
-          gte: new Date(`${year}-01-01`),
-          lte: new Date(`${year}-12-31`),
-        },
-        status,
-      },
+    let submission: GetSubmissionHistoryResponse[] = [];
+
+    const whereConditions: any = {
+      employee_id,
+    };
+
+    if (year) {
+      whereConditions.submission_date = {
+        gte: new Date(`${year}-01-01`),
+        lte: new Date(`${year}-12-31`),
+      };
+    }
+
+    if (status) {
+      whereConditions.status = status;
+    }
+
+    submission = await prisma.submission.findMany({
+      where: whereConditions,
       select: {
         submission_id: true,
         submission_date: true,
@@ -238,6 +248,7 @@ export class SubmissionService {
         type: true,
       },
     });
+
     return submission;
   }
   static async deleteSubmission({
