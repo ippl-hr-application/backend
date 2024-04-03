@@ -208,6 +208,10 @@ model Employee {
   wage                  Float
   password              String
   hasResigned           Boolean         @default(false)
+  gender                String          @db.VarChar()
+  join_date             DateTime        @db.Date
+  resign_date           DateTime?        @db.Date
+  delete_at             DateTime?        @db.Date
   tasks                 EmployeeTask[]  @relation("employee")
   give_tasks            EmployeeTask[]  @relation("manager")
   files                 EmployeeFile[]
