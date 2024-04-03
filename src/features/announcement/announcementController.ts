@@ -80,4 +80,25 @@ export class AnnouncementController {
       next(error);
     }
   }
+
+  static async getAnnouncementByTitle(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { company_id, title } = req.params;
+      const announcement = await AnnouncementService.getAnnouncementByTitle({
+        company_id,
+        title
+      });
+
+      res.status(200).json({
+        status: 'success',
+        data: announcement,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

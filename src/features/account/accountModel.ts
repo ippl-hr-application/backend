@@ -8,7 +8,12 @@ import {
 
 export type GetEmployeeRequest = {
   company_branch_id: string;
-  employee_id: string;
+  first_name?: string | undefined;
+  last_name?: string | undefined;
+  hasResigned?: string | undefined;
+  gender?: string | undefined;
+  job_position?: string | undefined;
+  employment_status?: string | undefined;
 };
 
 export type GetAllEmployeeResponse = Employee[];
@@ -36,6 +41,8 @@ export type CreateRequest = {
   bank_account_number?: string;
   bank_type?: string;
   wage: number;
+  gender: string;
+  join_date: Date;
 };
 
 export type CreateResponse = {
@@ -64,7 +71,9 @@ export type UpdateRequest = {
   bank_account_number?: string;
   bank_type?: string;
   wage?: number;
-  hasresigned?: boolean;
+  hasresigned?: string;
+  join_date?: Date;
+  gender?: string;
 };
 
 export type UpdateResponse = {

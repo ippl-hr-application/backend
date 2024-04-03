@@ -5,13 +5,6 @@ import {
 } from '@prisma/client'; 
 import exp from 'constants';
 
-// export type CreateAnnouncementRequest = Omit<
-//   CompanyAnnouncement,
-//   'company_announcement_id'
-// > & {
-//   company_branch_id?: string[];
-//   file_attachments?: Express.Multer.File | undefined;
-// };
 export type CreateAnnouncementRequest = {
   company_id: string;
   title: string;
@@ -34,3 +27,4 @@ export type UpdateAnnouncementRequest = Omit<
   CreateAnnouncementRequest,
   'company_branch_id' | 'announcement_id'
 >;
+

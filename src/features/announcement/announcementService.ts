@@ -244,6 +244,19 @@ export class AnnouncementService {
     company_id: string
   ) {
 
+    const isDeleted = await prisma.companyAnnouncement.findFirst({
+      where: {
+        company_announcement_id: parseInt(announcement_id),
+        company_id: company_id
+      }
+    });
+
+    if (!isDeleted) {
+      throw new ErrorResponse('Announcement not found', 404, [
+        'company_announcement_id',
+      ]);
+    }
+
     await prisma.companyAnnouncementTo.deleteMany({
       where: {
         company_announcement_id: parseInt(announcement_id)
@@ -264,6 +277,38 @@ export class AnnouncementService {
     });
   
     return announcement;
+  }
+
+  static async getAnnouncementByTitle({
+    company_id,
+    title,
+  }: {
+    company_id: string;
+    title: string;
+  }): Promise<CompanyAnnouncement[]> {
+    const announcements = await prisma.companyAnnouncement.findMany({
+      where: { company_id: company_id, title: title },
+      include: {
+        company_announcement_to: {
+          select: {
+            company_branch_id: true,
+          },
+        },
+        company_announcement_file_attachments: {
+          include: {
+            company_file: {
+              select: {
+                file_name: true,
+                file_size: true,
+                file_type: true,
+                file_url: true,
+              }
+            },
+          },
+        },
+      },
+    });
+    return announcements;
   }
   
 }
