@@ -24,7 +24,8 @@ export class AccountValidation {
     bank_account_number: z.string().max(20).optional(),
     bank_type: z.string().max(20).optional(),
     wage: z.number(),
-    // gender: z.string().max(10),
+    gender: z.string().max(10),
+    join_date: z.date(),
   });
 
   static readonly UPDATE_EMPLOYEE: ZodType = z.object({
@@ -48,7 +49,9 @@ export class AccountValidation {
     bank_account_number: z.string().max(20).optional(),
     bank_type: z.string().max(20).optional(),
     wage: z.number().optional(),
-    hasResigned: z.boolean().optional(),
+    hasResigned: z.string().optional(),
+    gender: z.string().max(10).optional(),
+    join_date: z.date().optional(),
   });
 
   static DELETE_EMPLOYEE: ZodType = z.object({

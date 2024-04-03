@@ -10,8 +10,21 @@ export class AccountController {
   ) {
     try {
       const company_branch_id = req.params.company_branch_id;
-      let hasResigned = req.query.hasResigned;
-      const employees = await AccountService.getAllEmployees(company_branch_id, hasResigned as string);
+      const first_name = req.query.first_name as string;
+      const last_name = req.query.last_name as string;
+      const hasResigned = req.query.hasResigned as string;
+      const gender = req.query.gender as string;
+      const job_position = req.query.job_position as string;
+      const employment_status = req.query.employment_status as string;
+      const employees = await AccountService.getAllEmployees({
+        company_branch_id,
+        hasResigned,
+        first_name,
+        last_name,
+        gender,
+        job_position,
+        employment_status,
+      });
       res.status(200).json({
         success: true,
         data: {
@@ -28,7 +41,6 @@ export class AccountController {
     try {
       const employee_id = req.params.employee_id;
       const company_branch_id = req.params.company_branch_id;
-      const hasResigned = req.query.hasResigned;
       const employee = await AccountService.searchEmployee({
         employee_id,
         company_branch_id,
@@ -136,26 +148,4 @@ export class AccountController {
       next(error);
     }
   }
-
-  // static async getEmployeesByResignedStatus(
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ) {
-  //   try {
-  //     const  company_branch_id  = req.params.company_branch_id;
-  //     const  hasResigned  = req.params.hasResigned;
-  //     const employees = await AccountService.getEmployeesByResignedStatus({
-  //       company_branch_id,
-  //       hasResigned: hasResigned === "true" ? true : false,
-  //     });
-  //     return res.status(200).json({
-  //       success: true,
-  //       data: employees,
-  //       message: "Successfully get employee by resigned status",
-  //     });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
 }

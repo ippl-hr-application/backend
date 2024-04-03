@@ -10,25 +10,47 @@ import {
   DeleteResponse,
   GetEmployeeRequest,
   ResignRequest,
+  GetAllEmployeeResponse,
 } from './accountModel';
 import { prisma } from '../../applications';
 import { ErrorResponse } from '../../models';
+import { promises } from 'dns';
 
 export class AccountService {
-  static async getAllEmployees(company_branch_id: string, hasResigned: string) {
+  static async getAllEmployees({
+    company_branch_id, 
+    hasResigned, 
+    first_name,
+    last_name, 
+    gender,
+    job_position,
+    employment_status,
+  }: GetEmployeeRequest): Promise<GetAllEmployeeResponse> {
     console.log(hasResigned);
-    return await prisma.employee.findMany({
+    const findEmployee = await prisma.employee.findMany({
       where: {
+        first_name: first_name,
+        last_name: last_name,
+        gender: gender,
         company_branch_id: company_branch_id,
         hasResigned: hasResigned === 'true' ? true : false,
       },
-    });
+    })
+    if(findEmployee[0] == undefined){
+      throw new ErrorResponse(
+        'Employee not found',
+        404,
+        ['employee'],
+        'EMPLOYEE_NOT_FOUND'
+      );
+    }
+    return findEmployee;
   }
 
   static async searchEmployee({
     company_branch_id,
     employee_id,
-  }: GetEmployeeRequest) {
+  }: {company_branch_id: string, employee_id: string}) {
     const findEmployee = await prisma.employee.findUnique({
       where: {
         company_branch_id: company_branch_id,
@@ -55,6 +77,7 @@ export class AccountService {
       employeeData.identity_expired_date
     );
     employeeData.birth_date = new Date(employeeData.birth_date);
+    employeeData.join_date = new Date(employeeData.join_date);
 
     const request = Validation.validate(
       AccountValidation.CREATE_EMPLOYEE,
@@ -100,7 +123,8 @@ export class AccountService {
         bank_account_number: request.bank_account_number,
         bank_type: request.bank_type,
         wage: request.wage,
-        // gender: request.gender,
+        gender: request.gender,
+        join_date: request.join_date,
       },
     });
 
@@ -113,7 +137,7 @@ export class AccountService {
   static async updateEmployee(
     employeeData: UpdateRequest
   ): Promise<UpdateResponse> {
-    if (employeeData.identity_expired_date) {
+    if (employeeData.identity_expired_date !== undefined) {
       employeeData.identity_expired_date = new Date(
         employeeData.identity_expired_date
       );
@@ -123,10 +147,10 @@ export class AccountService {
       AccountValidation.UPDATE_EMPLOYEE,
       employeeData
     );
-
+      
     const findEmployee = await prisma.employee.findUnique({
       where: {
-        company_branch_id: request.company_branch_id, // pake user local?
+        company_branch_id: request.company_branch_id,
         employee_id: request.employee_id,
       },
     });
@@ -147,8 +171,12 @@ export class AccountService {
       },
       data: { ...request },
     });
-
-    return employeeUpdate;
+    console.log(employeeUpdate)
+    return {
+      employee_id: employeeUpdate.employee_id,
+      first_name: employeeUpdate.first_name,
+      last_name: employeeUpdate.last_name,
+    };
   }
 
   static async deleteEmployee(data: DeleteRequest): Promise<DeleteResponse> {
@@ -249,18 +277,4 @@ export class AccountService {
 
     return employeeResign;
   }
-
-  // static async getEmployeesByResignedStatus({
-  //   company_branch_id,
-  //   hasResigned,
-  // }: ResignStatusRequest) {
-  //   console.log(hasResigned);
-  //   const employees = await prisma.employee.findMany({
-  //     where: {
-  //       company_branch_id: company_branch_id,
-  //       hasResigned: hasResigned,
-  //     },
-  //   });
-  //   return employees;
-  // }
 }
