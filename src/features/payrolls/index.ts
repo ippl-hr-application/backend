@@ -1,0 +1,1 @@
+export { default as payrollRoute } from "./payroll-route";

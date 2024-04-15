@@ -17,6 +17,7 @@ import { documentRoute } from "./features/document-management";
 import { companyBranchRoute } from "./features/company-branch";
 import { imagekit } from "./utils/image-kit";
 import { announcementRoute } from "./features/announcement";
+import { payrollRoute } from "./features/payrolls";
 
 dotenv.config();
 const app: Express = express();
@@ -46,6 +47,7 @@ app.get("/auth-imagekit", function (req, res) {
   res.send(result);
 });
 app.use("/announcement", announcementRoute);
+app.use("/payroll", payrollRoute);
 
 app.use(ErrorMiddleware.notFound);
 app.use(ErrorMiddleware.returnError);

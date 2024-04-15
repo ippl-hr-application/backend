@@ -41,10 +41,10 @@ model Company {
   User    RegisteredUser @relation(fields: [user_id], references: [user_id])
   user_id String         @unique
 
-  name       String
-  industry   String?
-  npwp_digit String? @db.VarChar(16)
-  package_type String @default("free")
+  name         String
+  industry     String?
+  npwp_digit   String? @db.VarChar(16)
+  package_type String  @default("free")
 
   company_logo          CompanyLogo?
   company_branches      CompanyBranches[]
@@ -58,7 +58,7 @@ model CompanyBranches {
   company_branch_id String @id @default(uuid())
 
   company    Company @relation(fields: [company_id], references: [company_id])
-  company_id String 
+  company_id String
 
   email        String?
   phone_number String? @db.VarChar(15)
@@ -66,7 +66,7 @@ model CompanyBranches {
   province     String? @db.VarChar(50)
   city         String? @db.VarChar(50)
   size         Int?    @db.Integer()
-  hq_initial   String @db.VarChar(50)
+  hq_initial   String  @db.VarChar(50)
   hq_code      String? @db.VarChar(50)
   umr          Float?
   umr_province Float?
@@ -80,11 +80,12 @@ model CompanyBranches {
   employee_tasks          EmployeeTask[]
   reimbursement           Reimbursement[]
   attendances             Attendance[]
-  shift Shift[] 
-  assign_shift AssignShift[]
-  current_company_branch MutationSubmission[] @relation("current")
-  target_company_branch MutationSubmission[] @relation("target")
-  
+  shift                   Shift[]
+  assign_shift            AssignShift[]
+  current_company_branch  MutationSubmission[]    @relation("current")
+  target_company_branch   MutationSubmission[]    @relation("target")
+  payrolls                Payroll[]
+
   @@map("company_branches")
 }
 
@@ -212,15 +213,16 @@ model Employee {
   hasResigned           Boolean         @default(false)
   gender                String          @db.VarChar()
   join_date             DateTime        @db.Date
-  resign_date           DateTime?        @db.Date
-  delete_at             DateTime?        @db.Date
+  resign_date           DateTime?       @db.Date
+  delete_at             DateTime?       @db.Date
   tasks                 EmployeeTask[]  @relation("employee")
   give_tasks            EmployeeTask[]  @relation("manager")
   files                 EmployeeFile[]
   reimbursement         Reimbursement[]
   attendances           Attendance[]
   submissions           Submission[]
-  assign_shift  AssignShift[]
+  assign_shift          AssignShift[]
+  payrolls              Payroll[]
 
   @@map("employees")
 }
@@ -246,17 +248,17 @@ model EmployeeTask {
 }
 
 model EmployeeFile {
-  employee_file_id      Int                           @id @default(autoincrement())
-  employee              Employee                      @relation(fields: [employee_id], references: [employee_id])
-  employee_id           String
-  file_name             String
-  file_size             Int
-  file_type             String
-  file_url              String
-  file_for              String?                       @db.VarChar(20)
-  reimbursements        ReimbursementFileAttachment[]
-  attendance_check      AttendanceCheck?
-  submission            Submission?
+  employee_file_id Int                           @id @default(autoincrement())
+  employee         Employee                      @relation(fields: [employee_id], references: [employee_id])
+  employee_id      String
+  file_name        String
+  file_size        Int
+  file_type        String
+  file_url         String
+  file_for         String?                       @db.VarChar(20)
+  reimbursements   ReimbursementFileAttachment[]
+  attendance_check AttendanceCheck?
+  submission       Submission?
 
   @@map("employee_files")
 }
@@ -290,27 +292,29 @@ model ReimbursementFileAttachment {
 }
 
 model Shift {
-  shift_id    Int          @id @default(autoincrement())
-  company_branch CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
+  shift_id          Int                     @id @default(autoincrement())
+  company_branch    CompanyBranches         @relation(fields: [company_branch_id], references: [company_branch_id])
   company_branch_id String
-  name  String
-  start_time String
-  end_time    String
-  attendance  Attendance[]
-  assign_shift AssignShift[]
-  current_shift ChangeShiftSubmission[] @relation("current")
-  target_shift ChangeShiftSubmission[] @relation("target")
+  name              String
+  start_time        String
+  end_time          String
+  attendance        Attendance[]
+  assign_shift      AssignShift[]
+  current_shift     ChangeShiftSubmission[] @relation("current")
+  target_shift      ChangeShiftSubmission[] @relation("target")
+
   @@map("shifts")
 }
+
 model AssignShift {
-  assign_shift_id Int @id @default(autoincrement())
-  shift    Shift @relation(fields: [shift_id], references: [shift_id])
-  shift_id Int
-  employee    Employee @relation(fields: [employee_id], references: [employee_id])
-  employee_id String
+  assign_shift_id   Int             @id @default(autoincrement())
+  shift             Shift           @relation(fields: [shift_id], references: [shift_id])
+  shift_id          Int
+  employee          Employee        @relation(fields: [employee_id], references: [employee_id])
+  employee_id       String
   company_branch    CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
   company_branch_id String
-  target_date  DateTime?        @db.Date
+  target_date       DateTime?       @db.Date
 }
 
 model Attendance {
@@ -319,12 +323,12 @@ model Attendance {
   employee    Employee @relation(fields: [employee_id], references: [employee_id])
   employee_id String
 
-  shift    Shift @relation(fields: [shift_id], references: [shift_id])
-  shift_id Int
-  company_branch    CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
+  shift             Shift            @relation(fields: [shift_id], references: [shift_id])
+  shift_id          Int
+  company_branch    CompanyBranches  @relation(fields: [company_branch_id], references: [company_branch_id])
   company_branch_id String
-  date             DateTime         @db.Date
-  attendance_check AttendanceCheck?
+  date              DateTime         @db.Date
+  attendance_check  AttendanceCheck?
 
   @@map("attendances")
 }
@@ -369,17 +373,17 @@ enum SubmissionStatus {
 }
 
 model Submission {
-  submission_id         Int                   @id @default(autoincrement())
-  submission_date       DateTime
-  type                  String                @db.VarChar(50)
-  employee_id           String
-  employee              Employee              @relation(fields: [employee_id], references: [employee_id])
-  employee_file_id  Int?           @unique
-  employee_file     EmployeeFile?   @relation(fields: [employee_file_id], references: [employee_file_id] ,onDelete: Cascade)
-  status                SubmissionStatus
-  permission_submission PermissionSubmission?
-  leave_submission      LeaveSubmission?
-  mutation_submission   MutationSubmission?
+  submission_id           Int                    @id @default(autoincrement())
+  submission_date         DateTime
+  type                    String                 @db.VarChar(50)
+  employee_id             String
+  employee                Employee               @relation(fields: [employee_id], references: [employee_id])
+  employee_file_id        Int?                   @unique
+  employee_file           EmployeeFile?          @relation(fields: [employee_file_id], references: [employee_file_id], onDelete: Cascade)
+  status                  SubmissionStatus
+  permission_submission   PermissionSubmission?
+  leave_submission        LeaveSubmission?
+  mutation_submission     MutationSubmission?
   change_shift_submission ChangeShiftSubmission?
 
   @@map("submissions")
@@ -388,8 +392,8 @@ model Submission {
 model PermissionSubmission {
   permission_submission_id Int @id @default(autoincrement())
 
-  submission        Submission     @relation(fields: [submision_id], references: [submission_id],onDelete: Cascade)
-  submision_id      Int            @unique
+  submission   Submission @relation(fields: [submision_id], references: [submission_id], onDelete: Cascade)
+  submision_id Int        @unique
 
   from              DateTime
   to                DateTime
@@ -400,37 +404,52 @@ model PermissionSubmission {
 }
 
 model LeaveSubmission {
-  leave_permission_id Int          @id @default(autoincrement())
- 
-  submission          Submission   @relation(fields: [submision_id], references: [submission_id], onDelete: Cascade)
-  submision_id        Int          @unique
+  leave_permission_id Int @id @default(autoincrement())
+
+  submission   Submission @relation(fields: [submision_id], references: [submission_id], onDelete: Cascade)
+  submision_id Int        @unique
 
   from         DateTime
   to           DateTime
   leave_reason String   @db.VarChar(100)
+
   @@map("leave_submission")
 }
 
 model MutationSubmission {
-  mutation_permission_id Int          @id @default(autoincrement())
-  submission             Submission   @relation(fields: [submision_id], references: [submission_id], onDelete: Cascade)
-  submision_id           Int          @unique
-  mutation_reason  String @db.VarChar(100)
-  current_company_branch CompanyBranches @relation( "current" ,fields: [current_company_branch_id], references: [company_branch_id])
+  mutation_permission_id    Int             @id @default(autoincrement())
+  submission                Submission      @relation(fields: [submision_id], references: [submission_id], onDelete: Cascade)
+  submision_id              Int             @unique
+  mutation_reason           String          @db.VarChar(100)
+  current_company_branch    CompanyBranches @relation("current", fields: [current_company_branch_id], references: [company_branch_id])
   current_company_branch_id String
-  target_company_branch CompanyBranches @relation("target", fields: [target_company_branch_id], references: [company_branch_id])
-  target_company_branch_id String
-  
+  target_company_branch     CompanyBranches @relation("target", fields: [target_company_branch_id], references: [company_branch_id])
+  target_company_branch_id  String
+
   @@map("mutation_submission")
 }
 
 model ChangeShiftSubmission {
-  change_shift_permission_id Int          @id @default(autoincrement())
-  submission             Submission   @relation(fields: [submision_id], references: [submission_id], onDelete: Cascade)
-  submision_id           Int          @unique
-  current_shift Shift @relation( "current",fields: [current_shift_id], references: [shift_id])
-  current_shift_id Int
-  target_shift Shift @relation("target", fields: [target_shift_id], references: [shift_id])
-  target_shift_id Int
-  target_date  DateTime       @db.Date
+  change_shift_permission_id Int        @id @default(autoincrement())
+  submission                 Submission @relation(fields: [submision_id], references: [submission_id], onDelete: Cascade)
+  submision_id               Int        @unique
+  current_shift              Shift      @relation("current", fields: [current_shift_id], references: [shift_id])
+  current_shift_id           Int
+  target_shift               Shift      @relation("target", fields: [target_shift_id], references: [shift_id])
+  target_shift_id            Int
+  target_date                DateTime   @db.Date
+}
+
+model Payroll {
+  payroll_id        Int             @id @default(autoincrement())
+  company_branch    CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
+  company_branch_id String
+  employee          Employee        @relation(fields: [employee_id], references: [employee_id])
+  employee_id       String
+  month             Int             @db.SmallInt()
+  year              Int             @db.SmallInt()
+  wage              Float
+  status            String          @db.VarChar(20)
+
+  @@map("payrolls")
 }
