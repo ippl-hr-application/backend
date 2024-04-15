@@ -18,9 +18,16 @@ import { companyBranchRoute } from "./features/company-branch";
 import { imagekit } from "./utils/image-kit";
 import { announcementRoute } from "./features/announcement";
 import { payrollRoute } from "./features/payrolls";
+import { meraihRoute } from "./features/meraih-exclusive";
+import cron from "node-cron";
+import { PackageTypeMiddleware } from "./middlewares/package_type_middleware";
 
 dotenv.config();
 const app: Express = express();
+
+cron.schedule("0 0 * * *", async () => {
+  await PackageTypeMiddleware.dailyCheckExpiredPremiumPackage();
+});
 
 app.use(cors());
 app.use(express.json());
@@ -48,6 +55,7 @@ app.get("/auth-imagekit", function (req, res) {
 });
 app.use("/announcement", announcementRoute);
 app.use("/payroll", payrollRoute);
+app.use("/meraih", meraihRoute);
 
 app.use(ErrorMiddleware.notFound);
 app.use(ErrorMiddleware.returnError);
