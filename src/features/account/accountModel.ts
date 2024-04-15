@@ -46,6 +46,7 @@ export type CreateRequest = {
 };
 
 export type CreateResponse = {
+  employee_id: string;
   first_name: string;
   last_name: string;
 };
