@@ -9,6 +9,11 @@ payrollRouter.get("/", [
   PayrollController.getPayrolls,
 ]);
 
+payrollRouter.get("/employee", [
+  JWTMiddleware.verifyToken,
+  PayrollController.getUserPayrolls,
+])
+
 payrollRouter.post("/", [
   JWTMiddleware.verifyToken,
   PayrollController.createPayroll,

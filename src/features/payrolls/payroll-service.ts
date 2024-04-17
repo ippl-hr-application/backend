@@ -1,9 +1,11 @@
+import { Payroll } from "@prisma/client";
 import { prisma } from "../../applications";
 import { ErrorResponse } from "../../models";
 import { Validation } from "../../validations";
 import {
   CreatePayrollRequest,
   GetPayrollRequest,
+  GetUserPayrollRequest,
   UpdatePayrollRequest,
 } from "./payroll-model";
 import { PayrollValidation } from "./payroll-validation";
@@ -27,7 +29,7 @@ export class PayrollService {
             select: {
               first_name: true,
               last_name: true,
-            }
+            },
           },
         },
         orderBy: {
@@ -49,6 +51,23 @@ export class PayrollService {
     ]);
 
     return [payrolls, totalWage._sum.wage];
+  }
+
+  static async getUserPayrolls(data: GetUserPayrollRequest): Promise<Payroll[]> {
+    const { company_branch_id, employee_id, year } = Validation.validate(
+      PayrollValidation.GET_USER_PAYROLL,
+      data
+    );
+
+    const userPayrolls = await prisma.payroll.findMany({
+      where: {
+        company_branch_id,
+        employee_id,
+        year,
+      },
+    })
+
+    return userPayrolls;
   }
 
   static async createPayroll(data: CreatePayrollRequest) {
@@ -94,9 +113,14 @@ export class PayrollService {
     return payrolls;
   }
 
-  static async updatePayroll({ payroll_id, status }: UpdatePayrollRequest) {
+  static async updatePayroll({
+    company_branch_id,
+    payroll_id,
+    status,
+  }: UpdatePayrollRequest) {
     const isPayrollExist = await prisma.payroll.findUnique({
       where: {
+        company_branch_id,
         payroll_id: Number(payroll_id),
       },
     });

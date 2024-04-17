@@ -7,5 +7,12 @@ export class PayrollValidation {
     year: z.number(),
   });
 
+  static readonly GET_USER_PAYROLL: ZodType = z.object({
+    company_branch_id: z.string(),
+    employee_id: z.string(),
+    year: z.number(),
+  });
+
   static readonly CREATE_PAYROLL: ZodType = this.GET_PAYROLL;
+
 }
