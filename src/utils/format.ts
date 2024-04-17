@@ -5,3 +5,9 @@ export const pathToFileUrl = (filePath: string, apiUrl: string) => {
   url = `${apiUrl}/${url}`;
   return url;
 };
+
+export const pathToFileFolder = (filePath: string) => {
+  let folder: string = filePath.replace(/\\/g, "/");
+  folder = folder.replace(/ /g, "%20");
+  return folder;
+};

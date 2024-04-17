@@ -48,14 +48,15 @@ model Company {
 
   name         String
   industry     String?
-  npwp_digit   String? @db.VarChar(16)
-  package_type PackageType  @default(PREMIUM)
+  npwp_digit   String?     @db.VarChar(16)
+  package_type PackageType @default(PREMIUM)
   package_end  DateTime?
 
   company_logo          CompanyLogo?
   company_branches      CompanyBranches[]
   company_announcements CompanyAnnouncement[]
   company_files         CompanyFile[]
+  CompanyFileTemplate   CompanyFileTemplate[]
 
   @@map("companies")
 }
@@ -120,6 +121,7 @@ model CompanyFile {
   file_url                              String
   description                           String?                             @db.VarChar(255)
   company_announcement_file_attachments CompanyAnnouncementFileAttachment[]
+  company_file_template                CompanyFileTemplate?
 
   @@map("company_files")
 }
@@ -158,6 +160,20 @@ model CompanyAnnouncementFileAttachment {
 
   @@id([company_announcement_id, company_file_id])
   @@map("company_announcement_file_attachements")
+}
+
+model CompanyFileTemplate {
+  company_file_template_id Int @id @default(autoincrement())
+
+  company    Company @relation(fields: [company_id], references: [company_id])
+  company_id String
+
+  company_file    CompanyFile @relation(fields: [company_file_id], references: [company_file_id])
+  company_file_id Int @unique
+
+  description String
+
+  @@map("company_file_templates")
 }
 
 //Employees
