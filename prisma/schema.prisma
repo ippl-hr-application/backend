@@ -10,6 +10,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum PackageType {
+  FREE
+  PREMIUM
+}
+
 model RegisteredUser {
   user_id      String @id @default(uuid())
   full_name    String @db.VarChar(50)
@@ -44,7 +49,8 @@ model Company {
   name         String
   industry     String?
   npwp_digit   String? @db.VarChar(16)
-  package_type String  @default("free")
+  package_type PackageType  @default(PREMIUM)
+  package_end  DateTime?
 
   company_logo          CompanyLogo?
   company_branches      CompanyBranches[]

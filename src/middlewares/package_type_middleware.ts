@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { EmployeeToken, ErrorResponse, UserToken } from "../models";
 import { prisma } from "../applications";
+import { PackageType } from "@prisma/client";
 
 export class PackageTypeMiddleware {
   static async isPackagePremium(
@@ -11,7 +12,7 @@ export class PackageTypeMiddleware {
     const { package_type, company_branch_id } = res.locals.user as
       | UserToken
       | EmployeeToken;
-      
+
     if (package_type && package_type === "premium") {
       next();
     } else if (company_branch_id) {
@@ -26,14 +27,48 @@ export class PackageTypeMiddleware {
         },
       });
 
-      if (companyBranch?.company?.package_type === "premium") {
+      if (companyBranch?.company?.package_type === PackageType.PREMIUM) {
         next();
       } else {
-        next(new ErrorResponse("You don't have the right package to send this request, please upgrade your package type.", 403, ["package_type"], "FORBIDDEN"));
+        next(
+          new ErrorResponse(
+            "You don't have the right package to send this request, please upgrade your package type.",
+            403,
+            ["package_type"],
+            "FORBIDDEN"
+          )
+        );
       }
     } else {
-      next(new ErrorResponse("You don't have the right package to send this request, please upgrade your package type.", 403, ["package_type"], "FORBIDDEN"));
+      next(
+        new ErrorResponse(
+          "You don't have the right package to send this request, please upgrade your package type.",
+          403,
+          ["package_type"],
+          "FORBIDDEN"
+        )
+      );
     }
+  }
 
+  static async dailyCheckExpiredPremiumPackage() {
+    const today = new Date();
+    const companies = await prisma.company.findMany({
+      where: {
+        package_type: PackageType.PREMIUM,
+        package_end: {
+          lte: today,
+        },
+      },
+    });
+
+    for (const company of companies) {
+      await prisma.company.update({
+        where: { company_id: company.company_id },
+        data: {
+          package_type: PackageType.FREE,
+        },
+      });
+    }
   }
 }
