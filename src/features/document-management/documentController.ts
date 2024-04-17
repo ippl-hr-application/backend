@@ -51,11 +51,18 @@ export class DocumentController {
       });
 
       const filePath = `${document.file_url}`;
-      res.sendFile(filePath, (err) => {
+      console.log(filePath)
+      res.download(filePath, (err) => {
         if (err) {
           next(err);
         }
       });
+      // absolute path use this
+      // res.sendFile(filePath, (err) => {
+      //   if (err) {
+      //     next(err);
+      //   }
+      // });
     } catch (error) {
       next(error);
     }

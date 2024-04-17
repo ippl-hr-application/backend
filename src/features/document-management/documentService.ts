@@ -16,6 +16,7 @@ import {
 } from './documentModel';
 import fs from 'fs';
 import { ErrorResponse } from '../../models';
+import { pathToFileUrl } from "../../utils/format";
 
 export class DocumentService {
   static async createDocument({
@@ -28,38 +29,13 @@ export class DocumentService {
       description,
     });
     // -------------------------
-    const baseFileName = document_file?.originalname || '';
-    const lastDotIndex = baseFileName.lastIndexOf('.');
-    const baseFileNameWithoutExtension = baseFileName.slice(0, lastDotIndex);
-    const fileExtension = baseFileName.slice(lastDotIndex + 1);
-
-    let fileName = baseFileNameWithoutExtension;
-    let fileNameWithType = baseFileName;
-    let count = 1;
-
-    while (true) {
-      const name_file = await prisma.companyFile.findMany({
-        where: {
-          file_name: fileNameWithType,
-        },
-      });
-
-      if (!name_file.length) {
-        break;
-      }
-
-      fileName = baseFileNameWithoutExtension; // Reset nama file
-      fileNameWithType = `${fileName}(${count}).${fileExtension}`;
-      count++;
-    }
-    
     const companyFile = await prisma.companyFile.create({
       data: {
         company_id: request.company_id,
-        file_name: fileNameWithType,
+        file_name: document_file?.originalname || '',
         file_size: document_file?.size || 0,
         file_type: document_file?.mimetype || '',
-        file_url: `./public/uploads/${fileNameWithType}`,
+        file_url: document_file?.path || "",
         description: request.description,
       },
     });
@@ -147,16 +123,12 @@ export class DocumentService {
         'FILE_NOT_FOUND'
       );
     }
-    // fs.unlinkSync(`./public/uploads/company_file/${companyFile.file_name}`);
     await prisma.companyFile.delete({
       where: {
         company_file_id: request.company_file_id,
         company_id: request.company_id,
       },
     });
-
-    // Hapus file dari sistem
-
     return companyFile;
   }
 }
