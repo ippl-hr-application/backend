@@ -1,4 +1,8 @@
+import { PackageType } from "@prisma/client";
 import { prisma } from "../../applications";
+import { UpdateUserPackageTypeRequets } from "./meraih-model";
+import { Validation } from "../../validations";
+import { MeraihValidation } from "./meraih-validation";
 
 export class MeraihService {
   static async getAllRegisteredUsers() {
@@ -32,12 +36,12 @@ export class MeraihService {
                 _count: {
                   select: {
                     employees: true,
-                  }
-                }
-              }
-            }
-          }
-        }
+                  },
+                },
+              },
+            },
+          },
+        },
         // include: {
         //   company: {
         //     include: {
@@ -56,5 +60,22 @@ export class MeraihService {
     });
 
     return users;
+  }
+
+  static async updateCompanyPackageType(data: UpdateUserPackageTypeRequets) {
+    const { company_id, package_end, package_type } = Validation.validate(MeraihValidation.UPDATE_COMPANY_PACKAGE_TYPE, {
+      ...data,
+      package_type: data.package_type.toUpperCase() as PackageType,
+    });
+
+    await prisma.company.update({
+      where: {
+        company_id,
+      },
+      data: {
+        package_type: PackageType[package_type],
+        package_end: new Date(package_end),
+      },
+    });
   }
 }
