@@ -5,13 +5,14 @@ import { EmployeeToken } from "../../models";
 export class PayrollController {
   static async getPayrolls(req: Request, res: Response, next: NextFunction) {
     try {
-      const { company_id: company_branch_id } = res.locals.user as EmployeeToken;
+      const { company_id: company_branch_id } = res.locals
+        .user as EmployeeToken;
       const { month, year } = req.query;
       const [payrolls, totalWage] = await PayrollService.getPayrolls({
         company_branch_id,
         month: Number(month),
         year: Number(year),
-      }); 
+      });
 
       return res.status(200).json({
         success: true,
@@ -23,9 +24,32 @@ export class PayrollController {
     }
   }
 
+  static async getUserPayrolls(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { company_branch_id, employee_id } = res.locals
+        .user as EmployeeToken;
+      const { year } = req.query;
+
+      const payrolls = await PayrollService.getUserPayrolls({
+        company_branch_id,
+        employee_id,
+        year: Number(year),
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: { payrolls },
+        message: "User payrolls fetched successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async createPayroll(req: Request, res: Response, next: NextFunction) {
     try {
-      const { company_id: company_branch_id } = res.locals.user as EmployeeToken;
+      const { company_branch_id } = res.locals
+        .user as EmployeeToken;
       const { month, year } = req.body;
       const payrolls = await PayrollService.createPayroll({
         company_branch_id,
@@ -46,8 +70,10 @@ export class PayrollController {
   static async updatePayroll(req: Request, res: Response, next: NextFunction) {
     try {
       const { payroll_id } = req.params;
+      const { company_branch_id } = res.locals.user as EmployeeToken;
       const { status } = req.body;
       const payroll = await PayrollService.updatePayroll({
+        company_branch_id,
         payroll_id,
         status,
       });
