@@ -11,3 +11,7 @@ export const pathToFileFolder = (filePath: string) => {
   folder = folder.replace(/ /g, "%20");
   return folder;
 };
+
+export const formatSpacedFileName = (fileName: string): string => {
+  return fileName.replace(/ /g, "_");
+};

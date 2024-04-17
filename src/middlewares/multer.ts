@@ -1,5 +1,6 @@
 import multer from "multer";
 import fs from "fs";
+import { formatSpacedFileName } from "../utils/format";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -28,7 +29,7 @@ const storage = multer.diskStorage({
     cb(null, dest);
   },
   filename: function (req, file, cb) {
-    cb(null, `${file.originalname.split(".")[0]}-${new Date().getTime()}.${file.originalname.split(".")[1]}`);
+    cb(null, `${formatSpacedFileName(file.originalname.split(".")[0])}-${new Date().getTime()}.${file.originalname.split(".")[1]}`);
   },
 });
 
