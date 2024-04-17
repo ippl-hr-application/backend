@@ -19,13 +19,16 @@ const storage = multer.diskStorage({
     if (file.fieldname === "attendance_file") {
       dest = "public/uploads/attendance_file/";
     }
+    if (file.fieldname === "template_file") {
+      dest = "public/uploads/template_file/";
+    }
     if (!fs.existsSync(dest)) {
       fs.mkdirSync(dest, { recursive: true });
     }
     cb(null, dest);
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+    cb(null, `${file.originalname.split(".")[0]}-${new Date().getTime()}.${file.originalname.split(".")[1]}`);
   },
 });
 
