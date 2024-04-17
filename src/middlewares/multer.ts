@@ -22,6 +22,12 @@ const storage = multer.diskStorage({
     if (file.fieldname === "template_file") {
       dest = "public/uploads/template_file/";
     }
+    if (file.fieldname === "document_file") {
+      dest = "public/uploads/document_file/";
+    }
+    if (file.fieldname === "announcement_file") {
+      dest = "public/uploads/announcement_file/";
+    }
     if (!fs.existsSync(dest)) {
       fs.mkdirSync(dest, { recursive: true });
     }
