@@ -1,0 +1,1 @@
+export { default as templateRoute } from './template-route';
