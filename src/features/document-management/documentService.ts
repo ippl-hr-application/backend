@@ -11,6 +11,8 @@ import {
   UpdateDocumentResponse,
   DeleteDocumentRequest,
   DeleteDocumentResponse,
+  DownloadDocumentRequest,
+  // DownloadDocumentResponse,
 } from './documentModel';
 import fs from 'fs';
 import { ErrorResponse } from '../../models';
@@ -50,14 +52,14 @@ export class DocumentService {
       fileNameWithType = `${fileName}(${count}).${fileExtension}`;
       count++;
     }
-
+    
     const companyFile = await prisma.companyFile.create({
       data: {
         company_id: request.company_id,
         file_name: fileNameWithType,
         file_size: document_file?.size || 0,
         file_type: document_file?.mimetype || '',
-        file_url: `/uploads/company_file/${fileNameWithType}`,
+        file_url: `./public/uploads/${fileNameWithType}`,
         description: request.description,
       },
     });
@@ -79,6 +81,28 @@ export class DocumentService {
     });
 
     return companyFiles;
+  }
+
+  static async downloadDocument({
+    company_file_id,
+  }: DownloadDocumentRequest) {
+
+    const companyFile = await prisma.companyFile.findFirst({
+      where: {
+        company_file_id: company_file_id
+      },
+    });
+
+    if (!companyFile) {
+      throw new ErrorResponse(
+        'File not found',
+        404,
+        ['company_file_id'],
+        'FILE_NOT_FOUND'
+      );
+    }
+
+    return companyFile;
   }
 
   static async updateDocument(
