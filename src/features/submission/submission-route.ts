@@ -29,7 +29,7 @@ submissionRoute.post("/change-shift", [
   JWTMiddleware.verifyToken,
   SubmissionController.createChangeShiftLetter,
 ]);
-submissionRoute.delete("/:id", [
+submissionRoute.delete("/:submission_id", [
   JWTMiddleware.verifyToken,
   SubmissionController.deleteSubmission,
 ]);
