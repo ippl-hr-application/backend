@@ -23,6 +23,7 @@ export class AttendanceService {
             shift_id: true,
             start_time: true,
             end_time: true,
+            name: true,
           },
         },
         employee: {
@@ -59,6 +60,8 @@ export class AttendanceService {
       date: new Date(),
       from: shiftInfo?.shift.start_time,
       to: shiftInfo?.shift.end_time,
+      shift_id: shiftInfo.shift.shift_id,
+      shift_name: shiftInfo?.shift.name,
     };
   }
   static async attendanceCheck({
