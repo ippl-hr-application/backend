@@ -9,6 +9,8 @@ export type GetShiftInfoResponse = {
   date: Date;
   from: string;
   to: string;
+  shift_id: number;
+  shift_name: string;
 };
 
 export type AttendanceCheckRequest = {
