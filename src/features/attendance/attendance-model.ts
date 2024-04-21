@@ -11,6 +11,7 @@ export type GetShiftInfoResponse = {
   to: string;
   shift_id: number;
   shift_name: string;
+  job_position: string;
 };
 
 export type AttendanceCheckRequest = {
