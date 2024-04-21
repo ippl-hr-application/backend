@@ -43,6 +43,31 @@ export class DocumentController {
     }
   }
 
+  static async downloadDocument(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { company_file_id } = req.params;
+      const document = await DocumentService.downloadDocument({
+        company_file_id: parseInt(company_file_id),
+      });
+
+      const filePath = `${document.file_url}`;
+      console.log(filePath)
+      res.download(filePath, (err) => {
+        if (err) {
+          next(err);
+        }
+      });
+      // absolute path use this
+      // res.sendFile(filePath, (err) => {
+      //   if (err) {
+      //     next(err);
+      //   }
+      // });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async updateDocument(req: Request, res: Response, next: NextFunction) {
     try {
       const document = await DocumentService.updateDocument(req.body);
