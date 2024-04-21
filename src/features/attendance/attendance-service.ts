@@ -30,6 +30,11 @@ export class AttendanceService {
           select: {
             first_name: true,
             last_name: true,
+            job_position: {
+              select: {
+                name: true,
+              },
+            },
             company_branch: {
               select: {
                 company: {
@@ -62,6 +67,7 @@ export class AttendanceService {
       to: shiftInfo?.shift.end_time,
       shift_id: shiftInfo.shift.shift_id,
       shift_name: shiftInfo?.shift.name,
+      job_position: shiftInfo?.employee.job_position.name,
     };
   }
   static async attendanceCheck({
