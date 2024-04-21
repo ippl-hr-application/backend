@@ -2,6 +2,7 @@ import {
   CompanyAnnouncement,
   CompanyAnnouncementFileAttachment,
   CompanyAnnouncementTo,
+  CompanyFile,
 } from '@prisma/client';
 import { prisma } from '../../applications';
 import { ErrorResponse } from '../../models';
@@ -12,6 +13,7 @@ import {
   UpdateAnnouncementRequest,
 } from './announcementModel';
 import { AnnouncementValidation } from './announcementValidation';
+import { pathToFileUrl } from '../../utils/format';
 
 export class AnnouncementService {
   static async getAnnouncementCompany({
@@ -43,6 +45,40 @@ export class AnnouncementService {
     });
 
     return announcements;
+  }
+
+  static async downloadAnnouncementFile({
+    company_id,
+    company_announcement_id,
+  }: {
+    company_id: number;
+    company_announcement_id: number;
+  }) {
+    const announcementFile = await prisma.companyAnnouncementFileAttachment.findMany({
+      where: {
+        company_announcement_id: company_announcement_id,
+      },
+      include: {
+        company_file: {
+          select: {
+            file_name: true,
+            file_size: true,
+            file_type: true,
+            file_url: true,
+          }
+        },
+      },
+    });
+
+    if (!announcementFile) {
+      throw new ErrorResponse('File not found', 404, [
+        'company_announcement_id',
+      ]);
+    }
+
+    const urlpath = announcementFile[0].company_file.file_url.replace("http://localhost:3000", "")
+    const fixurl = decodeURIComponent(urlpath)
+    return fixurl;
   }
 
   // static async getAnnouncementCompanyBranch({
@@ -111,48 +147,23 @@ export class AnnouncementService {
         });
       }
     }
-    let fileName = '';
-    if (file_attachment) {
-      console.log(file_attachment);
-      const baseFileName = file_attachment?.originalname || '';
-      const lastDotIndex = baseFileName.lastIndexOf('.');
-      const baseFileNameWithoutExtension = baseFileName.slice(0, lastDotIndex);
-      const fileExtension = baseFileName.slice(lastDotIndex + 1);
-      
-      fileName = baseFileNameWithoutExtension;
-      let fileNameWithType = baseFileName;
-      let count = 1;
-      
-      while (true) {
-        const name_file = await prisma.companyFile.findMany({
-          where: {
-            file_name: fileNameWithType,
-          },
-        });
-        
-        if (!name_file.length) {
-          break;
-        }
-        
-        fileName = baseFileNameWithoutExtension; // Reset nama file
-        fileNameWithType = `${fileName}(${count}).${fileExtension}`;
-        count++;
-      }
-
       const addCompanyFile = await prisma.companyFile.create({
         data: {
           company_id: request.company_id,
-          file_name: fileNameWithType,
+          file_name: file_attachment?.originalname || '',
           file_size: file_attachment?.size || 0,
           file_type: file_attachment?.mimetype || '',
-          file_url: `/uploads/company_file/${fileNameWithType}`,
+          file_url: pathToFileUrl(
+            file_attachment?.path || "",
+            process.env.SERVER_URL || "http://localhost:3000"
+          ),
           description: description,
         },
       });
       const company_file_id = await prisma.companyFile.findMany({
         where: {
           company_id: request.company_id,
-          file_name: fileNameWithType,
+          file_name: file_attachment?.originalname || '',
         },
         select: {
           company_file_id: true,
@@ -169,8 +180,6 @@ export class AnnouncementService {
           company_file_id: company_file_id[0]?.company_file_id,
         },
       });
-      
-    }
     
     const branch_names = await prisma.companyBranches.findMany({
       where: {
@@ -190,7 +199,7 @@ export class AnnouncementService {
     return {
       ...request,
       company_announcement_id: find_company_announcement_id[0]?.company_announcement_id || 0,
-      file_name: fileName,
+      file_name: file_attachment?.originalname || '',
       company_branch_id: branch_names_str,
     };
   }

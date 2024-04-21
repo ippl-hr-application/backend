@@ -17,6 +17,12 @@ export type GetDocumentRequest = {
 
 export type GetDocumentResponse = CompanyFile;
 
+export type DownloadDocumentRequest = {
+  company_file_id: number;
+};
+
+// export type DownloadDocumentResponse = CompanyFile;
+
 export type UpdateDocumentRequest = {
   company_file_id: number;
   company_id: string;

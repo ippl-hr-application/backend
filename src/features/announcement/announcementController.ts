@@ -7,11 +7,33 @@ export class AnnouncementController {
       const announcements = await AnnouncementService.getAnnouncementCompany({
         company_id: req.params.company_id,
       });
-
+      
       res.status(200).json({
         status: 'success',
         data: announcements,
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async downloadAnnouncementFile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { company_announcement_id, company_id } = req.params;
+
+      const announcementFile = await AnnouncementService.downloadAnnouncementFile({
+        company_id: parseInt(company_id),
+        company_announcement_id: parseInt(company_announcement_id),
+      });
+      // const filePath = `${announcementFile[0].company_file.file_url}`;
+      const filePath = `./public/${announcementFile}`;
+      console.log("ini file path")
+      res.download(filePath, (err) => {
+        if (err) {
+          next(err);
+        }
+      });
+      
     } catch (error) {
       next(error);
     }
