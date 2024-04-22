@@ -17,6 +17,10 @@ const storage = multer.diskStorage({
     if (file.fieldname === "mutation_file") {
       dest = "public/uploads/mutation_file/";
     }
+    if (file.fieldname === "resign_file") {
+      dest = "public/uploads/resign_file/";
+    }
+
     if (file.fieldname === "attendance_file") {
       dest = "public/uploads/attendance_file/";
     }
@@ -35,7 +39,12 @@ const storage = multer.diskStorage({
     cb(null, dest);
   },
   filename: function (req, file, cb) {
-    cb(null, `${formatSpacedFileName(file.originalname.split(".")[0])}-${new Date().getTime()}.${file.originalname.split(".")[1]}`);
+    cb(
+      null,
+      `${formatSpacedFileName(
+        file.originalname.split(".")[0]
+      )}-${new Date().getTime()}.${file.originalname.split(".")[1]}`
+    );
   },
 });
 

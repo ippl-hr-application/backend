@@ -184,4 +184,29 @@ export class SubmissionController {
       next(error);
     }
   }
+  static async createResignLetter(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { reason } = req.body;
+      const { employee_id } = res.locals.user;
+      const resign_file: Express.Multer.File | undefined = req.file;
+      const result = await SubmissionService.createResignLetter({
+        reason,
+        employee_id,
+        resign_file,
+      });
+      return res.status(201).json({
+        success: true,
+        data: {
+          ...result,
+        },
+        message: "Resign Letter Submitted",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

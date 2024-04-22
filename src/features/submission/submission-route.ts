@@ -29,6 +29,13 @@ submissionRoute.post("/change-shift", [
   JWTMiddleware.verifyToken,
   SubmissionController.createChangeShiftLetter,
 ]);
+
+submissionRoute.post("/resign", [
+  JWTMiddleware.verifyToken,
+  upload.single("resign_file"),
+  SubmissionController.createResignLetter,
+]);
+
 submissionRoute.delete("/:submission_id", [
   JWTMiddleware.verifyToken,
   SubmissionController.deleteSubmission,

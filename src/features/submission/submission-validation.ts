@@ -26,4 +26,8 @@ export class SubmissionValidation {
     current_shift_id: z.number(),
     target_date: z.string(),
   });
+
+  static readonly RESIGN_LETTER: ZodType = z.object({
+    reason: z.string().max(100),
+  });
 }

@@ -66,3 +66,14 @@ export type ChangeShiftSubmissionRequest = {
 };
 
 export type ChangeShiftSubmissionResponse = ChangeShiftSubmissionRequest;
+
+export type ResignSubmissionRequest = {
+  employee_id: string;
+  resign_file: Express.Multer.File | undefined;
+  reason: string;
+};
+
+export type ResignSubmissionResponse = {
+  reason: string;
+  employee_id: string;
+};

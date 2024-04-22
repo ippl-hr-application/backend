@@ -11,6 +11,8 @@ import {
   MutationSubmissionResponse,
   PermissionSubmissionRequest,
   PermissionSubmissionResponse,
+  ResignSubmissionRequest,
+  ResignSubmissionResponse,
 } from "./submission-model";
 import { SubmissionValidation } from "./submission-validation";
 import { pathToFileUrl } from "../../utils/format";
@@ -287,5 +289,52 @@ export class SubmissionService {
         submission_id,
       },
     });
+  }
+  static async createResignLetter({
+    employee_id,
+    reason,
+    resign_file,
+  }: ResignSubmissionRequest): Promise<ResignSubmissionResponse> {
+    const request = Validation.validate(SubmissionValidation.RESIGN_LETTER, {
+      reason,
+    });
+    await prisma.submission.create({
+      data: {
+        status: "PENDING",
+        submission_date: new Date(),
+        type: "RESIGN",
+        employee: {
+          connect: {
+            employee_id: employee_id,
+          },
+        },
+        employee_file: {
+          create: {
+            file_name: resign_file?.originalname || "",
+            file_size: resign_file?.size || 0,
+            file_type: resign_file?.mimetype || "",
+            file_url: pathToFileUrl(
+              resign_file?.path || "",
+              process.env.SERVER_URL || "http://localhost:3000"
+            ),
+            file_for: "SURAT RESIGN",
+            employee: {
+              connect: {
+                employee_id: employee_id,
+              },
+            },
+          },
+        },
+        resign_submission: {
+          create: {
+            reason: request.reason,
+          },
+        },
+      },
+    });
+    return {
+      reason: reason,
+      employee_id: employee_id,
+    };
   }
 }
