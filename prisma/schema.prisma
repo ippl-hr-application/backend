@@ -337,6 +337,7 @@ model AssignShift {
   company_branch    CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
   company_branch_id String
   target_date       DateTime?       @db.Date
+  @@map("assign_shifts")
 }
 
 model Attendance {
@@ -407,7 +408,7 @@ model Submission {
   leave_submission        LeaveSubmission?
   mutation_submission     MutationSubmission?
   change_shift_submission ChangeShiftSubmission?
-
+  resign_submission ResignSubmission?
   @@map("submissions")
 }
 
@@ -460,6 +461,16 @@ model ChangeShiftSubmission {
   target_shift               Shift      @relation("target", fields: [target_shift_id], references: [shift_id])
   target_shift_id            Int
   target_date                DateTime   @db.Date
+  reason                     String     @db.VarChar(100)
+  @@map("change_shift_submission")
+}
+
+model ResignSubmission {
+  resign_submission_id Int @id @default(autoincrement())
+  submission                 Submission @relation(fields: [submision_id], references: [submission_id], onDelete: Cascade)
+  submision_id               Int        @unique
+  reason                     String     @db.VarChar(100)
+  @@map("resign_submission")
 }
 
 model Payroll {

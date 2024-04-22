@@ -1,5 +1,3 @@
-import { number } from "zod";
-
 type PermissionType = "SAKIT" | "IZIN";
 type SubmissionStatus = "PENDING" | "ACCEPTED" | "REJECTED";
 export type PermissionSubmissionRequest = {
@@ -64,6 +62,18 @@ export type ChangeShiftSubmissionRequest = {
   target_shift_id: number;
   current_shift_id: number;
   target_date: Date;
+  reason: string;
 };
 
 export type ChangeShiftSubmissionResponse = ChangeShiftSubmissionRequest;
+
+export type ResignSubmissionRequest = {
+  employee_id: string;
+  resign_file: Express.Multer.File | undefined;
+  reason: string;
+};
+
+export type ResignSubmissionResponse = {
+  reason: string;
+  employee_id: string;
+};

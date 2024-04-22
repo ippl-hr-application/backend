@@ -20,4 +20,14 @@ export class SubmissionValidation {
     target_company_branch_id: z.string(),
     employee_id: z.string(),
   });
+  static readonly CHANGE_SHIFT_LETTER: ZodType = z.object({
+    reason: z.string().max(100),
+    target_shift_id: z.number(),
+    current_shift_id: z.number(),
+    target_date: z.string(),
+  });
+
+  static readonly RESIGN_LETTER: ZodType = z.object({
+    reason: z.string().max(100),
+  });
 }

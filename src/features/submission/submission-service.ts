@@ -11,6 +11,8 @@ import {
   MutationSubmissionResponse,
   PermissionSubmissionRequest,
   PermissionSubmissionResponse,
+  ResignSubmissionRequest,
+  ResignSubmissionResponse,
 } from "./submission-model";
 import { SubmissionValidation } from "./submission-validation";
 import { pathToFileUrl } from "../../utils/format";
@@ -193,8 +195,18 @@ export class SubmissionService {
     target_shift_id,
     current_shift_id,
     target_date,
+    reason,
     employee_id,
   }: ChangeShiftSubmissionRequest): Promise<ChangeShiftSubmissionResponse> {
+    const request = Validation.validate(
+      SubmissionValidation.CHANGE_SHIFT_LETTER,
+      {
+        target_shift_id,
+        current_shift_id,
+        target_date,
+        reason,
+      }
+    );
     await prisma.submission.create({
       data: {
         employee_id,
@@ -203,18 +215,20 @@ export class SubmissionService {
         type: "PERUBAHAN SHIFT",
         change_shift_submission: {
           create: {
-            target_shift_id: target_shift_id,
-            current_shift_id: current_shift_id,
-            target_date: target_date,
+            reason: request.reason,
+            target_shift_id: request.target_shift_id,
+            current_shift_id: request.current_shift_id,
+            target_date: request.target_date,
           },
         },
       },
     });
     return {
       employee_id,
-      target_shift_id: target_shift_id,
-      current_shift_id: current_shift_id,
-      target_date: target_date,
+      reason: request.reason,
+      target_shift_id: request.target_shift_id,
+      current_shift_id: request.current_shift_id,
+      target_date: request.target_date,
     };
   }
   static async getSubmissionHistory({
@@ -275,5 +289,52 @@ export class SubmissionService {
         submission_id,
       },
     });
+  }
+  static async createResignLetter({
+    employee_id,
+    reason,
+    resign_file,
+  }: ResignSubmissionRequest): Promise<ResignSubmissionResponse> {
+    const request = Validation.validate(SubmissionValidation.RESIGN_LETTER, {
+      reason,
+    });
+    await prisma.submission.create({
+      data: {
+        status: "PENDING",
+        submission_date: new Date(),
+        type: "RESIGN",
+        employee: {
+          connect: {
+            employee_id: employee_id,
+          },
+        },
+        employee_file: {
+          create: {
+            file_name: resign_file?.originalname || "",
+            file_size: resign_file?.size || 0,
+            file_type: resign_file?.mimetype || "",
+            file_url: pathToFileUrl(
+              resign_file?.path || "",
+              process.env.SERVER_URL || "http://localhost:3000"
+            ),
+            file_for: "SURAT RESIGN",
+            employee: {
+              connect: {
+                employee_id: employee_id,
+              },
+            },
+          },
+        },
+        resign_submission: {
+          create: {
+            reason: request.reason,
+          },
+        },
+      },
+    });
+    return {
+      reason: reason,
+      employee_id: employee_id,
+    };
   }
 }
