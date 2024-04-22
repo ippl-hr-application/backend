@@ -37,6 +37,8 @@ export class AttendanceService {
             },
             company_branch: {
               select: {
+                company_branch_id: true,
+                city: true,
                 company: {
                   select: {
                     name: true,
@@ -68,6 +70,8 @@ export class AttendanceService {
       shift_id: shiftInfo.shift.shift_id,
       shift_name: shiftInfo?.shift.name,
       job_position: shiftInfo?.employee.job_position.name,
+      company_branch_id: shiftInfo?.employee.company_branch.company_branch_id,
+      city: shiftInfo?.employee.company_branch.city,
     };
   }
   static async attendanceCheck({
