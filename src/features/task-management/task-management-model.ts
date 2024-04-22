@@ -5,8 +5,8 @@ export type CreateTaskRequest = {
   employee_id: string[];
   title: string;
   description: string;
-  start_date: Date;
-  end_date: Date;
+  start_date: string;
+  end_date: string;
 };
 
 export type UpdateTaskRequest = Omit<CreateTaskRequest, "company_branch_id" | "task_id" | "employee_id">;

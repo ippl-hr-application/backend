@@ -54,8 +54,8 @@ export class TaskManagementService {
         employee_id,
         title: request.title,
         description: request.description,
-        start_date: request.start_date,
-        end_date: request.end_date,
+        start_date: new Date(request.start_date),
+        end_date: new Date(request.end_date),
         given_by_id: from,
       })),
     });
