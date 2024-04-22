@@ -8,11 +8,23 @@ import { ErrorResponse } from "../../models";
 export class TaskManagementService {
   static async getTaskManagementFromCompany({
     company_branch_id,
+    start_date,
+    end_date,
   }: {
     company_branch_id: string;
+    [key: string]: string;
   }): Promise<EmployeeTask[]> {
+    console.log(start_date, end_date);
     const tasks = await prisma.employeeTask.findMany({
-      where: { company_branch_id },
+      where: {
+        company_branch_id,
+        end_date: {
+          lte: end_date ? new Date(end_date) : undefined,
+        },
+        start_date: {
+          gte: start_date ? new Date(start_date) : undefined,
+        },
+      },
     });
 
     return tasks;
@@ -21,27 +33,36 @@ export class TaskManagementService {
   static async addTaskManagement(
     data: CreateTaskRequest,
     from: string
-  ): Promise<EmployeeTask> {
+  ): Promise<Number> {
     const request: CreateTaskRequest = Validation.validate(
       TaskManagementValidation.CREATE_TASK,
       data
     );
 
     const userGive = await prisma.employee.findFirst({
-      where: { company_branch_id: from },
+      where: {
+        employee_id: from,
+      },
     });
 
     if (!userGive)
       throw new ErrorResponse("Invalid Unique ID", 400, ["from", "unique_id"]);
 
-    const task = await prisma.employeeTask.create({
-      data: {
-        ...request,
-        given_by_id: userGive?.employee_id!,
-      },
+    const task = await prisma.employeeTask.createMany({
+      data: request.employee_id.map((employee_id) => ({
+        company_branch_id: request.company_branch_id,
+        employee_id,
+        title: request.title,
+        description: request.description,
+        start_date: new Date(request.start_date),
+        end_date: new Date(request.end_date),
+        given_by_id: from,
+      })),
     });
 
-    return task;
+    console.log(task.count);
+
+    return task.count;
   }
 
   static async updateTaskManagement(

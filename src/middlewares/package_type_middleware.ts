@@ -9,12 +9,30 @@ export class PackageTypeMiddleware {
     res: Response,
     next: NextFunction
   ) {
-    const { package_type, company_branch_id } = res.locals.user as
+    const { company_id, company_branch_id } = res.locals.user as
       | UserToken
       | EmployeeToken;
 
-    if (package_type && package_type === "premium") {
-      next();
+    if (company_id) {
+      const company = await prisma.company.findFirst({
+        where: { company_id },
+        select: {
+          package_type: true,
+        },
+      });
+
+      if (company?.package_type === PackageType.PREMIUM) {
+        next();
+      } else {
+        next(
+          new ErrorResponse(
+            "You don't have the right package to send this request, please upgrade your package type.",
+            403,
+            ["package_type"],
+            "FORBIDDEN"
+          )
+        );
+      }
     } else if (company_branch_id) {
       const companyBranch = await prisma.companyBranches.findFirst({
         where: { company_branch_id },

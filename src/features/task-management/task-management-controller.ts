@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { TaskManagementService } from "./task-management-service";
+import { EmployeeToken } from "../../models";
 
 export class TaskManagementController {
   static async getTaskManagementFromCompany(
@@ -8,9 +9,12 @@ export class TaskManagementController {
     next: NextFunction
   ) {
     try {
-      const { company_branch_id } = req.params;
+      const { company_id } = res.locals.user as EmployeeToken;
+      const { start_date, end_date } = req.query;
       const tasks = await TaskManagementService.getTaskManagementFromCompany({
-        company_branch_id: company_branch_id,
+        company_branch_id: company_id,
+        start_date: start_date as string,
+        end_date: end_date as string,
       });
 
       return res.status(201).json({
@@ -30,13 +34,15 @@ export class TaskManagementController {
   ) {
     try {
       const data = req.body;
-      const task = await TaskManagementService.addTaskManagement(
+      const { employee_id: given_by_employee_id } = res.locals
+        .user as EmployeeToken;
+      const task_created = await TaskManagementService.addTaskManagement(
         data,
-        res.locals.user.company_branch_id
+        given_by_employee_id
       );
       return res.status(201).json({
         success: true,
-        data: { task },
+        data: { task_created },
         message: "Task added successfully",
       });
     } catch (error) {
@@ -50,7 +56,8 @@ export class TaskManagementController {
     next: NextFunction
   ) {
     try {
-      const { company_branch_id, task_id } = req.params;
+      const { task_id } = req.params;
+      const { company_branch_id } = res.locals.user as EmployeeToken;
       const data = req.body;
       const task = await TaskManagementService.updateTaskManagement(
         {
@@ -76,7 +83,8 @@ export class TaskManagementController {
     next: NextFunction
   ) {
     try {
-      const { company_branch_id, task_id } = req.params;
+      const { task_id } = req.params;
+      const { company_branch_id } = res.locals.user as EmployeeToken;
       await TaskManagementService.deleteTaskManagement(
         Number(task_id),
         company_branch_id
