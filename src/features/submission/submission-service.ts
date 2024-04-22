@@ -193,8 +193,18 @@ export class SubmissionService {
     target_shift_id,
     current_shift_id,
     target_date,
+    reason,
     employee_id,
   }: ChangeShiftSubmissionRequest): Promise<ChangeShiftSubmissionResponse> {
+    const request = Validation.validate(
+      SubmissionValidation.CHANGE_SHIFT_LETTER,
+      {
+        target_shift_id,
+        current_shift_id,
+        target_date,
+        reason,
+      }
+    );
     await prisma.submission.create({
       data: {
         employee_id,
@@ -203,18 +213,20 @@ export class SubmissionService {
         type: "PERUBAHAN SHIFT",
         change_shift_submission: {
           create: {
-            target_shift_id: target_shift_id,
-            current_shift_id: current_shift_id,
-            target_date: target_date,
+            reason: request.reason,
+            target_shift_id: request.target_shift_id,
+            current_shift_id: request.current_shift_id,
+            target_date: request.target_date,
           },
         },
       },
     });
     return {
       employee_id,
-      target_shift_id: target_shift_id,
-      current_shift_id: current_shift_id,
-      target_date: target_date,
+      reason: request.reason,
+      target_shift_id: request.target_shift_id,
+      current_shift_id: request.current_shift_id,
+      target_date: request.target_date,
     };
   }
   static async getSubmissionHistory({

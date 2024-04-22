@@ -460,6 +460,7 @@ model ChangeShiftSubmission {
   target_shift               Shift      @relation("target", fields: [target_shift_id], references: [shift_id])
   target_shift_id            Int
   target_date                DateTime   @db.Date
+  reason                     String     @db.VarChar(100)
 }
 
 model Payroll {

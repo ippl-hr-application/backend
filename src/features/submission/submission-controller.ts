@@ -124,13 +124,15 @@ export class SubmissionController {
     next: NextFunction
   ) {
     try {
-      const { target_shift_id, current_shift_id, target_date } = req.body;
+      const { target_shift_id, current_shift_id, target_date, reason } =
+        req.body;
       const { employee_id } = res.locals.user;
       const result = await SubmissionService.createChangeShiftLetter({
         target_shift_id,
         current_shift_id,
         target_date,
         employee_id,
+        reason,
       });
       return res.status(201).json({
         success: true,
