@@ -5,6 +5,7 @@ import {
   BranchResponse,
   CreateCompanyBranch,
   EditCompanyBranch,
+  GetAllBranchesResponse,
 } from "./company-branch-model";
 import { CompanyBranchValidation } from "./company-branch-validation";
 
@@ -51,5 +52,31 @@ export class CompanyBranchService {
     });
 
     return branch;
+  }
+
+  static async getAllBranches(
+    company_branch_id: string
+  ): Promise<GetAllBranchesResponse[]> {
+    const company = await prisma.companyBranches.findUnique({
+      where: {
+        company_branch_id,
+      },
+      select: {
+        company_id: true,
+      },
+    });
+    if (!company) {
+      throw new ErrorResponse("Company not found", 404, ["company_branch_id"]);
+    }
+    const branches = await prisma.companyBranches.findMany({
+      where: {
+        company_id: company.company_id,
+      },
+      select: {
+        company_branch_id: true,
+        city: true,
+      },
+    });
+    return branches;
   }
 }

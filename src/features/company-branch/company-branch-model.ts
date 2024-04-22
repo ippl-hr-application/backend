@@ -19,4 +19,9 @@ export interface BranchResponse extends CreateCompanyBranch {
   company_branch_id: string;
 }
 
-export type EditCompanyBranch = CreateCompanyBranch
+export type EditCompanyBranch = CreateCompanyBranch;
+
+export type GetAllBranchesResponse = {
+  company_branch_id: string;
+  city: string | null;
+};

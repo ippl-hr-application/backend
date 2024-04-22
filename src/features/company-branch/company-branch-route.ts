@@ -16,5 +16,9 @@ companyBranchRoute.put("/edit/:company_branch_id", [
   PackageTypeMiddleware.isPackagePremium,
   CompanyBranchController.editBranch,
 ]);
+companyBranchRoute.get("/all", [
+  JWTMiddleware.verifyToken,
+  CompanyBranchController.getAllBranches,
+]);
 
 export default companyBranchRoute;

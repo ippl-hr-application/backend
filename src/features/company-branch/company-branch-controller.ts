@@ -39,4 +39,21 @@ export class CompanyBranchController {
       next(error);
     }
   }
+  static async getAllBranches(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { company_branch_id } = res.locals.user;
+      const branches = await CompanyBranchService.getAllBranches(
+        company_branch_id
+      );
+      return res.status(200).json({
+        success: true,
+        data: {
+          ...branches,
+        },
+        message: "Company branches retrieved successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
