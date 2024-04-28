@@ -20,7 +20,7 @@ documentRoute.get('/:company_id', [
 ]);
 
 documentRoute.get('/download/:company_file_id', [
-  // JWTMiddleware.verifyToken,
+  JWTMiddleware.verifyToken,
   DocumentController.downloadDocument,
 ]);
 
