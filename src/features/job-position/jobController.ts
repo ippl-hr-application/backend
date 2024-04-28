@@ -32,4 +32,19 @@ export class JobPositionController {
       next(error);
     }
   }
+
+  static async updateJobPosition(req: Request, res: Response, next: NextFunction) {
+    try {
+      const jobPosition = await JobPositionService.updateJobPosition(req.body);
+      res.status(200).json({
+        success: true,
+        data: {
+          jobPosition,
+        },
+        message: "Job position updated successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
