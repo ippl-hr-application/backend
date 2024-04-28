@@ -5,6 +5,8 @@ import {
   GetJobPositionResponse,
   CreateJobPositionRequest,
   CreateJobPositionResponse,
+  UpdateJobPositionRequest,
+  UpdateJobPositionResponse,
 } from "./jobModel";
 import { prisma } from "../../applications";
 import { ErrorResponse } from "../../models";
@@ -32,6 +34,42 @@ export class JobPositionService {
       data: {
         company_branch_id: validatedRequest.company_branch_id,
         name: validatedRequest.name},
+    });
+
+    return jobPosition;
+  }
+
+  static async updateJobPosition(
+    request: UpdateJobPositionRequest
+  ): Promise<UpdateJobPositionResponse> {
+    const validatedRequest = Validation.validate(
+      JobPositionValidation.UPDATE_JOB_POSITION,
+      request
+    );
+    const isJobPositionExist = await prisma.jobPosition.findFirst({
+      where: {
+        job_position_id: validatedRequest.job_position_id,
+        company_branch_id: validatedRequest.company_branch_id,
+      },
+    });
+
+    if (!isJobPositionExist) {
+      throw new ErrorResponse(
+        'Job Position not found',
+        404,
+        ['job_position_id', 'company_branch_id'],
+        'JOB_POSITION_NOT_FOUND'
+      );
+    }
+
+    const jobPosition = await prisma.jobPosition.update({
+      where: { 
+        job_position_id: validatedRequest.job_position_id,
+        company_branch_id: validatedRequest.company_branch_id, 
+      },
+      data: {
+        name: validatedRequest.name,
+      },
     });
 
     return jobPosition;
