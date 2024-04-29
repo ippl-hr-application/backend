@@ -23,4 +23,8 @@ attendanceRoute.get("/today", [
   JWTMiddleware.verifyToken,
   AttendanceController.getToday,
 ]);
+attendanceRoute.get("/recap", [
+  JWTMiddleware.verifyToken,
+  AttendanceController.getRecap,
+]);
 export default attendanceRoute;

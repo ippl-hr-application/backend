@@ -1,3 +1,5 @@
+import { number } from "zod";
+
 export type GetShiftInfoRequest = {
   employee_id: string;
 };
@@ -46,4 +48,19 @@ export type AttendanceTodayResponse = {
     type: string | undefined;
     status: string | undefined;
   };
+};
+export type AttendanceRecapRequest = {
+  employee_id: string;
+  month_and_year: string | undefined;
+};
+export type AttendanceRecapResponse = {
+  number_of_attendees: number;
+  number_of_absences: number;
+  detail: DetailAttendanceRecap[];
+};
+
+export type DetailAttendanceRecap = {
+  attendance_id: number;
+  date: string;
+  isPresent: false | true;
 };

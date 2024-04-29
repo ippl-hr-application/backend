@@ -100,4 +100,22 @@ export class AttendanceController {
       next(error);
     }
   }
+  static async getRecap(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { employee_id } = res.locals.user;
+      const { month_and_year } = req.query;
+      const result = await AttendanceService.getRecap({
+        employee_id,
+        month_and_year: month_and_year as string,
+      });
+      return res.status(200).json({
+        success: true,
+        data: {
+          ...result,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
