@@ -21,12 +21,19 @@ export class AttendanceController {
   static async checkIn(req: Request, res: Response, next: NextFunction) {
     try {
       const { employee_id } = res.locals.user;
-      const { shift_id, long, lat, file_name, file_size, file_type, file_url } =
-        req.body;
+      const {
+        assign_shift_id,
+        long,
+        lat,
+        file_name,
+        file_size,
+        file_type,
+        file_url,
+      } = req.body;
       const result = await AttendanceService.attendanceCheck({
         employee_id,
         type: "CHECK_IN",
-        shift_id: Number(shift_id),
+        assign_shift_id: Number(assign_shift_id),
         long: Number(long),
         lat: Number(lat),
         file_name,
@@ -47,14 +54,21 @@ export class AttendanceController {
   static async checkOut(req: Request, res: Response, next: NextFunction) {
     try {
       const { employee_id } = res.locals.user;
-      const { shift_id, long, lat, file_name, file_size, file_type, file_url } =
-        req.body;
+      const {
+        assign_shift_id,
+        long,
+        lat,
+        file_name,
+        file_size,
+        file_type,
+        file_url,
+      } = req.body;
 
       const result = await AttendanceService.attendanceCheck({
         employee_id,
 
         type: "CHECK_OUT",
-        shift_id: Number(shift_id),
+        assign_shift_id: Number(assign_shift_id),
         long: Number(long),
         lat: Number(lat),
         file_name,
@@ -63,6 +77,20 @@ export class AttendanceController {
         file_url,
       });
       return res.status(201).json({
+        success: true,
+        data: {
+          ...result,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async getToday(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { employee_id } = res.locals.user;
+      const result = await AttendanceService.getToday(employee_id);
+      return res.status(200).json({
         success: true,
         data: {
           ...result,

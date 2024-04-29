@@ -320,7 +320,6 @@ model Shift {
   name              String
   start_time        String
   end_time          String
-  attendance        Attendance[]
   assign_shift      AssignShift[]
   current_shift     ChangeShiftSubmission[] @relation("current")
   target_shift      ChangeShiftSubmission[] @relation("target")
@@ -337,6 +336,7 @@ model AssignShift {
   company_branch    CompanyBranches @relation(fields: [company_branch_id], references: [company_branch_id])
   company_branch_id String
   target_date       DateTime?       @db.Date
+  attandance  Attendance[]
   @@map("assign_shifts")
 }
 
@@ -346,8 +346,8 @@ model Attendance {
   employee    Employee @relation(fields: [employee_id], references: [employee_id])
   employee_id String
 
-  shift             Shift            @relation(fields: [shift_id], references: [shift_id])
-  shift_id          Int
+  assign_shift            AssignShift            @relation(fields: [assign_shift_id], references: [assign_shift_id])
+  assign_shift_id          Int
   company_branch    CompanyBranches  @relation(fields: [company_branch_id], references: [company_branch_id])
   company_branch_id String
   date              DateTime         @db.Date

@@ -2,6 +2,7 @@ export type GetShiftInfoRequest = {
   employee_id: string;
 };
 
+type Type = {};
 export type GetShiftInfoResponse = {
   employee_name: string;
   company_name: string;
@@ -18,7 +19,7 @@ export type GetShiftInfoResponse = {
 
 export type AttendanceCheckRequest = {
   employee_id: string;
-  shift_id: number;
+  assign_shift_id: number;
   type: "CHECK_IN" | "CHECK_OUT";
   long: number;
   lat: number;
@@ -33,4 +34,16 @@ export type AttendanceCheckResponse = {
   from: string | undefined;
   to: string | undefined;
   time: string;
+};
+
+export type AttendanceTodayResponse = {
+  attendance_id: number | undefined;
+  date: string;
+  from: string | undefined;
+  to: string | undefined;
+  check_in: {
+    time: string | undefined;
+    type: string | undefined;
+    status: string | undefined;
+  };
 };
