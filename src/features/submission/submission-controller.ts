@@ -209,4 +209,31 @@ export class SubmissionController {
       next(error);
     }
   }
+  static async createAttendanceLetter(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { reason, attendance_id } = req.body;
+      const { employee_id } = res.locals.user;
+      const attendance_submission_file: Express.Multer.File | undefined =
+        req.file;
+      const result = await SubmissionService.createAttendanceLetter({
+        reason,
+        employee_id,
+        attendance_submission_file,
+        attendance_id,
+      });
+      return res.status(201).json({
+        success: true,
+        data: {
+          ...result,
+        },
+        message: "Attendance Letter Submitted",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

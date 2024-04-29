@@ -352,6 +352,7 @@ model Attendance {
   company_branch_id String
   date              DateTime         @db.Date
   attendance_check  AttendanceCheck?
+  attendanceSubmission  AttendanceSubmission?
 
   @@map("attendances")
 }
@@ -409,6 +410,7 @@ model Submission {
   mutation_submission     MutationSubmission?
   change_shift_submission ChangeShiftSubmission?
   resign_submission ResignSubmission?
+  attendance_submission AttendanceSubmission?
   @@map("submissions")
 }
 
@@ -471,6 +473,16 @@ model ResignSubmission {
   submision_id               Int        @unique
   reason                     String     @db.VarChar(100)
   @@map("resign_submission")
+}
+
+model AttendanceSubmission {
+  attendance_submission_id Int @id @default(autoincrement())
+  submission                Submission @relation(fields: [submision_id], references: [submission_id], onDelete: Cascade)
+  submision_id              Int        @unique
+  attendance_id             Int @unique
+  attendance                Attendance @relation(fields: [attendance_id], references: [attendance_id])
+  reason                    String     @db.VarChar(100)
+  @@map("attendance_submission")
 }
 
 model Payroll {

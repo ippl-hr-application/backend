@@ -33,9 +33,13 @@ const storage = multer.diskStorage({
     if (file.fieldname === "announcement_file") {
       dest = "public/uploads/announcement_file/";
     }
+    if (file.fieldname === "attendance_submission_file") {
+      dest = "public/uploads/attendance_submission_file/";
+    }
     if (!fs.existsSync(dest)) {
       fs.mkdirSync(dest, { recursive: true });
     }
+
     cb(null, dest);
   },
   filename: function (req, file, cb) {

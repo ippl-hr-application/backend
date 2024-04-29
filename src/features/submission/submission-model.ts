@@ -77,3 +77,15 @@ export type ResignSubmissionResponse = {
   reason: string;
   employee_id: string;
 };
+
+export type AttendanceSubmissionRequest = {
+  attendance_id: number;
+  reason: string;
+  employee_id: string;
+  attendance_submission_file: Express.Multer.File | undefined;
+};
+
+export type AttendanceSubmissionResponse = {
+  reason: string;
+  employee_id: string;
+};

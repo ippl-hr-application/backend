@@ -44,4 +44,11 @@ submissionRoute.get("/", [
   JWTMiddleware.verifyToken,
   SubmissionController.getSubmissionHistory,
 ]);
+
+submissionRoute.post("/attendance", [
+  JWTMiddleware.verifyToken,
+  upload.single("attendance_submission_file"),
+  SubmissionController.createAttendanceLetter,
+]);
+
 export default submissionRoute;

@@ -30,4 +30,8 @@ export class SubmissionValidation {
   static readonly RESIGN_LETTER: ZodType = z.object({
     reason: z.string().max(100),
   });
+  static readonly ATTENDANCE_LETTER: ZodType = z.object({
+    reason: z.string().max(100),
+    attendance_id: z.number(),
+  });
 }
