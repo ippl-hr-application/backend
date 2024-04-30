@@ -13,6 +13,15 @@ taskManagementRouter.post("/", [
   TaskManagementController.addTaskManagement,
 ]);
 
+taskManagementRouter.get("/employee", [
+  JWTMiddleware.verifyToken,
+  TaskManagementController.getTaskEmployee,
+]);
+taskManagementRouter.get("/:task_id", [
+  JWTMiddleware.verifyToken,
+  TaskManagementController.getTaskById,
+]);
+
 taskManagementRouter.put("/:task_id", [
   JWTMiddleware.verifyToken,
   TaskManagementController.updateTaskManagement,

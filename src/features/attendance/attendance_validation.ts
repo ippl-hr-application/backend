@@ -6,4 +6,7 @@ export class AttendanceValidation {
     long: z.number(),
     lat: z.number(),
   });
+  static readonly GET_RECAP: ZodType = z.object({
+    month_and_year: z.string(),
+  });
 }

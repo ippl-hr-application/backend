@@ -3,9 +3,15 @@ import { prisma } from "../../applications";
 import {
   AttendanceCheckRequest,
   AttendanceCheckResponse,
+  AttendanceRecapRequest,
+  AttendanceRecapResponse,
+  AttendanceTodayResponse,
+  DetailAttendanceRecap,
   GetShiftInfoRequest,
   GetShiftInfoResponse,
 } from "./attendance-model";
+import { Validation } from "../../validations";
+import { AttendanceValidation } from "./attendance_validation";
 
 export class AttendanceService {
   static async getShiftInfo({
@@ -76,7 +82,7 @@ export class AttendanceService {
   }
   static async attendanceCheck({
     employee_id,
-    shift_id,
+    assign_shift_id,
     type,
     long,
     lat,
@@ -100,7 +106,7 @@ export class AttendanceService {
     await prisma.attendance.create({
       data: {
         date: date,
-        shift_id,
+        assign_shift_id,
         employee_id,
         company_branch_id: employee?.company_branch_id,
 
@@ -127,16 +133,122 @@ export class AttendanceService {
         },
       },
     });
-    const shiftInfo = await prisma.shift.findFirst({
+    const shiftInfo = await prisma.assignShift.findFirst({
       where: {
-        shift_id,
+        assign_shift_id,
+      },
+      select: {
+        shift: {
+          select: {
+            start_time: true,
+            end_time: true,
+          },
+        },
       },
     });
     return {
       date: new Date(),
-      from: shiftInfo?.start_time,
-      to: shiftInfo?.end_time,
+      from: shiftInfo?.shift.start_time,
+      to: shiftInfo?.shift.end_time,
       time: date.substring(11, 19),
+    };
+  }
+  static async getToday(employee_id: string): Promise<AttendanceTodayResponse> {
+    const today = new Date().toISOString();
+    const attendance = await prisma.attendance.findFirst({
+      where: {
+        employee_id,
+        date: today,
+      },
+      select: {
+        attendance_id: true,
+        date: true,
+        attendance_check: {
+          select: {
+            time: true,
+            type: true,
+            status: true,
+          },
+        },
+        assign_shift: {
+          select: {
+            shift: {
+              select: {
+                start_time: true,
+                end_time: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return {
+      attendance_id: attendance?.attendance_id,
+      date: today,
+      from: attendance?.assign_shift?.shift?.start_time,
+      to: attendance?.assign_shift?.shift?.end_time,
+      check_in: {
+        time: attendance?.attendance_check?.time,
+        type: attendance?.attendance_check?.type,
+        status: attendance?.attendance_check?.status,
+      },
+    };
+  }
+
+  static async getRecap({
+    employee_id,
+    month_and_year,
+  }: AttendanceRecapRequest): Promise<AttendanceRecapResponse> {
+    const request = Validation.validate(AttendanceValidation.GET_RECAP, {
+      employee_id,
+      month_and_year,
+    });
+    const attendances = await prisma.attendance.findMany({
+      where: {
+        employee_id: request.employee_id,
+        date: {
+          gte: `${request.month_and_year}-01`,
+          lte: `${request.month_and_year}-31`,
+        },
+      },
+      select: {
+        attendance_id: true,
+        date: true,
+        attendance_check: {
+          where: {
+            status: "ACCEPTED",
+          },
+          select: {
+            status: true,
+          },
+        },
+      },
+    });
+
+    const attendanceArray: DetailAttendanceRecap[] = [];
+    attendances.forEach((attendance) => {
+      let isPresent = false;
+      if (
+        attendance.attendance_check &&
+        attendance.attendance_check.status.length >= 2
+      ) {
+        isPresent = true;
+      }
+      attendanceArray.push({
+        attendance_id: attendance.attendance_id,
+        date: attendance.date.toISOString(),
+        isPresent: isPresent,
+      });
+    });
+
+    return {
+      detail: attendanceArray,
+      number_of_absences: attendanceArray.filter(
+        (attendance) => !attendance.isPresent
+      ).length,
+      number_of_attendees: attendanceArray.filter(
+        (attendance) => attendance.isPresent
+      ).length,
     };
   }
 }

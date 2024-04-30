@@ -19,4 +19,12 @@ attendanceRoute.post("/check-out", [
   upload.single("attendance_file"),
   AttendanceController.checkOut,
 ]);
+attendanceRoute.get("/today", [
+  JWTMiddleware.verifyToken,
+  AttendanceController.getToday,
+]);
+attendanceRoute.get("/recap", [
+  JWTMiddleware.verifyToken,
+  AttendanceController.getRecap,
+]);
 export default attendanceRoute;

@@ -77,3 +77,23 @@ export type ResignSubmissionResponse = {
   reason: string;
   employee_id: string;
 };
+
+export type GetAttendanceDataResponse = {
+  date: Date;
+  start_time: string;
+  end_time: string;
+  check_in: string;
+  check_out: string;
+};
+
+export type AttendanceSubmissionRequest = {
+  attendance_id: number;
+  reason: string;
+  employee_id: string;
+  attendance_submission_file: Express.Multer.File | undefined;
+};
+
+export type AttendanceSubmissionResponse = {
+  reason: string;
+  employee_id: string;
+};

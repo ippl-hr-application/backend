@@ -1,8 +1,11 @@
 import { prisma } from "../../applications";
 import { Validation } from "../../validations";
 import {
+  AttendanceSubmissionRequest,
+  AttendanceSubmissionResponse,
   ChangeShiftSubmissionRequest,
   ChangeShiftSubmissionResponse,
+  GetAttendanceDataResponse,
   GetSubmissionHistoryRequest,
   GetSubmissionHistoryResponse,
   LeaveSubmissionRequest,
@@ -328,6 +331,60 @@ export class SubmissionService {
         resign_submission: {
           create: {
             reason: request.reason,
+          },
+        },
+      },
+    });
+    return {
+      reason: reason,
+      employee_id: employee_id,
+    };
+  }
+
+  static async createAttendanceLetter({
+    attendance_id,
+    attendance_submission_file,
+    employee_id,
+    reason,
+  }: AttendanceSubmissionRequest): Promise<AttendanceSubmissionResponse> {
+    const request = Validation.validate(
+      SubmissionValidation.ATTENDANCE_LETTER,
+      {
+        reason,
+        attendance_id,
+      }
+    );
+    await prisma.submission.create({
+      data: {
+        status: "PENDING",
+        submission_date: new Date(),
+        type: "SURAT KEHADIRAN",
+        employee: {
+          connect: {
+            employee_id: employee_id,
+          },
+        },
+        attendance_submission: {
+          create: {
+            reason: request.reason,
+            attendance_id: request.attendance_id,
+          },
+        },
+        employee_file: {
+          create: {
+            file_name: attendance_submission_file?.originalname || "",
+            file_size: attendance_submission_file?.size || 0,
+            file_type: attendance_submission_file?.mimetype || "",
+            file_url: pathToFileUrl(
+              attendance_submission_file?.path || "",
+              process.env.SERVER_URL || "http://localhost:3000"
+            ),
+            file_for: "SURAT KEHADIRAN",
+            employee: {
+              connect: {
+                employee_id: employee_id,
+              },
+            },
           },
         },
       },

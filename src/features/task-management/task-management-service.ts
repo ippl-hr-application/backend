@@ -1,7 +1,11 @@
 import { EmployeeTask } from "@prisma/client";
 import { prisma } from "../../applications";
 import { Validation } from "../../validations";
-import { CreateTaskRequest, UpdateTaskRequest } from "./task-management-model";
+import {
+  CreateTaskRequest,
+  GetTaskEmployeeRequest,
+  UpdateTaskRequest,
+} from "./task-management-model";
 import { TaskManagementValidation } from "./task-management-validation";
 import { ErrorResponse } from "../../models";
 
@@ -96,6 +100,36 @@ export class TaskManagementService {
       where: { task_id, company_branch_id },
     });
 
+    return task;
+  }
+  static async getTaskEmployee({
+    employee_id,
+    start_date,
+    end_date,
+  }: GetTaskEmployeeRequest): Promise<EmployeeTask[]> {
+    const tasks = await prisma.employeeTask.findMany({
+      where: {
+        employee_id,
+        end_date: {
+          lte: end_date ? new Date(end_date) : undefined,
+        },
+        start_date: {
+          gte: start_date ? new Date(start_date) : undefined,
+        },
+      },
+    });
+
+    return tasks;
+  }
+  static async getTaskById(task_id: number): Promise<EmployeeTask> {
+    const request = Validation.validate(
+      TaskManagementValidation.GET_TASK_BY_ID,
+      { task_id }
+    );
+    const task = await prisma.employeeTask.findUnique({
+      where: { task_id: request.task_id },
+    });
+    if (!task) throw new ErrorResponse("Task not found", 404, ["task_id"]);
     return task;
   }
 }
