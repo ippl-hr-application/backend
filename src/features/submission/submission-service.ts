@@ -5,6 +5,7 @@ import {
   AttendanceSubmissionResponse,
   ChangeShiftSubmissionRequest,
   ChangeShiftSubmissionResponse,
+  GetAttendanceDataResponse,
   GetSubmissionHistoryRequest,
   GetSubmissionHistoryResponse,
   LeaveSubmissionRequest,
@@ -339,6 +340,7 @@ export class SubmissionService {
       employee_id: employee_id,
     };
   }
+
   static async createAttendanceLetter({
     attendance_id,
     attendance_submission_file,

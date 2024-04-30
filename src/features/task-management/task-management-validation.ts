@@ -16,4 +16,7 @@ export class TaskManagementValidation {
     start_date: z.string().optional(),
     end_date: z.string().optional(),
   });
+  static readonly GET_TASK_BY_ID: ZodType = z.object({
+    task_id: z.number(),
+  });
 }

@@ -98,4 +98,39 @@ export class TaskManagementController {
       next(error);
     }
   }
+  static async getTaskEmployee(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { employee_id } = res.locals.user as EmployeeToken;
+      const { start_date, end_date } = req.query;
+      const tasks = await TaskManagementService.getTaskEmployee({
+        employee_id,
+        start_date: start_date as string,
+        end_date: end_date as string,
+      });
+      return res.status(200).json({
+        success: true,
+        data: { tasks },
+        message: "Task Employee Retrieved Successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async getTaskById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { task_id } = req.params;
+      const task = await TaskManagementService.getTaskById(Number(task_id));
+      return res.status(200).json({
+        success: true,
+        data: { task },
+        message: "Task Retrieved Successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

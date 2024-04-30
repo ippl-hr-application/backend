@@ -154,7 +154,7 @@ export class AttendanceService {
     };
   }
   static async getToday(employee_id: string): Promise<AttendanceTodayResponse> {
-    const today = new Date().toISOString().substring(0, 10);
+    const today = new Date().toISOString();
     const attendance = await prisma.attendance.findFirst({
       where: {
         employee_id,
