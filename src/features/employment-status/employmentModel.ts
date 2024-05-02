@@ -15,3 +15,14 @@ export type GetEmploymentStatusRequest = {
 };
 
 export type GetEmploymentStatusResponse = EmploymentStatus[];
+
+export type UpdateEmploymentStatusRequest = {
+  company_branch_id: string;
+  employment_status_id: number;
+  name: string;
+};
+
+export type UpdateEmploymentStatusResponse = {
+  employment_status_id: number;
+  name: string;
+};

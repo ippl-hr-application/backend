@@ -45,4 +45,19 @@ export class EmploymentController {
       next(error);
     }
   }  
+
+  static async updateEmploymentStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      const employmentStatus = await EmploymentStatusService.updateEmploymentStatus(req.body);
+      res.status(200).json({
+        success: true,
+        data: {
+          employmentStatus,
+        },
+        message: 'Employment status updated successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
