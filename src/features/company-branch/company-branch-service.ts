@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../../applications";
 import { ErrorResponse } from "../../models";
 import { Validation } from "../../validations";
@@ -78,5 +79,34 @@ export class CompanyBranchService {
       },
     });
     return branches;
+  }
+
+  static async getStatistics(company_branch_id: string) {
+    const employeeCount = await prisma.employee.count({
+      where: {
+        company_branch_id,
+      },
+    });
+
+    const employeeGenderData = await prisma.employee.groupBy({
+      _count: {
+        employee_id: true,
+      },
+      by: ["gender", "company_branch_id"],
+      having: {
+        company_branch_id,
+      },
+    });
+
+    const employeeGenderCount: { [gender: string]: number } = {};
+
+    employeeGenderData.forEach((data) => {
+      employeeGenderCount[data.gender] = data._count.employee_id;
+    });
+
+    return {
+      employee_count: employeeCount,
+      employee_gender_count: employeeGenderCount,
+    };
   }
 }

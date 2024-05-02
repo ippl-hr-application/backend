@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { CompanyBranchService } from "./company-branch-service";
-import { UserToken } from "../../models";
+import { EmployeeToken, UserToken } from "../../models";
 
 export class CompanyBranchController {
   static async addNewBranch(req: Request, res: Response, next: NextFunction) {
@@ -56,4 +56,21 @@ export class CompanyBranchController {
       next(error);
     }
   }
+
+static async getStatistics(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { company_branch_id } = req.params;
+      const statistics = await CompanyBranchService.getStatistics(company_branch_id);
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          ...statistics,
+        },
+        message: "Company statistics retrieved successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+}
 }
