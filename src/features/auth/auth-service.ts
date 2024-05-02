@@ -196,10 +196,48 @@ export class AuthService {
             {
               name: "Manager",
             },
+            {
+              name: "Staff",
+            },
+          ],
+        },
+        employment_statuses: {
+          create: [
+            { name: "Permanent" },
+            { name: "Contract" },
+            { name: "Probation" },
+            { name: "Internship" },
           ],
         },
       },
     });
+
+    const user_employee_account = await prisma.employee.create({
+      data: {
+        company_branch_id: companyBranch.company_branch_id,
+        email: request.email,
+        password: hashedPassword,
+        first_name: (request.full_name as string).split(" ")[0],
+        last_name: (request.full_name as string).split(" ")[1] || "",
+        phone_number: request.phone_number,
+        job_position_id: 1,
+        employment_status_id: 1,
+        birth_date: new Date(),
+        marital_status: "",
+        blood_type: "",
+        religion: "",
+        citizen_id_address: "",
+        gender: "Male",
+        identity_expired_date: new Date(),
+        identity_number: "",
+        identity_type: "",
+        join_date: new Date(),
+        place_of_birth: "",
+        postcal_code: "",
+        residential_address: "",
+        wage: 0,
+      },
+    })
 
     return user;
   }

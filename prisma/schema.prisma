@@ -49,7 +49,7 @@ model Company {
   name         String
   industry     String?
   npwp_digit   String?     @db.VarChar(16)
-  package_type PackageType @default(PREMIUM)
+  package_type PackageType @default(FREE)
   package_end  DateTime?
 
   company_logo          CompanyLogo?
