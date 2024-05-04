@@ -5,10 +5,10 @@ import { EmployeeToken, UserToken } from "../../models";
 export class CompanyBranchController {
   static async addNewBranch(req: Request, res: Response, next: NextFunction) {
     try {
-      const { company_id } = res.locals.user as UserToken;
+      const { company_id, user_id } = res.locals.user as UserToken;
       const data = req.body;
 
-      const branch = await CompanyBranchService.addNewBranch(company_id, data);
+      const branch = await CompanyBranchService.addNewBranch(company_id, user_id, data);
 
       return res.status(201).json({
         success: true,

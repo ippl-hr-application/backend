@@ -13,6 +13,7 @@ import { CompanyBranchValidation } from "./company-branch-validation";
 export class CompanyBranchService {
   static async addNewBranch(
     company_id: string,
+    user_id: string,
     data: CreateCompanyBranch
   ): Promise<BranchResponse> {
     const validate = Validation.validate(
@@ -20,14 +21,80 @@ export class CompanyBranchService {
       data
     );
 
-    const branch = await prisma.companyBranches.create({
-      data: {
-        company_id,
-        ...validate,
-      },
-    });
+    const newData = (({ password, ...d }) => ({ ...d }))(validate);
+    
+    return prisma.$transaction(async (prisma) => {
+      const branch = await prisma.companyBranches.create({
+        data: {
+          company_id,
+          ...newData,
+          job_positions: {
+            create: [
+              {
+                name: "Owner",
+              },
+              {
+                name: "Manager",
+              },
+              {
+                name: "Staff",
+              },
+            ],
+          },
+          employment_statuses: {
+            create: [
+              { name: "Permanent" },
+              { name: "Contract" },
+              { name: "Probation" },
+              { name: "Internship" },
+            ],
+          },
+        },
+        include: {
+          job_positions: true,
+          employment_statuses: true,
+        },
+      });
 
-    return branch;
+      const user = await prisma.registeredUser.findFirst({
+        where: {
+          user_id,
+        },
+      });
+
+      await prisma.employee.create({
+        data: {
+          company_branch_id: branch.company_branch_id,
+          email: user!.email,
+          password: validate.password,
+          first_name: (user!.full_name as string).split(" ")[0],
+          last_name: (user!.full_name as string).split(" ")[1] || "",
+          phone_number: user!.phone_number,
+          job_position_id: branch.job_positions.find(
+            (job) => job.name === "Owner"
+          )!.job_position_id,
+          employment_status_id: branch.employment_statuses.find(
+            (status) => status.name === "Permanent"
+          )!.employment_status_id,
+          birth_date: new Date(),
+          marital_status: "",
+          blood_type: "",
+          religion: "",
+          citizen_id_address: "",
+          gender: "Male",
+          identity_expired_date: new Date(),
+          identity_number: "",
+          identity_type: "",
+          join_date: new Date(),
+          place_of_birth: "",
+          postcal_code: "",
+          residential_address: "",
+          wage: 0,
+        },
+      });
+
+      return branch;
+    });
   }
 
   static async editBranch(
