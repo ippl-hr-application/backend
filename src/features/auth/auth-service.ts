@@ -77,28 +77,21 @@ export class AuthService {
   }
 
   static async employeeLogin({
-    company_id,
     employee_id,
     password,
   }: LoginEmployeeRequest): Promise<LoginResponse> {
     const request = Validation.validate(AuthValidation.EMPLOYEE_LOGIN, {
-      company_id,
       employee_id,
       password,
     });
-
-    const company = await prisma.companyBranches.findUnique({
-      where: { company_branch_id: request.company_id },
-    });
-
-    if (!company) {
-      throw new ErrorResponse("Invalid company id", 400, ["company_id"]);
-    }
 
     const employee = await prisma.employee.findFirst({
       where: {
         employee_id: request.employee_id,
       },
+      include: {
+        job_position: true,
+      }
     });
 
     if (!employee) {
@@ -124,6 +117,7 @@ export class AuthService {
       {
         employee_id: employee.employee_id,
         company_branch_id: employee.company_branch_id,
+        position: employee.job_position.name,
       },
       process.env.JWT_SECRET!,
       {
