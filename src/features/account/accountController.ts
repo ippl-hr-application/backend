@@ -57,8 +57,58 @@ export class AccountController {
 
   static async createEmployee(req: Request, res: Response, next: NextFunction) {
     try {
-      // const company_branch_id = res.locals.user.company_branch_id;
-      const employee = await AccountService.createEmployee(req.body);
+      const {
+        company_branch_id,
+        job_position_id,
+        employment_status_id,
+        first_name,
+        last_name,
+        email,
+        password,
+        phone_number,
+        place_of_birth,
+        birth_date,       
+        marital_status,
+        blood_type,
+        religion,
+        identity_type,
+        identity_number,
+        identity_expired_date,       
+        postcal_code,
+        citizen_id_address,
+        residential_address,
+        bank_account_number,
+        bank_type,
+        wage,
+        gender,
+        join_date     
+      } = req.body;
+      const employee = await AccountService.createEmployee({
+        company_branch_id,
+        job_position_id,
+        employment_status_id,
+        first_name,
+        last_name,
+        email,
+        password,
+        phone_number,
+        place_of_birth,
+        birth_date,       
+        marital_status,
+        blood_type,
+        religion,
+        identity_type,
+        identity_number,
+        identity_expired_date,       
+        postcal_code,
+        citizen_id_address,
+        residential_address,
+        bank_account_number,
+        bank_type,
+        wage,
+        gender,
+        join_date
+      });
       res.status(201).json({
         success: true,
         data: employee,
@@ -71,18 +121,57 @@ export class AccountController {
 
   static async updateEmployee(req: Request, res: Response, next: NextFunction) {
     try {
-      // const employeeId = req.params.employee_id;
-      // const companyBranchId = parseInt(req.params.company_branch_id);
-
-      // atau pake local user daripada pake params
-      // const { company_branch_id } = res.locals.user;
-
-      // kalo pake params
-      // const employee = await AccountService.updateEmployee(companyBranchId, employeeId, req.body);
-
-      // const employee = await AccountService.updateEmployee(req.body.company_branch_id, req.body.employee_id, req.body);
-
-      const employee = await AccountService.updateEmployee(req.body);
+      const {
+        employee_id,
+        company_branch_id,
+        job_position_id,
+        employment_status_id,
+        first_name,
+        last_name,
+        email,
+        password,
+        phone_number,
+        place_of_birth,
+        birth_date,       
+        marital_status,
+        blood_type,
+        religion,
+        identity_type,
+        identity_number,
+        identity_expired_date,       
+        postcal_code,
+        citizen_id_address,
+        residential_address,
+        bank_account_number,
+        bank_type,
+        wage,
+        gender,
+        join_date
+      } = req.body;
+      const employee = await AccountService.updateEmployee({
+        employee_id,
+        company_branch_id,
+        job_position_id,
+        employment_status_id,
+        first_name,
+        last_name,
+        email,
+        phone_number,
+        marital_status,
+        blood_type,
+        religion,
+        identity_type,
+        identity_number,
+        identity_expired_date,
+        postcal_code,
+        citizen_id_address,
+        residential_address,
+        bank_account_number,
+        bank_type,
+        wage,
+        gender,
+        join_date
+      });
       res.status(200).json({
         success: true,
         data: employee,
