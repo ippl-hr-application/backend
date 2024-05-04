@@ -12,18 +12,21 @@ templateRoute.get("/", [
 
 templateRoute.post("/", [
   JWTMiddleware.verifyToken,
+  JWTMiddleware.employeeOnly,
   upload.single("template_file"),
   TemplateController.addNewTemplateDocument,
 ])
 
 templateRoute.post("/:template_id", [
   JWTMiddleware.verifyToken,
+  JWTMiddleware.employeeOnly,
   upload.single("template_file"),
   TemplateController.updateTemplateDocument,
 ])
 
 templateRoute.delete("/:template_id", [
   JWTMiddleware.verifyToken,
+  JWTMiddleware.employeeOnly,
   TemplateController.deleteTemplateDocument,
 ])
 

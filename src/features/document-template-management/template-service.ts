@@ -7,26 +7,10 @@ import { addNewTemplateDocumentRequest } from "./template-model";
 import { TemplateValidation } from "./template-validation";
 
 export class TemplateService {
-  static async getAllTemplateDocuments(
-    company_id: string,
-    company_branch_id: string
-  ) {
-    let headCompany;
-    if (company_branch_id) {
-      headCompany = await prisma.companyBranches.findFirst({
-        select: {
-          company: {
-            select: {
-              company_id: true,
-            },
-          },
-        },
-      });
-    }
-
+  static async getAllTemplateDocuments(company_branch_id: string) {
     const templates = await prisma.companyFile.findMany({
       where: {
-        company_id: headCompany ? headCompany?.company.company_id : company_id,
+        company_id: company_branch_id,
       },
     });
 

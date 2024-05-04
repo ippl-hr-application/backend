@@ -9,10 +9,9 @@ export class TemplateController {
     next: NextFunction
   ) {
     try {
-      const { company_id, company_branch_id } = res.locals.user as UserToken | EmployeeToken;
+      const { company_branch_id } = res.locals.user as EmployeeToken;
 
       const templates = await TemplateService.getAllTemplateDocuments(
-        company_id,
         company_branch_id
       );
 
@@ -32,12 +31,12 @@ export class TemplateController {
     next: NextFunction
   ) {
     try {
-      const { company_id } = res.locals.user as UserToken;
+      const { company_branch_id } = res.locals.user as EmployeeToken;
       const { description } = req.body;
       const document = req.file as Express.Multer.File;
 
       const template = await TemplateService.addNewTemplateDocument(document, {
-        company_id,
+        company_id: company_branch_id,
         description,
       });
 
@@ -57,11 +56,11 @@ export class TemplateController {
     next: NextFunction
   ) {
     try {
-      const { company_id } = res.locals.user as UserToken;
+      const { company_branch_id } = res.locals.user as EmployeeToken;
       const { template_id } = req.params;
 
       const template = await TemplateService.deleteTemplateDocument(
-        company_id,
+        company_branch_id,
         parseInt(template_id)
       );
 
@@ -81,7 +80,7 @@ export class TemplateController {
     next: NextFunction
   ) {
     try {
-      const { company_id } = res.locals.user as UserToken;
+      const { company_branch_id } = res.locals.user as UserToken;
       const { template_id } = req.params;
       const { description } = req.body;
       const document = req.file as Express.Multer.File;
@@ -89,7 +88,7 @@ export class TemplateController {
       const template = await TemplateService.updateTemplateDocument(
         document,
         parseInt(template_id),
-        { company_id, description }
+        { company_id: company_branch_id, description }
       );
 
       return res.status(200).json({
