@@ -12,15 +12,18 @@ companyBranchRoute.get("/statistics/:company_branch_id", [
 
 companyBranchRoute.post("/create", [
   JWTMiddleware.verifyToken,
+  JWTMiddleware.ownerOnly,
   PackageTypeMiddleware.isPackagePremium,
   CompanyBranchController.addNewBranch,
 ]);
 
 companyBranchRoute.put("/edit/:company_branch_id", [
   JWTMiddleware.verifyToken,
+  JWTMiddleware.ownerOnly,
   PackageTypeMiddleware.isPackagePremium,
   CompanyBranchController.editBranch,
 ]);
+
 companyBranchRoute.get("/all", [
   JWTMiddleware.verifyToken,
   CompanyBranchController.getAllBranches,

@@ -13,13 +13,18 @@ export type CreateCompanyBranch = {
   umr_province: number | null;
   umr_city: number | null;
   bpjs: string | null;
+  password: string;
 };
 
-export interface BranchResponse extends CreateCompanyBranch {
-  company_branch_id: string;
-}
+// export interface BranchResponse extends CreateCompanyBranch {
+//   company_branch_id: string;
+// }
 
-export type EditCompanyBranch = CreateCompanyBranch;
+export type BranchResponse = Omit<CreateCompanyBranch, "password"> & {
+  company_branch_id: string;
+};
+
+export type EditCompanyBranch = Omit<CreateCompanyBranch, "password">;
 
 export type GetAllBranchesResponse = {
   company_branch_id: string;

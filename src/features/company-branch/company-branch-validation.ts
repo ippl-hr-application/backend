@@ -14,6 +14,7 @@ export class CompanyBranchValidation {
     umr_province: z.number().int().optional(),
     umr_city: z.number().int().optional(),
     bpjs: z.string().min(3).max(50).optional(),
+    password: z.string().min(8),
   });
 
   static readonly EDIT_BRANCH: ZodType = z.object({

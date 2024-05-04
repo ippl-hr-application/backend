@@ -13,6 +13,7 @@ import {
   CurrentEmployeeLoggedInUserResponse,
 } from "./auth-model";
 import jwt from "jsonwebtoken";
+import { connect } from "http2";
 
 export class AuthService {
   static async login({
@@ -210,6 +211,10 @@ export class AuthService {
           ],
         },
       },
+      include: {
+        job_positions: true,
+        employment_statuses: true,
+      },
     });
 
     const user_employee_account = await prisma.employee.create({
@@ -220,8 +225,12 @@ export class AuthService {
         first_name: (request.full_name as string).split(" ")[0],
         last_name: (request.full_name as string).split(" ")[1] || "",
         phone_number: request.phone_number,
-        job_position_id: 1,
-        employment_status_id: 1,
+        job_position_id: companyBranch.job_positions.find(
+          (job) => job.name === "Owner"
+        )!.job_position_id,
+        employment_status_id: companyBranch.employment_statuses.find(
+          (status) => status.name === "Permanent"
+        )!.employment_status_id,
         birth_date: new Date(),
         marital_status: "",
         blood_type: "",
@@ -237,7 +246,7 @@ export class AuthService {
         residential_address: "",
         wage: 0,
       },
-    })
+    });
 
     return user;
   }
