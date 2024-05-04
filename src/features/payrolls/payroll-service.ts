@@ -12,7 +12,7 @@ import { PayrollValidation } from "./payroll-validation";
 
 export class PayrollService {
   static async getPayrolls(data: GetPayrollRequest) {
-    const { company_branch_id, month, year } = Validation.validate(
+    const { company_branch_id, company_id, month, year } = Validation.validate(
       PayrollValidation.GET_PAYROLL,
       data
     );
@@ -53,7 +53,9 @@ export class PayrollService {
     return [payrolls, totalWage._sum.wage];
   }
 
-  static async getUserPayrolls(data: GetUserPayrollRequest): Promise<Payroll[]> {
+  static async getUserPayrolls(
+    data: GetUserPayrollRequest
+  ): Promise<Payroll[]> {
     const { company_branch_id, employee_id, year } = Validation.validate(
       PayrollValidation.GET_USER_PAYROLL,
       data
@@ -65,7 +67,7 @@ export class PayrollService {
         employee_id,
         year,
       },
-    })
+    });
 
     return userPayrolls;
   }
@@ -96,6 +98,14 @@ export class PayrollService {
     const employees = await prisma.employee.findMany({
       where: {
         company_branch_id,
+        NOT: {
+          job_position: {
+            name: "Owner",
+          },
+        },
+      },
+      include: {
+        job_position: true,
       },
     });
 
@@ -146,10 +156,14 @@ export class PayrollService {
     return payroll;
   }
 
-  static async deletePayroll(payroll_id: string) {
-    const isPayrollExist = await prisma.payroll.findUnique({
+  static async deletePayroll(company_branch_id: string, payroll_id: string) {
+    
+    const isPayrollExist = await prisma.payroll.findFirst({
       where: {
-        payroll_id: Number(payroll_id),
+        AND: {
+          payroll_id: Number(payroll_id),
+          company_branch_id,
+        }
       },
     });
 

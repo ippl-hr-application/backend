@@ -1,15 +1,35 @@
 import { NextFunction, Request, Response } from "express";
 import { PayrollService } from "./payroll-service";
-import { EmployeeToken } from "../../models";
+import { EmployeeToken, ErrorResponse, UserToken } from "../../models";
+import { prisma } from "../../applications";
 
 export class PayrollController {
   static async getPayrolls(req: Request, res: Response, next: NextFunction) {
     try {
-      const { company_id: company_branch_id } = res.locals
-        .user as EmployeeToken;
-      const { month, year } = req.query;
+      const { company_branch_id } = res.locals.user as EmployeeToken;
+      const { month, year, company_branch_id: query_comp_id } = req.query;
+
+      if (query_comp_id) {
+        const { company_id } = res.locals.user as UserToken;
+        const isCompanyExists = await prisma.companyBranches.findFirst({
+          where: {
+            company_id,
+            company_branch_id: query_comp_id as string,
+          },
+        });
+
+        if (!isCompanyExists) {
+          throw new ErrorResponse(
+            "Company not found",
+            404,
+            ["company_branch_id"],
+            "COMPANY_NOT_FOUND"
+          );
+        }
+      }
+
       const [payrolls, totalWage] = await PayrollService.getPayrolls({
-        company_branch_id,
+        company_branch_id: (query_comp_id as string) || company_branch_id,
         month: Number(month),
         year: Number(year),
       });
@@ -24,7 +44,11 @@ export class PayrollController {
     }
   }
 
-  static async getUserPayrolls(req: Request, res: Response, next: NextFunction) {
+  static async getUserPayrolls(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { company_branch_id, employee_id } = res.locals
         .user as EmployeeToken;
@@ -48,8 +72,7 @@ export class PayrollController {
 
   static async createPayroll(req: Request, res: Response, next: NextFunction) {
     try {
-      const { company_branch_id } = res.locals
-        .user as EmployeeToken;
+      const { company_branch_id } = res.locals.user as EmployeeToken;
       const { month, year } = req.body;
       const payrolls = await PayrollService.createPayroll({
         company_branch_id,
@@ -90,8 +113,9 @@ export class PayrollController {
 
   static async deletePayroll(req: Request, res: Response, next: NextFunction) {
     try {
+      const { company_branch_id } = res.locals.user as EmployeeToken;
       const { payroll_id } = req.params;
-      await PayrollService.deletePayroll(payroll_id);
+      await PayrollService.deletePayroll(company_branch_id ?? "", payroll_id);
 
       return res.status(200).json({
         success: true,
