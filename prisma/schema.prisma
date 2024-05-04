@@ -215,7 +215,7 @@ model Employee {
 
   first_name            String
   last_name             String
-  email                 String          @unique
+  email                 String          
   phone_number          String          @db.VarChar(15)
   place_of_birth        String
   birth_date            DateTime        @db.Date
