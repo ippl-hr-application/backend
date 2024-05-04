@@ -205,10 +205,20 @@ export class AccountService {
       );
     }
 
-    const employeeDelete = await prisma.employee.delete({
+    // const employeeDelete = await prisma.employee.delete({
+    //   where: {
+    //     company_branch_id: request.company_branch_id,
+    //     employee_id: request.employee_id,
+    //   },
+    // });
+
+    const employeeDelete = await prisma.employee.update({
       where: {
         company_branch_id: request.company_branch_id,
         employee_id: request.employee_id,
+      },
+      data: {
+        hasResigned: true,
       },
     });
 
