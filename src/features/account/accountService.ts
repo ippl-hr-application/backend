@@ -86,7 +86,7 @@ export class AccountService {
 
     const countEmailEmployee = await prisma.employee.count({
       where: { 
-        company_branch_id: request.company_branch_id,
+        company_branch_id: request.company_branch_id, 
         email: request.email
       },
     });
