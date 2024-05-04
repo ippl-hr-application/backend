@@ -85,7 +85,10 @@ export class AccountService {
     );
 
     const countEmailEmployee = await prisma.employee.count({
-      where: { email: request.email },
+      where: { 
+        company_branch_id: request.company_branch_id, 
+        email: request.email
+      },
     });
 
     if (countEmailEmployee > 0) {
@@ -167,7 +170,7 @@ export class AccountService {
 
     const employeeUpdate = await prisma.employee.update({
       where: {
-        company_branch_id: request.company_branch_id, // pake user local?
+        company_branch_id: request.company_branch_id,
         employee_id: request.employee_id,
       },
       data: { ...request },
@@ -202,10 +205,20 @@ export class AccountService {
       );
     }
 
-    const employeeDelete = await prisma.employee.delete({
+    // const employeeDelete = await prisma.employee.delete({
+    //   where: {
+    //     company_branch_id: request.company_branch_id,
+    //     employee_id: request.employee_id,
+    //   },
+    // });
+
+    const employeeDelete = await prisma.employee.update({
       where: {
         company_branch_id: request.company_branch_id,
         employee_id: request.employee_id,
+      },
+      data: {
+        hasResigned: true,
       },
     });
 

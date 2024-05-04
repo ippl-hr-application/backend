@@ -26,3 +26,13 @@ export type UpdateEmploymentStatusResponse = {
   employment_status_id: number;
   name: string;
 };
+
+export type DeleteEmploymentStatusRequest = {
+  company_branch_id: string;
+  employment_status_id: number;
+};
+
+export type DeleteEmploymentStatusResponse = {
+  employment_status_id: number;
+  name: string;
+};

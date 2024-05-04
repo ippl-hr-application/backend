@@ -26,3 +26,13 @@ export type UpdateJobPositionResponse = {
   job_position_id: number;
   name: string;
 }
+
+export type DeleteJobPositionRequest = {
+  company_branch_id: string;
+  job_position_id: number;
+}
+
+export type DeleteJobPositionResponse = {
+  job_position_id: number;
+  name: string;
+}
