@@ -341,32 +341,32 @@ export class AuthService {
     });
   }
 
-  static async employeeResetPassword(uniqueId: string, newPassword: string) {
-    const request = Validation.validate(AuthValidation.RESET_PASSWORD, {
-      email: uniqueId,
-      newPassword,
-    });
+  // static async employeeResetPassword(uniqueId: string, newPassword: string) {
+  //   const request = Validation.validate(AuthValidation.RESET_PASSWORD, {
+  //     email: uniqueId,
+  //     newPassword,
+  //   });
 
-    const employee = await prisma.employee.findFirst({
-      where: { email: request.email },
-    });
+  //   const employee = await prisma.employee.findFirst({
+  //     where: { email: request.email },
+  //   });
 
-    if (!employee) {
-      throw new ErrorResponse(
-        "Employee not found",
-        404,
-        ["uniqueId"],
-        "EMPLOYEE_NOT_FOUND"
-      );
-    }
+  //   if (!employee) {
+  //     throw new ErrorResponse(
+  //       "Employee not found",
+  //       404,
+  //       ["uniqueId"],
+  //       "EMPLOYEE_NOT_FOUND"
+  //     );
+  //   }
 
-    const hashedPassword = hashPassword(request.newPassword);
+  //   const hashedPassword = hashPassword(request.newPassword);
 
-    await prisma.employee.update({
-      where: { email: request.email },
-      data: {
-        password: hashedPassword,
-      },
-    });
-  }
+  //   await prisma.employee.update({
+  //     where: { email: request.email },
+  //     data: {
+  //       password: hashedPassword,
+  //     },
+  //   });
+  // }
 }
