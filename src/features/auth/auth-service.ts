@@ -341,7 +341,7 @@ export class AuthService {
     });
   }
 
-  // static async employeeResetPassword(uniqueId: string, newPassword: string) {
+  static async employeeResetPassword(uniqueId: string, newPassword: string) {
   //   const request = Validation.validate(AuthValidation.RESET_PASSWORD, {
   //     email: uniqueId,
   //     newPassword,
@@ -368,5 +368,5 @@ export class AuthService {
   //       password: hashedPassword,
   //     },
   //   });
-  // }
+  }
 }
