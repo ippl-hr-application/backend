@@ -22,7 +22,7 @@ export class CompanyBranchService {
     );
 
     const newData = (({ password, ...d }) => ({ ...d }))(validate);
-    
+
     return prisma.$transaction(async (prisma) => {
       const branch = await prisma.companyBranches.create({
         data: {
@@ -98,6 +98,7 @@ export class CompanyBranchService {
   }
 
   static async editBranch(
+    company_id: string,
     company_branch_id: string,
     data: EditCompanyBranch
   ): Promise<BranchResponse> {
@@ -107,7 +108,7 @@ export class CompanyBranchService {
     );
 
     const isBranchExist = await prisma.companyBranches.findFirst({
-      where: { company_branch_id },
+      where: { company_branch_id, company_id },
     });
 
     if (!isBranchExist) {
@@ -123,26 +124,22 @@ export class CompanyBranchService {
   }
 
   static async getAllBranches(
-    company_branch_id: string
+    company_id: string
   ): Promise<GetAllBranchesResponse[]> {
-    const company = await prisma.companyBranches.findUnique({
-      where: {
-        company_branch_id,
-      },
-      select: {
-        company_id: true,
-      },
-    });
-    if (!company) {
-      throw new ErrorResponse("Company not found", 404, ["company_branch_id"]);
-    }
+    // const company = await prisma.companyBranches.findUnique({
+    //   where: {
+    //     company_id,
+    //   },
+    //   select: {
+    //     company_id: true,
+    //   },
+    // });
+    // if (!company) {
+    //   throw new ErrorResponse("Company not found", 404, ["company_branch_id"]);
+    // }
     const branches = await prisma.companyBranches.findMany({
       where: {
-        company_id: company.company_id,
-      },
-      select: {
-        company_branch_id: true,
-        city: true,
+        company_id: company_id,
       },
     });
     return branches;

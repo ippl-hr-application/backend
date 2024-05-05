@@ -22,10 +22,12 @@ export class CompanyBranchController {
 
   static async editBranch(req: Request, res: Response, next: NextFunction) {
     try {
+      const { company_id } = res.locals.user as UserToken;
       const { company_branch_id } = req.params;
       const data = req.body;
 
       const branch = await CompanyBranchService.editBranch(
+        company_id,
         company_branch_id,
         data
       );
@@ -41,14 +43,14 @@ export class CompanyBranchController {
   }
   static async getAllBranches(req: Request, res: Response, next: NextFunction) {
     try {
-      const { company_branch_id } = res.locals.user;
+      const { company_id } = res.locals.user as UserToken;
       const branches = await CompanyBranchService.getAllBranches(
-        company_branch_id
+        company_id
       );
       return res.status(200).json({
         success: true,
         data: {
-          ...branches,
+          branches,
         },
         message: "Company branches retrieved successfully",
       });
