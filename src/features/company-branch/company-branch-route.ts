@@ -29,4 +29,11 @@ companyBranchRoute.get("/all", [
   CompanyBranchController.getAllBranches,
 ]);
 
+companyBranchRoute.delete("/delete/:company_branch_id", [
+  JWTMiddleware.verifyToken,
+  JWTMiddleware.ownerOnly,
+  PackageTypeMiddleware.isPackagePremium,
+  CompanyBranchController.deleteBranch,
+]);
+
 export default companyBranchRoute;

@@ -8,7 +8,11 @@ export class CompanyBranchController {
       const { company_id, user_id } = res.locals.user as UserToken;
       const data = req.body;
 
-      const branch = await CompanyBranchService.addNewBranch(company_id, user_id, data);
+      const branch = await CompanyBranchService.addNewBranch(
+        company_id,
+        user_id,
+        data
+      );
 
       return res.status(201).json({
         success: true,
@@ -44,9 +48,7 @@ export class CompanyBranchController {
   static async getAllBranches(req: Request, res: Response, next: NextFunction) {
     try {
       const { company_id } = res.locals.user as UserToken;
-      const branches = await CompanyBranchService.getAllBranches(
-        company_id
-      );
+      const branches = await CompanyBranchService.getAllBranches(company_id);
       return res.status(200).json({
         success: true,
         data: {
@@ -59,10 +61,12 @@ export class CompanyBranchController {
     }
   }
 
-static async getStatistics(req: Request, res: Response, next: NextFunction) {
+  static async getStatistics(req: Request, res: Response, next: NextFunction) {
     try {
       const { company_branch_id } = req.params;
-      const statistics = await CompanyBranchService.getStatistics(company_branch_id);
+      const statistics = await CompanyBranchService.getStatistics(
+        company_branch_id
+      );
 
       return res.status(200).json({
         success: true,
@@ -74,5 +78,20 @@ static async getStatistics(req: Request, res: Response, next: NextFunction) {
     } catch (error) {
       next(error);
     }
-}
+  }
+
+  static async deleteBranch(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { company_id } = res.locals.user as UserToken;
+      const { company_branch_id } = req.params;
+      await CompanyBranchService.deleteBranch(company_id, company_branch_id);
+
+      return res.status(200).json({
+        success: true,
+        message: "Branch deleted successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

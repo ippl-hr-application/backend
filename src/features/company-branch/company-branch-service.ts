@@ -173,4 +173,79 @@ export class CompanyBranchService {
       employee_gender_count: employeeGenderCount,
     };
   }
+
+  static async deleteBranch(company_id: string, company_branch_id: string) {
+    const isCompanyBranchExists = await prisma.companyBranches.findFirst({
+      where: { company_id, company_branch_id },
+    });
+
+    if (!isCompanyBranchExists)
+      throw new ErrorResponse(
+        "Branch not found",
+        404,
+        ["company_branch_id"],
+        "BRANCH_NOT_FOUND"
+      );
+
+    return prisma.$transaction(async (prisma) => {
+      await prisma.companyAnnouncementTo.deleteMany({
+        where: { company_branch_id },
+      });
+
+      await prisma.employee.deleteMany({
+        where: { company_branch_id },
+      });
+
+      await prisma.employeeTask.deleteMany({
+        where: { company_branch_id },
+      });
+
+      await prisma.employmentStatus.deleteMany({
+        where: { company_branch_id },
+      });
+
+      await prisma.reimbursement.deleteMany({
+        where: { company_branch_id },
+      });
+
+      await prisma.attendance.deleteMany({
+        where: { company_branch_id },
+      });
+
+      await prisma.jobPosition.deleteMany({
+        where: { company_branch_id },
+      });
+
+      await prisma.assignShift.deleteMany({
+        where: { company_branch_id },
+      });
+
+      await prisma.mutationSubmission.deleteMany({
+        where: {
+          OR: [
+            { current_company_branch_id: company_branch_id },
+            { target_company_branch_id: company_branch_id },
+          ],
+        },
+      });
+
+      await prisma.payroll.deleteMany({
+        where: { company_branch_id },
+      });
+
+      await prisma.companyFileTemplate.deleteMany({
+        where: { company_id: company_branch_id },
+      });
+
+      await prisma.companyBranches.delete({
+        where: { company_branch_id, company_id },
+        include: {
+          job_positions: true,
+          employment_statuses: true,
+          employees: true,
+          employee_tasks: true,
+        },
+      });
+    });
+  }
 }
