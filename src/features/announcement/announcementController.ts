@@ -7,8 +7,10 @@ export class AnnouncementController {
   static async getAnnouncementCompany(req: Request, res: Response, next: NextFunction) {
     try {
       const { company_branch_id } = res.locals.user ;
+      const title = req.query.title as string;
       const announcements = await AnnouncementService.getAnnouncementCompany({
         company_branch_id,
+        title,
       });
       
       res.status(200).json({
@@ -24,8 +26,10 @@ export class AnnouncementController {
   static async getAnnouncementCompanyBranch(req: Request, res: Response, next: NextFunction) {
     try {
       const { company_branch_id } = res.locals.user;
+      const title = req.query.title as string;
       const announcements = await AnnouncementService.getAnnouncementCompanyBranch({
         company_branch_id,
+        title
       });
 
       res.status(200).json({

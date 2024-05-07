@@ -18,8 +18,10 @@ import { pathToFileUrl } from '../../utils/format';
 export class AnnouncementService {
   static async getAnnouncementCompany({
     company_branch_id,
+    title,
   }: {
     company_branch_id: string;
+    title: string;
   }): Promise<CompanyAnnouncement[]> {
     const company = await prisma.companyBranches.findFirst({
       where: { company_branch_id: company_branch_id },
@@ -29,7 +31,10 @@ export class AnnouncementService {
     });
     
     const announcements = await prisma.companyAnnouncement.findMany({
-      where: { company_id: company?.company_id},
+      where: { 
+        title: { contains: title },
+        company_id: company?.company_id
+      },
       include: {
         company_announcement_to: {
           select: {
@@ -56,8 +61,10 @@ export class AnnouncementService {
   
   static async getAnnouncementCompanyBranch({
     company_branch_id,
+    title,
   }: {
     company_branch_id: string;
+    title: string;
   }): Promise<CompanyAnnouncement[]> {
     
     const announcements_id = await prisma.companyAnnouncementTo.findMany({
@@ -68,7 +75,10 @@ export class AnnouncementService {
     });
     
     const announcements = await prisma.companyAnnouncement.findMany({
-      where: { company_announcement_id: { in: announcements_id.map((announcement) => announcement.company_announcement_id) }},
+      where: { 
+        title: { contains: title },
+        company_announcement_id: { in: announcements_id.map((announcement) => announcement.company_announcement_id) }
+    },
       include: {
         company_announcement_to: {
           select: {
