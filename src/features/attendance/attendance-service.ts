@@ -12,6 +12,7 @@ import {
 } from "./attendance-model";
 import { Validation } from "../../validations";
 import { AttendanceValidation } from "./attendance_validation";
+import { pathToFileUrl } from "../../utils/format";
 
 export class AttendanceService {
   static async getShiftInfo({
@@ -86,10 +87,7 @@ export class AttendanceService {
     type,
     long,
     lat,
-    file_name,
-    file_size,
-    file_type,
-    file_url,
+    attendance_file,
   }: AttendanceCheckRequest): Promise<AttendanceCheckResponse> {
     const date = new Date().toISOString();
     const employee = await prisma.employee.findUnique({
@@ -119,10 +117,13 @@ export class AttendanceService {
             time: date.substring(11, 19),
             employee_file: {
               create: {
-                file_name,
-                file_size,
-                file_type,
-                file_url,
+                file_name: attendance_file?.originalname || "",
+                file_size: attendance_file?.size || 0,
+                file_type: attendance_file?.mimetype || "",
+                file_url: pathToFileUrl(
+                  attendance_file?.path || "",
+                  process.env.SERVER_URL || "http://localhost:3000"
+                ),
                 file_for: "BUKTI KEHADIRAN",
                 employee: {
                   connect: { employee_id },
