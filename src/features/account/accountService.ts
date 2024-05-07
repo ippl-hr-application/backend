@@ -100,6 +100,38 @@ export class AccountService {
       );
     }
 
+    const job_position = await prisma.jobPosition.findUnique({
+      where: {
+        job_position_id: request.job_position_id,
+        company_branch_id: request.company_branch_id,
+      },
+    });
+
+    if (!job_position) {
+      throw new ErrorResponse(
+        'Job position not found',
+        404,
+        ['job_position_id'],
+        'JOB_POSITION_NOT_FOUND'
+      );
+    }
+
+    const employment_status = await prisma.employmentStatus.findUnique({
+      where: {
+        employment_status_id: request.employment_status_id,
+        company_branch_id: request.company_branch_id,
+      },
+    });
+
+    if (!employment_status) {
+      throw new ErrorResponse(
+        'Employment status not found',
+        404,
+        ['employment_status_id'],
+        'EMPLOYMENT_STATUS_NOT_FOUND'
+      );
+    }
+    
     const hashedPassword = hashPassword(request.password);
 
     const newEmployee = await prisma.employee.create({
