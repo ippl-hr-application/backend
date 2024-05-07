@@ -155,11 +155,14 @@ export class AttendanceService {
     };
   }
   static async getToday(employee_id: string): Promise<AttendanceTodayResponse> {
-    const today = new Date().toISOString();
+    const today = new Date().toISOString().split("T")[0];
     const attendance = await prisma.attendance.findFirst({
       where: {
         employee_id,
-        date: today,
+        date: {
+          gte: today + "T00:00:00.000Z", // Tanggal hari ini mulai dari waktu 00:00:00
+          lte: today + "T23:59:59.999Z", // Tanggal hari ini sampai waktu 23:59:59
+        },
       },
       select: {
         attendance_id: true,
@@ -201,12 +204,11 @@ export class AttendanceService {
     month_and_year,
   }: AttendanceRecapRequest): Promise<AttendanceRecapResponse> {
     const request = Validation.validate(AttendanceValidation.GET_RECAP, {
-      employee_id,
       month_and_year,
     });
     const attendances = await prisma.attendance.findMany({
       where: {
-        employee_id: request.employee_id,
+        employee_id,
         date: {
           gte: `${request.month_and_year}-01`,
           lte: `${request.month_and_year}-31`,

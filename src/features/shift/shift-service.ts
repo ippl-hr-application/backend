@@ -12,7 +12,6 @@ import {
   AddAssignShiftResponse,
   UpdateAssignShiftRequest,
   UpdateAssignShiftResponse,
-  GetAllAsignShiftResponse,
   GetAllAsignShiftRequest,
 } from "./shift-model";
 import { ShiftValidation } from "./shift-validation";
