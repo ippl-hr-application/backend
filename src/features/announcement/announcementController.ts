@@ -113,4 +113,39 @@ export class AnnouncementController {
       next(error);
     }
   }
+
+  static async updateAnnouncement(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { 
+        company_id,
+        company_announcement_id,
+        title,
+        description,
+        company_branch_id_add,
+        company_branch_id_remove 
+      } = req.body;
+      const file_attachment: Express.Multer.File | undefined = req.file;
+      const announcement = await AnnouncementService.updateAnnouncement({
+        company_id,
+        company_announcement_id: parseInt(company_announcement_id),
+        title,
+        description,
+        file_attachment,
+        company_branch_id_add,
+        company_branch_id_remove,
+      });
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Announcement updated successfully',
+        data: announcement,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 };

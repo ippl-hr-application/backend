@@ -31,4 +31,9 @@ announcementRoute.delete('/company/:company_id/announcement/:announcement_id', [
   AnnouncementController.deleteAnnouncement,
 ]);
 
+announcementRoute.put('/update',[
+  upload.single('announcement_file'),
+  JWTMiddleware.verifyToken,
+  AnnouncementController.updateAnnouncement,
+])
 export default announcementRoute;

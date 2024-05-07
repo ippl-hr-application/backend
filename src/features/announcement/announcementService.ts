@@ -11,6 +11,7 @@ import {
   CreateAnnouncementRequest,
   CreateAnnouncementResponse,
   UpdateAnnouncementRequest,
+  UpdateAnnouncementResponse,
 } from './announcementModel';
 import { AnnouncementValidation } from './announcementValidation';
 import { pathToFileUrl } from '../../utils/format';
@@ -249,49 +250,107 @@ export class AnnouncementService {
     };
   }
 
-  // static async updateAnnouncement(
-  //   {
-  //     announcement_id,
-  //     company_id,
-  //   }: {
-  //     announcement_id: string;
-  //     company_id: string;
-  //   },
-  //   data: UpdateAnnouncementRequest
-  // ): Promise<CompanyAnnouncement> {
-  //   const request: UpdateAnnouncementRequest = Validation.validate(
-  //     AnnouncementValidation.UPDATE_ANNOUNCEMENT,
-  //     data
-  //   );
+  static async updateAnnouncement(
+    {
+      company_id,
+      company_announcement_id,
+      title,
+      description,
+      company_branch_id_add,
+      company_branch_id_remove,
+      file_attachment,
+    }: UpdateAnnouncementRequest
+  ): Promise<UpdateAnnouncementResponse> {
+    const request = Validation.validate(
+      AnnouncementValidation.UPDATE_ANNOUNCEMENT,
+      {
+        company_id,
+        company_announcement_id,
+        title,
+        description,
+        company_branch_id_add,
+        company_branch_id_remove
+      }
+    );
+     
+    if (company_branch_id_add !== undefined && company_branch_id_add.length > 0) {
+      for (let i = 0; i < (company_branch_id_add ?? []).length; i++) {
+        const isCreated = await prisma.companyAnnouncementTo.findFirst({ 
+          where: {
+            company_announcement_id: request.company_announcement_id,
+            company_branch_id: company_branch_id_add[i],
+          },
+        });
 
-  //   const announcement = await prisma.companyAnnouncement.update({
-  //     where: { company_announcement_id: parseInt(announcement_id) },
-  //     data: request,
-  //   });
+        if (isCreated) {
+          throw new ErrorResponse(
+            'Branch already added', 
+            400, 
+            ['company_branch_id']
+            );
+        }
+        const announcementTo = await prisma.companyAnnouncementTo.create({
+          data: {
+            company_announcement_id: request.company_announcement_id,
+            company_branch_id: company_branch_id_add[i],
+          },
+        });
+      }
+    }
 
-  //   return announcement;
-  // }
+    if (company_branch_id_remove !== undefined && company_branch_id_remove.length > 0) {
+      for (let i = 0; i < (company_branch_id_remove ?? []).length; i++) {
+        const announcementTo = await prisma.companyAnnouncementTo.deleteMany({
+          where: {
+            company_announcement_id: request.company_announcement_id,
+            company_branch_id: company_branch_id_remove[i],
+          },
+        });
+      }
+    }
+    const company_file_id = await prisma.companyAnnouncementFileAttachment.findFirst({
+      where: {
+        company_announcement_id: request.company_announcement_id,
+      },
+      select: {
+        company_file_id: true,
+      },
 
-  // static async addAnnouncementTo(
-  //   data: CompanyAnnouncementTo
-  // ): Promise<CompanyAnnouncementTo> {
-  //   const announcementTo = await prisma.companyAnnouncementTo.create({
-  //     data,
-  //   });
+    });
+    const addCompanyFile = await prisma.companyFile.update({
+      where: {
+        company_file_id: company_file_id?.company_file_id,
+      },
+      data: {
+        company_id: request.company_id,
+        file_name: file_attachment?.originalname || '',
+        file_size: file_attachment?.size || 0,
+        file_type: file_attachment?.mimetype || '',
+        file_url: pathToFileUrl(
+          file_attachment?.path || "",
+          process.env.SERVER_URL || "http://localhost:3000"
+        ),
+        description: description,
+      },
+    });
+    const announcement = await prisma.companyAnnouncement.update({
+      where: { company_announcement_id: request.company_announcement_id},
+      data: {
+        title: request.title,
+        description: request.description,
 
-  //   return announcementTo;
-  // }
+      },
+    });
 
-  // static async addAnnouncementFileAttachment(
-  //   data: CompanyAnnouncementFileAttachment
-  // ): Promise<CompanyAnnouncementFileAttachment> {
-  //   const announcementFileAttachment =
-  //     await prisma.companyAnnouncementFileAttachment.create({
-  //       data,
-  //     });
-
-  //   return announcementFileAttachment;
-  // }
+    return {company_id,
+      company_announcement_id,
+      title,
+      description,
+      company_branch_id_add,
+      company_branch_id_remove,
+      file_attachment
+    };
+  }
 
   static async deleteAnnouncement(
     announcement_id: string,
