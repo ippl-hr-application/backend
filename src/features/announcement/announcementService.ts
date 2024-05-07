@@ -17,12 +17,58 @@ import { pathToFileUrl } from '../../utils/format';
 
 export class AnnouncementService {
   static async getAnnouncementCompany({
-    company_id,
+    company_branch_id,
   }: {
-    company_id: string;
+    company_branch_id: string;
   }): Promise<CompanyAnnouncement[]> {
+    const company = await prisma.companyBranches.findFirst({
+      where: { company_branch_id: company_branch_id },
+      select: {
+        company_id: true,
+      },
+    });
+    
     const announcements = await prisma.companyAnnouncement.findMany({
-      where: { company_id: company_id },
+      where: { company_id: company?.company_id},
+      include: {
+        company_announcement_to: {
+          select: {
+            company_branch_id: true,
+          },
+        },
+        company_announcement_file_attachments: {
+          include: {
+            company_file: {
+              select: {
+                file_name: true,
+                file_size: true,
+                file_type: true,
+                file_url: true,
+              }
+            },
+          },
+        },
+      },
+    });
+    
+    return announcements;
+  }
+  
+  static async getAnnouncementCompanyBranch({
+    company_branch_id,
+  }: {
+    company_branch_id: string;
+  }): Promise<CompanyAnnouncement[]> {
+    
+    const announcements_id = await prisma.companyAnnouncementTo.findMany({
+      where: { company_branch_id: company_branch_id},
+      select: {
+        company_announcement_id: true,
+      },
+    });
+    
+    const announcements = await prisma.companyAnnouncement.findMany({
+      where: { company_announcement_id: { in: announcements_id.map((announcement) => announcement.company_announcement_id) }},
       include: {
         company_announcement_to: {
           select: {
@@ -81,17 +127,6 @@ export class AnnouncementService {
     return fixurl;
   }
 
-  // static async getAnnouncementCompanyBranch({
-  //   company_branch_id,
-  // }: {
-  //   company_branch_id: string;
-  // }): Promise<CompanyAnnouncement[]> {
-  //   const announcements = await prisma.companyAnnouncement.findMany({
-  //     where: { company_branch_id: company_branch_id },
-  //   });
-
-  //   return announcements;
-  // }
 
   static async addAnnouncement({
     company_id,
