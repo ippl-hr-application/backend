@@ -11,9 +11,14 @@ announcementRoute.post('/', [
   AnnouncementController.addAnnouncement,
 ]);
 
-announcementRoute.get('/:company_id', [
+announcementRoute.get('/hq', [
   JWTMiddleware.verifyToken,
   AnnouncementController.getAnnouncementCompany,
+]);
+
+announcementRoute.get('/branch', [
+  JWTMiddleware.verifyToken,
+  AnnouncementController.getAnnouncementCompanyBranch,
 ]);
 
 announcementRoute.get('/:company_id/:title', [

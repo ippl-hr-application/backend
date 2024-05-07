@@ -1,15 +1,36 @@
 import { Request, Response, NextFunction } from 'express';
 import { AnnouncementService } from './announcementService';
+import { EmployeeToken } from '../../models';
 
 export class AnnouncementController {
+  // Get announcement company branch by company_branch_id from token employee
   static async getAnnouncementCompany(req: Request, res: Response, next: NextFunction) {
     try {
+      const { company_branch_id } = res.locals.user ;
       const announcements = await AnnouncementService.getAnnouncementCompany({
-        company_id: req.params.company_id,
+        company_branch_id,
       });
       
       res.status(200).json({
         status: 'success',
+        message: 'Announcement from HQ retrieved successfully',
+        data: announcements,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getAnnouncementCompanyBranch(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { company_branch_id } = res.locals.user;
+      const announcements = await AnnouncementService.getAnnouncementCompanyBranch({
+        company_branch_id,
+      });
+
+      res.status(200).json({
+        status: 'success getAnnouncementCompanyBranch',
+        message: 'Announcement from branch retrieved successfully',
         data: announcements,
       });
     } catch (error) {
@@ -39,20 +60,6 @@ export class AnnouncementController {
     }
   }
 
-  // static async getAnnouncementCompanyBranch(req: Request, res: Response, next: NextFunction) {
-  //   try {
-  //     const announcements = await AnnouncementService.getAnnouncementCompanyBranch({
-  //       company_branch_id: req.params.company_branch_id,
-  //     });
-
-  //     res.status(200).json({
-  //       status: 'success',
-  //       data: announcements,
-  //     });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
 
   static async addAnnouncement(
     req: Request,
