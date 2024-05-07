@@ -21,11 +21,6 @@ announcementRoute.get('/branch', [
   AnnouncementController.getAnnouncementCompanyBranch,
 ]);
 
-announcementRoute.get('/:company_id/:title', [
-  JWTMiddleware.verifyToken,
-  AnnouncementController.getAnnouncementByTitle,
-]);
-
 announcementRoute.get('/download/:company_id/:company_announcement_id', [
   JWTMiddleware.verifyToken,
   AnnouncementController.downloadAnnouncementFile,
