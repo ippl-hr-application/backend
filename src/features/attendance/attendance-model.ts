@@ -1,3 +1,8 @@
+import {
+  Attendance,
+  AttendanceCheckStatus,
+  AttendanceCheckType,
+} from "@prisma/client";
 import { number } from "zod";
 
 export type GetShiftInfoRequest = {
@@ -40,11 +45,13 @@ export type AttendanceTodayResponse = {
   date: string;
   from: string | undefined;
   to: string | undefined;
-  check_in: {
-    time: string | undefined;
-    type: string | undefined;
-    status: string | undefined;
-  };
+  checks:
+    | {
+        time: string;
+        type: AttendanceCheckType;
+        status: AttendanceCheckStatus;
+      }[]
+    | undefined;
 };
 export type AttendanceRecapRequest = {
   employee_id: string;

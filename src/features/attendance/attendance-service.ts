@@ -159,10 +159,7 @@ export class AttendanceService {
     const attendance = await prisma.attendance.findFirst({
       where: {
         employee_id,
-        date: {
-          gte: today + "T00:00:00.000Z", // Tanggal hari ini mulai dari waktu 00:00:00
-          lte: today + "T23:59:59.999Z", // Tanggal hari ini sampai waktu 23:59:59
-        },
+        date: today,
       },
       select: {
         attendance_id: true,
@@ -191,11 +188,15 @@ export class AttendanceService {
       date: today,
       from: attendance?.assign_shift?.shift?.start_time,
       to: attendance?.assign_shift?.shift?.end_time,
-      check_in: {
-        time: attendance?.attendance_check?.time,
-        type: attendance?.attendance_check?.type,
-        status: attendance?.attendance_check?.status,
-      },
+      checks: attendance?.attendance_check?.map(
+        (check: { time: any; type: any; status: any }) => {
+          return {
+            time: check.time,
+            type: check.type,
+            status: check.status,
+          };
+        }
+      ),
     };
   }
 
@@ -233,7 +234,7 @@ export class AttendanceService {
       let isPresent = false;
       if (
         attendance.attendance_check &&
-        attendance.attendance_check.status.length >= 2
+        attendance.attendance_check.length >= 2
       ) {
         isPresent = true;
       }

@@ -352,7 +352,7 @@ model Attendance {
   company_branch       CompanyBranches       @relation(fields: [company_branch_id], references: [company_branch_id])
   company_branch_id    String
   date                 DateTime              @db.Date
-  attendance_check     AttendanceCheck?
+  attendance_check     AttendanceCheck[]
   attendanceSubmission AttendanceSubmission?
 
   @@map("attendances")
@@ -372,7 +372,7 @@ enum AttendanceCheckType {
 model AttendanceCheck {
   attendance_check_id Int @id @default(autoincrement())
 
-  attendance_id Int        @unique
+  attendance_id Int       
   attendance    Attendance @relation(fields: [attendance_id], references: [attendance_id])
 
   employee_file_id Int                   @unique
