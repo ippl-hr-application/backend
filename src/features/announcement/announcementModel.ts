@@ -20,6 +20,7 @@ export type CreateAnnouncementResponse = {
   company_announcement_id: number;
   file_name: string;
   company_branch_id: string;
+  date: Date;
 };
 
 export type UpdateAnnouncementRequest = Omit<

@@ -159,11 +159,12 @@ export class AnnouncementService {
         'from',
         'company_id',
       ]);
-
+    const date = new Date()
     const announcement = await prisma.companyAnnouncement.create({
       data: {
         ...request,
         company_id: request.company_id,
+        date,
       },
     });
 
@@ -247,6 +248,7 @@ export class AnnouncementService {
       company_announcement_id: find_company_announcement_id[0]?.company_announcement_id || 0,
       file_name: file_attachment?.originalname || '',
       company_branch_id: branch_names_str,
+      date
     };
   }
 

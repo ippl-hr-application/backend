@@ -134,6 +134,7 @@ model CompanyAnnouncement {
 
   title                                 String
   description                           String
+  date                                  DateTime     @db.Date
   company_announcement_to               CompanyAnnouncementTo[]
   company_announcement_file_attachments CompanyAnnouncementFileAttachment[]
 
