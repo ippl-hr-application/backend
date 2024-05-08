@@ -21,11 +21,6 @@ announcementRoute.get('/branch', [
   AnnouncementController.getAnnouncementCompanyBranch,
 ]);
 
-announcementRoute.get('/:company_id/:title', [
-  JWTMiddleware.verifyToken,
-  AnnouncementController.getAnnouncementByTitle,
-]);
-
 announcementRoute.get('/download/:company_id/:company_announcement_id', [
   JWTMiddleware.verifyToken,
   AnnouncementController.downloadAnnouncementFile,
@@ -36,4 +31,9 @@ announcementRoute.delete('/company/:company_id/announcement/:announcement_id', [
   AnnouncementController.deleteAnnouncement,
 ]);
 
+announcementRoute.put('/update',[
+  upload.single('announcement_file'),
+  JWTMiddleware.verifyToken,
+  AnnouncementController.updateAnnouncement,
+])
 export default announcementRoute;
