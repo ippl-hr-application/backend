@@ -23,10 +23,40 @@ export class AccountService {
     first_name,
     last_name, 
     gender,
-    job_position,
-    employment_status,
+    job_position_name,
+    employment_status_name,
+    get_all,
   }: GetEmployeeRequest): Promise<GetAllEmployeeResponse> {
-    console.log(hasResigned);
+    const findJobPositionId = await prisma.jobPosition.findMany({
+      where: {
+        name: {contains: job_position_name},
+      },
+    });
+
+    const findEmploymentStatusId = await prisma.employmentStatus.findMany({
+      where: {
+        name: {contains: employment_status_name},
+      },
+    });
+
+    if(get_all === 'true'){
+      const findEmployee = await prisma.employee.findMany({
+        where: {
+          company_branch_id: company_branch_id,
+        },
+      });
+
+      if(findEmployee[0] == undefined){
+        throw new ErrorResponse(
+          'Employee not found',
+          404,
+          ['employee'],
+          'EMPLOYEE_NOT_FOUND'
+        );
+      }
+      return findEmployee;
+    }
+
     const findEmployee = await prisma.employee.findMany({
       where: {
         first_name: first_name,
@@ -34,8 +64,11 @@ export class AccountService {
         gender: gender,
         company_branch_id: company_branch_id,
         hasResigned: hasResigned === 'true' ? true : false,
+        job_position_id: {in: findJobPositionId.map((jobPosition) => jobPosition.job_position_id)},
+        employment_status_id: {in: findEmploymentStatusId.map((employmentStatus) => employmentStatus.employment_status_id)},
       },
     })
+
     if(findEmployee[0] == undefined){
       throw new ErrorResponse(
         'Employee not found',
@@ -71,18 +104,77 @@ export class AccountService {
   }
 
   static async createEmployee(
-    employeeData: CreateRequest
+    {
+      company_branch_id,
+      job_position_id,
+      employment_status_id,
+      first_name,
+      last_name,
+      email,
+      password,
+      phone_number,
+      place_of_birth,
+      birth_date,       
+      marital_status,
+      blood_type,
+      religion,
+      identity_type,
+      identity_number,
+      identity_expired_date,       
+      postcal_code,
+      citizen_id_address,
+      residential_address,
+      bank_account_number,
+      bank_type,
+      wage,
+      gender,
+      join_date
+    }: CreateRequest
   ): Promise<CreateResponse> {
-    employeeData.identity_expired_date = new Date(
-      employeeData.identity_expired_date
+    identity_expired_date = new Date(
+      identity_expired_date
     );
-    employeeData.birth_date = new Date(employeeData.birth_date);
-    employeeData.join_date = new Date(employeeData.join_date);
+    birth_date = new Date(birth_date);
+    join_date = new Date(join_date);
 
     const request = Validation.validate(
       AccountValidation.CREATE_EMPLOYEE,
-      employeeData
+      { 
+        company_branch_id,
+        job_position_id,
+        employment_status_id,
+        first_name,
+        last_name,
+        email,
+        password,
+        phone_number,
+        place_of_birth,
+        birth_date,       
+        marital_status,
+        blood_type,
+        religion,
+        identity_type,
+        identity_number,
+        identity_expired_date,       
+        postcal_code,
+        citizen_id_address,
+        residential_address,
+        bank_account_number,
+        bank_type,
+        wage,
+        gender,
+        join_date
+      }
     );
+
+    // if(company_branch_id !== company_branch_id_params){
+    //   throw new ErrorResponse(
+    //     'Company branch id not match with params',
+    //     400,
+    //     ['company_branch_id'],
+    //     'COMPANY_BRANCH_ID_NOT_MATCH'
+    //   );
+    // }
 
     const countEmailEmployee = await prisma.employee.count({
       where: { 
@@ -251,6 +343,7 @@ export class AccountService {
       },
       data: {
         hasResigned: true,
+        resign_date: new Date(),
       },
     });
 

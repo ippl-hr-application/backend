@@ -12,8 +12,9 @@ export type GetEmployeeRequest = {
   last_name?: string | undefined;
   hasResigned?: string | undefined;
   gender?: string | undefined;
-  job_position?: string | undefined;
-  employment_status?: string | undefined;
+  job_position_name?: string | undefined;
+  employment_status_name?: string | undefined;
+  get_all?: string | undefined;
 };
 
 export type GetAllEmployeeResponse = Employee[];
@@ -75,6 +76,7 @@ export type UpdateRequest = {
   hasresigned?: string;
   join_date?: Date;
   gender?: string;
+  resign_date?: Date;
 };
 
 export type UpdateResponse = {
