@@ -89,8 +89,20 @@ export class AuthService {
       where: {
         employee_id: request.employee_id,
       },
-      include: {
-        job_position: true,
+      select: {
+        employee_id: true,
+        company_branch_id: true,
+        company_branch: {
+          select: {
+            company_id: true,
+          }
+        },
+        password: true,
+        job_position: {
+          select: {
+            name: true,
+          }
+        }
       }
     });
 
@@ -118,6 +130,7 @@ export class AuthService {
         employee_id: employee.employee_id,
         company_branch_id: employee.company_branch_id,
         position: employee.job_position.name,
+        company_id: employee.company_branch.company_id,
       },
       process.env.JWT_SECRET!,
       {
@@ -213,6 +226,7 @@ export class AuthService {
 
     const user_employee_account = await prisma.employee.create({
       data: {
+        employee_id: user.user_id,
         company_branch_id: companyBranch.company_branch_id,
         email: request.email,
         password: hashedPassword,

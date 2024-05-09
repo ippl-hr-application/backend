@@ -43,6 +43,7 @@ export class PayrollService {
           company_branch_id,
           month,
           year,
+          status: "PAID"
         },
         _sum: {
           wage: true,
