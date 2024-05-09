@@ -25,7 +25,8 @@ export class AnnouncementController {
 
   static async getAnnouncementCompanyBranch(req: Request, res: Response, next: NextFunction) {
     try {
-      const { company_branch_id } = res.locals.user;
+      const company_branch_id_token = res.locals.user.company_branch_id as EmployeeToken;
+      const company_branch_id = String(req.params.company_branch_id || company_branch_id_token);
       const title = req.query.title as string;
       const announcements = await AnnouncementService.getAnnouncementCompanyBranch({
         company_branch_id,

@@ -67,7 +67,7 @@ export class AnnouncementService {
     company_branch_id: string;
     title: string;
   }): Promise<CompanyAnnouncement[]> {
-    
+
     const announcements_id = await prisma.companyAnnouncementTo.findMany({
       where: { company_branch_id: company_branch_id},
       select: {
