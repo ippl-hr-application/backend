@@ -9,5 +9,7 @@ export interface UserToken extends JwtPayload {
 export interface EmployeeToken extends JwtPayload {
   employee_id: string,
   company_branch_id: string,
+  company_id: string,
+  position: string,
 }
 

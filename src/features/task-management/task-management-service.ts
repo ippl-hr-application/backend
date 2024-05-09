@@ -35,6 +35,7 @@ export class TaskManagementService {
   }
 
   static async addTaskManagement(
+    company_branch_id: string,
     data: CreateTaskRequest,
     from: string
   ): Promise<Number> {
@@ -54,7 +55,7 @@ export class TaskManagementService {
 
     const task = await prisma.employeeTask.createMany({
       data: request.employee_id.map((employee_id) => ({
-        company_branch_id: request.company_branch_id,
+        company_branch_id,
         employee_id,
         title: request.title,
         description: request.description,
@@ -86,7 +87,11 @@ export class TaskManagementService {
 
     const task = await prisma.employeeTask.update({
       where: { task_id, company_branch_id },
-      data: request,
+      data: {
+        ...request,
+        start_date: new Date(request.start_date),
+        end_date: new Date(request.end_date),
+      },
     });
 
     return task;
@@ -96,6 +101,13 @@ export class TaskManagementService {
     task_id: number,
     company_branch_id: string
   ): Promise<EmployeeTask> {
+    const isTaskExist = await prisma.employeeTask.findUnique({
+      where: { task_id, company_branch_id },
+    });
+
+    if (!isTaskExist)
+      throw new ErrorResponse("Task not found", 404, ["task_id"]);
+
     const task = await prisma.employeeTask.delete({
       where: { task_id, company_branch_id },
     });
