@@ -38,11 +38,27 @@ CREATE TABLE "attendance_submission" (
     CONSTRAINT "attendance_submission_pkey" PRIMARY KEY ("attendance_submission_id")
 );
 
+-- CreateTable
+CREATE TABLE "reset_password_tokens" (
+    "token_id" SERIAL NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "expired_at" TIMESTAMP(3) NOT NULL,
+    "is_used" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "reset_password_tokens_pkey" PRIMARY KEY ("token_id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "attendance_submission_submision_id_key" ON "attendance_submission"("submision_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "attendance_submission_attendance_id_key" ON "attendance_submission"("attendance_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "reset_password_tokens_token_key" ON "reset_password_tokens"("token");
 
 -- AddForeignKey
 ALTER TABLE "company_file_templates" ADD CONSTRAINT "company_file_templates_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "company_branches"("company_branch_id") ON DELETE RESTRICT ON UPDATE CASCADE;
