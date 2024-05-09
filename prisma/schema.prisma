@@ -431,6 +431,7 @@ model Payroll {
 
 model ResetPasswordToken {
   token_id   Int      @id @default(autoincrement())
+  user_id    String
   email      String
   token      String   @unique
   created_at DateTime @default(now())

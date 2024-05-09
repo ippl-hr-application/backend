@@ -97,14 +97,14 @@ export class AuthController {
     }
   }
 
-  static async employeeResetPassword(
+  static async employeeForgotPassword(
     req: Request,
     res: Response,
     next: NextFunction
   ) {
     try {
-      const { employee_id, newPassword } = req.body;
-      await AuthService.employeeResetPassword(employee_id, newPassword);
+      const { employee_id } = req.body;
+      await AuthService.employeeForgotPassword(employee_id);
       return res.status(200).json({
         success: true,
         message: "Password reset successfully",
@@ -114,4 +114,20 @@ export class AuthController {
     }
   }
 
+  static async employeeResetPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { token, new_password } = req.body;
+      await AuthService.employeeResetPassword(token, new_password);
+      return res.status(200).json({
+        success: true,
+        message: "Password reset successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

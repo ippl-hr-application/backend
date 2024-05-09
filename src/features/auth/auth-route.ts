@@ -6,7 +6,6 @@ const authRoute: Router = Router();
 
 authRoute.post("/login", AuthController.login);
 authRoute.post("/employee-login", AuthController.employeeLogin);
-authRoute.post("/employee-reset-password", AuthController.employeeResetPassword);
 authRoute.post("/register", AuthController.register);
 authRoute.get("/me", [
   JWTMiddleware.verifyToken,
@@ -14,5 +13,7 @@ authRoute.get("/me", [
 ]);
 authRoute.get("/forgot-password", AuthController.ownerForgotPassword);
 authRoute.post("/reset-password", AuthController.resetPassword);
+authRoute.get("/employee-forgot-password", AuthController.employeeForgotPassword);
+authRoute.post("/employee-reset-password", AuthController.employeeResetPassword);
 
 export default authRoute;
