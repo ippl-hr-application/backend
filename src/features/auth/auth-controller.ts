@@ -69,11 +69,28 @@ export class AuthController {
 
   static async resetPassword(req: Request, res: Response, next: NextFunction) {
     try {
-      const { email, newPassword } = req.body;
-      await AuthService.resetPassword(email, newPassword);
+      const { token, new_password } = req.body;
+      await AuthService.resetPassword(token, new_password);
       return res.status(200).json({
         success: true,
         message: "Password reset successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async ownerForgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { email } = req.body;
+      await AuthService.ownerForgotPassword(email);
+      return res.status(200).json({
+        success: true,
+        message: "Please check your email for password reset link",
       });
     } catch (error) {
       next(error);
@@ -96,4 +113,5 @@ export class AuthController {
       next(error);
     }
   }
+
 }

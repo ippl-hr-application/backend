@@ -429,6 +429,17 @@ model Payroll {
   @@map("payrolls")
 }
 
+model ResetPasswordToken {
+  token_id   Int      @id @default(autoincrement())
+  email      String
+  token      String   @unique
+  created_at DateTime @default(now())
+  expired_at DateTime
+  is_used    Boolean  @default(false)
+
+  @@map("reset_password_tokens")
+}
+
 enum PackageType {
   FREE
   PREMIUM

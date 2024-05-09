@@ -13,7 +13,8 @@ import {
   CurrentEmployeeLoggedInUserResponse,
 } from "./auth-model";
 import jwt from "jsonwebtoken";
-import { connect } from "http2";
+import crypto from "crypto";
+import { sendEmail } from "../../utils/nodemailer";
 
 export class AuthService {
   static async login({
@@ -95,15 +96,15 @@ export class AuthService {
         company_branch: {
           select: {
             company_id: true,
-          }
+          },
         },
         password: true,
         job_position: {
           select: {
             name: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     if (!employee) {
@@ -326,14 +327,22 @@ export class AuthService {
     return user;
   }
 
-  static async resetPassword(email: string, newPassword: string) {
+  static async resetPassword(token: string, newPassword: string) {
     const request = Validation.validate(AuthValidation.RESET_PASSWORD, {
-      email,
+      token,
       newPassword,
     });
 
+    const resetToken = await prisma.resetPasswordToken.findUnique({
+      where: { token: request.token },
+    });
+
+    if (!resetToken || resetToken.expired_at < new Date() || resetToken.is_used) {
+      throw new ErrorResponse("Token is invalid", 404, ["token"]);
+    }
+
     const user = await prisma.registeredUser.findUnique({
-      where: { email: request.email },
+      where: { email: resetToken.email },
     });
 
     if (!user) {
@@ -348,39 +357,74 @@ export class AuthService {
     const hashedPassword = hashPassword(request.newPassword);
 
     await prisma.registeredUser.update({
-      where: { email: request.email },
+      where: { email: resetToken.email },
       data: {
         password: hashedPassword,
       },
     });
+
+    await prisma.resetPasswordToken.update({
+      where: { token },
+      data: {
+        is_used: true,
+      },
+    });
+  }
+
+  static async ownerForgotPassword(email: string) {
+    const user = await prisma.registeredUser.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new ErrorResponse("Email is not registered in the system", 404, [
+        "email",
+      ]);
+    }
+
+    const token = crypto.randomBytes(16).toString("hex");
+    const expiredAt = new Date(new Date().getTime() + 5 * 60000);
+
+    await prisma.resetPasswordToken.create({
+      data: {
+        token,
+        email,
+        expired_at: expiredAt,
+      },
+    });
+
+    sendEmail({
+      from: process.env.EMAIL,
+      to: email,
+      subject: "Reset Password",
+      text: `Click this link to reset your password: ${
+        process.env.BASE_URL || "http://localhost:3000"
+      }/reset-password/${token} \n\n This link will be expired in 5 minutes.`,
+    });
   }
 
   static async employeeResetPassword(uniqueId: string, newPassword: string) {
-  //   const request = Validation.validate(AuthValidation.RESET_PASSWORD, {
-  //     email: uniqueId,
-  //     newPassword,
-  //   });
-
-  //   const employee = await prisma.employee.findFirst({
-  //     where: { email: request.email },
-  //   });
-
-  //   if (!employee) {
-  //     throw new ErrorResponse(
-  //       "Employee not found",
-  //       404,
-  //       ["uniqueId"],
-  //       "EMPLOYEE_NOT_FOUND"
-  //     );
-  //   }
-
-  //   const hashedPassword = hashPassword(request.newPassword);
-
-  //   await prisma.employee.update({
-  //     where: { email: request.email },
-  //     data: {
-  //       password: hashedPassword,
-  //     },
-  //   });
+    //   const request = Validation.validate(AuthValidation.RESET_PASSWORD, {
+    //     email: uniqueId,
+    //     newPassword,
+    //   });
+    //   const employee = await prisma.employee.findFirst({
+    //     where: { email: request.email },
+    //   });
+    //   if (!employee) {
+    //     throw new ErrorResponse(
+    //       "Employee not found",
+    //       404,
+    //       ["uniqueId"],
+    //       "EMPLOYEE_NOT_FOUND"
+    //     );
+    //   }
+    //   const hashedPassword = hashPassword(request.newPassword);
+    //   await prisma.employee.update({
+    //     where: { email: request.email },
+    //     data: {
+    //       password: hashedPassword,
+    //     },
+    //   });
   }
 }
