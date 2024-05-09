@@ -21,7 +21,7 @@ export class AuthValidation {
   });
 
   static readonly RESET_PASSWORD: ZodType = z.object({
-    email: z.string().email(),
+    token: z.string(),
     newPassword: z.string().min(6).max(20),
   });
 }
