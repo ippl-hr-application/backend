@@ -14,7 +14,7 @@ import { attendanceRoute } from "./features/attendance";
 import { jobPositionRoute } from "./features/job-position";
 import { employmentRoute } from "./features/employment-status";
 import { documentRoute } from "./features/document-management";
-import { companyBranchRoute } from "./features/company-branch";
+import { companyRoute } from "./company-management/";
 import { imagekit } from "./utils/image-kit";
 import { announcementRoute } from "./features/announcement";
 import { payrollRoute } from "./features/payrolls";
@@ -48,7 +48,7 @@ app.use("/task-management", taskManagementRoute);
 app.use("/job-position", jobPositionRoute);
 app.use("/employment-status", employmentRoute);
 app.use("/doc", documentRoute);
-app.use("/company-branch", companyBranchRoute);
+app.use("/company", companyRoute);
 app.get("/auth-imagekit", function (req, res) {
   const result = imagekit.getAuthenticationParameters();
   res.send(result);
