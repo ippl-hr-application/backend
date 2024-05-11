@@ -57,10 +57,12 @@ export class ShiftService {
   }
   static async getAllShifts({
     company_branch_id,
+    name,
   }: GetShiftRequest): Promise<GetShiftResponse[]> {
     const shift = await prisma.shift.findMany({
       where: {
         company_branch_id,
+        ...(name ? { name: { contains: name, mode: "insensitive" } } : {}),
       },
     });
     if (!shift) {
@@ -77,6 +79,14 @@ export class ShiftService {
       shift_id,
       employee_id,
     });
+    const shift = await prisma.shift.findFirst({
+      where: {
+        shift_id: request.shift_id,
+      },
+    });
+    if (!shift) {
+      throw new ErrorResponse("Shift not found", 404, ["shift_id"]);
+    }
     const employee = await prisma.assignShift.findFirst({
       where: {
         employee_id: request.employee_id,
@@ -124,11 +134,18 @@ export class ShiftService {
   }
   static async getAllAsignShifts({
     company_branch_id,
+    name,
   }: GetAllAsignShiftRequest) {
     const assignShifts = await prisma.assignShift.findMany({
       orderBy: [{ assign_shift_id: "desc" }],
       where: {
         company_branch_id,
+        employee: {
+          OR: [
+            { first_name: { contains: name || "", mode: "insensitive" } }, // Mencari nama pertama yang mengandung 'name' atau kosong jika 'name' kosong
+            { last_name: { contains: name || "", mode: "insensitive" } }, // Mencari nama terakhir yang mengandung 'name' atau kosong jika 'name' kosong
+          ],
+        },
       }, // Urutkan berdasarkan employee_id secara descending, kemudian berdasarkan id secara descending
       distinct: ["employee_id"],
       select: {

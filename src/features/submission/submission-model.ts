@@ -47,7 +47,8 @@ export type MutationSubmissionResponse = {
 export type GetSubmissionHistoryRequest = {
   employee_id: string;
   status: SubmissionStatus;
-  year: number;
+  year: string;
+  month: string;
 };
 
 export type GetSubmissionHistoryResponse = {

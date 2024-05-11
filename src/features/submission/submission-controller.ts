@@ -152,10 +152,11 @@ export class SubmissionController {
   ) {
     try {
       const { employee_id } = res.locals.user;
-      const { year, status } = req.query;
+      const { year, month, status } = req.query;
       const result = await SubmissionService.getSubmissionHistory({
         employee_id,
-        year: Number(year),
+        year: year as string,
+        month: month as string,
         status: status as SubmissionStatus,
       });
       return res.status(200).json({
@@ -223,7 +224,7 @@ export class SubmissionController {
         reason,
         employee_id,
         attendance_submission_file,
-        attendance_id,
+        attendance_id: Number(attendance_id),
       });
       return res.status(201).json({
         success: true,

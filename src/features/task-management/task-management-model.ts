@@ -19,3 +19,18 @@ export type GetTaskEmployeeRequest = {
   start_date: string;
   end_date: string;
 };
+export type GetTaskEmployeeResponse = {
+  task_id: number;
+  title: string;
+  description: string;
+  start_date: Date;
+  end_date: Date;
+  given_by: {
+    employee_id: string;
+    first_name: string;
+    last_name: string;
+    job_position: {
+      name: string;
+    };
+  };
+};
