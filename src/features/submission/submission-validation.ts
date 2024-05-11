@@ -12,13 +12,11 @@ export class SubmissionValidation {
     to: z.string(),
     leave_reason: z.string().max(100),
     leave_type: z.string(),
-    employee_id: z.string(),
   });
   static readonly MUTATION_LETTER: ZodType = z.object({
     mutation_reason: z.string().max(100),
     current_company_branch_id: z.string(),
     target_company_branch_id: z.string(),
-    employee_id: z.string(),
   });
   static readonly CHANGE_SHIFT_LETTER: ZodType = z.object({
     reason: z.string().max(100),
@@ -33,5 +31,13 @@ export class SubmissionValidation {
   static readonly ATTENDANCE_LETTER: ZodType = z.object({
     reason: z.string().max(100),
     attendance_id: z.number(),
+  });
+  static readonly GET_SUBMISSION_HISTORY: ZodType = z.object({
+    year: z.string(),
+    month: z.string(),
+    status: z.enum(["PENDING", "ACCEPTED", "REJECTED"]).optional(),
+  });
+  static readonly DELETE_SUBMISSION: ZodType = z.object({
+    submission_id: z.number(),
   });
 }

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { AttendanceService } from "./attendance-service";
+import { z } from "zod";
 export class AttendanceController {
   static async getShiftInfo(req: Request, res: Response, next: NextFunction) {
     try {
@@ -91,6 +92,29 @@ export class AttendanceController {
           ...result,
         },
         message: "Recap Retrieved",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async getHistoryAttendance(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { employee_id } = res.locals.user;
+      const { date } = req.query;
+      const result = await AttendanceService.getHistoryAttendance({
+        employee_id,
+        date: new Date(date as string),
+      });
+      return res.status(200).json({
+        success: true,
+        data: {
+          ...result,
+        },
+        message: "History Retrieved",
       });
     } catch (error) {
       next(error);

@@ -29,7 +29,7 @@ export class ShiftController {
       });
       return res.status(201).json({
         success: true,
-        data: { shift },
+        data: { ...shift },
         message: "Shifted Deleted",
       });
     } catch (error) {
@@ -39,11 +39,15 @@ export class ShiftController {
 
   static async getAllshifts(req: Request, res: Response, next: NextFunction) {
     try {
+      const { name } = req.query;
       const { company_branch_id } = res.locals.user;
-      const shifts = await ShiftService.getAllShifts(company_branch_id);
+      const shifts = await ShiftService.getAllShifts({
+        company_branch_id,
+        name: name as string,
+      });
       return res.status(201).json({
         success: true,
-        data: { shifts },
+        data: shifts,
         message: "shifts Found",
       });
     } catch (error) {
@@ -61,7 +65,7 @@ export class ShiftController {
       });
       return res.status(201).json({
         success: true,
-        data: { assignShift },
+        data: { ...assignShift },
         message: "Assign Shift Added",
       });
     } catch (error) {
@@ -84,7 +88,7 @@ export class ShiftController {
       });
       return res.status(201).json({
         success: true,
-        data: { assignShift },
+        data: { ...assignShift },
         message: "Assign Shift Updated",
       });
     } catch (error) {
@@ -98,12 +102,14 @@ export class ShiftController {
   ) {
     try {
       const { company_branch_id } = res.locals.user;
+      const { name } = req.query;
       const assignShift = await ShiftService.getAllAsignShifts({
         company_branch_id,
+        name: name as string,
       });
       return res.status(200).json({
         success: true,
-        data: { assignShift },
+        data: assignShift,
         message: "Get All Assign Shift Success",
       });
     } catch (error) {

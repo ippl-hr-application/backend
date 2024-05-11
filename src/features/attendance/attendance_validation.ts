@@ -15,4 +15,7 @@ export class AttendanceValidation {
     month: z.string(),
     year: z.string(),
   });
+  static readonly GET_HISTORY: ZodType = z.object({
+    date: z.date(),
+  });
 }

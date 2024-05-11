@@ -21,6 +21,7 @@ import { payrollRoute } from "./features/payrolls";
 import { meraihRoute } from "./features/meraih-exclusive";
 import cron from "node-cron";
 import { PackageTypeMiddleware } from "./middlewares/package_type_middleware";
+import { attendanceManagementRoute } from "./features/attendance-management";
 
 dotenv.config();
 const app: Express = express();
@@ -41,6 +42,7 @@ app.get("/", (req, res) => {
 app.use("/auth", authRoute);
 app.use("/attendance", attendanceRoute);
 app.use("/submission", submissionRoute);
+app.use("/attendance-management", attendanceManagementRoute);
 app.use("/shift", shiftRoute);
 app.use("/profile", profileRoute);
 app.use("/account", accountRoute);

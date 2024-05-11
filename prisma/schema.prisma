@@ -320,7 +320,7 @@ model AttendanceCheck {
   long                Float
   lat                 Float
   status              AttendanceCheckStatus
-  attendance          Attendance            @relation(fields: [attendance_id], references: [attendance_id])
+  attendance          Attendance            @relation(fields: [attendance_id], references: [attendance_id], onDelete: Cascade)
   employee_file       EmployeeFile          @relation(fields: [employee_file_id], references: [employee_file_id])
 
   @@map("attendance_checks")

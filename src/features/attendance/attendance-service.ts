@@ -8,6 +8,8 @@ import {
   AttendanceRecapResponse,
   AttendanceTodayResponse,
   DetailAttendanceRecap,
+  GetHistoryAttendanceRequest,
+  GetHistoryAttendanceResponse,
   GetShiftInfoRequest,
   GetShiftInfoResponse,
 } from "./attendance-model";
@@ -369,7 +371,7 @@ export class AttendanceService {
       }
       attendanceArray.push({
         attendance_id: attendance.attendance_id,
-        date: attendance.date.toISOString(),
+        date: attendance.date,
         isPresent: isPresent,
       });
     });
@@ -382,6 +384,50 @@ export class AttendanceService {
       number_of_attendees: attendanceArray.filter(
         (attendance) => attendance.isPresent
       ).length,
+    };
+  }
+  static async getHistoryAttendance({
+    employee_id,
+    date,
+  }: GetHistoryAttendanceRequest): Promise<GetHistoryAttendanceResponse> {
+    const request = Validation.validate(AttendanceValidation.GET_HISTORY, {
+      date,
+    });
+    const attendance = await prisma.attendance.findFirst({
+      where: {
+        date: request.date,
+        employee_id,
+      },
+      select: {
+        attendance_id: true,
+        date: true,
+        assign_shift: {
+          select: {
+            shift: {
+              select: {
+                start_time: true,
+                end_time: true,
+              },
+            },
+          },
+        },
+        attendance_check: {
+          select: {
+            time: true,
+          },
+        },
+      },
+    });
+    if (!attendance) {
+      throw new ErrorResponse("Attendance not found", 404, ["NOT_FOUND"]);
+    }
+    return {
+      attendance_id: attendance.attendance_id,
+      date: attendance.date,
+      start_time: attendance.assign_shift?.shift?.start_time,
+      end_time: attendance.assign_shift?.shift?.end_time,
+      check_in_time: attendance.attendance_check[0]?.time,
+      check_out_time: attendance.attendance_check[1]?.time,
     };
   }
 }

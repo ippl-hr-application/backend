@@ -74,6 +74,20 @@ export type AttendanceRecapResponse = {
 
 export type DetailAttendanceRecap = {
   attendance_id: number;
-  date: string;
+  date: Date;
   isPresent: false | true;
+};
+
+export type GetHistoryAttendanceRequest = {
+  employee_id: string;
+  date: Date;
+};
+
+export type GetHistoryAttendanceResponse = {
+  attendance_id: number;
+  date: Date;
+  start_time: string;
+  end_time: string;
+  check_in_time: string | null;
+  check_out_time: string | null;
 };
