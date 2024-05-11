@@ -21,18 +21,26 @@ export type GetShiftInfoResponse = {
   shift_name: string;
   job_position: string;
   company_branch_id: string;
+  logo: string | undefined;
   city: string | null;
+  assign_shift_id: number;
 };
 
-export type AttendanceCheckRequest = {
+export type AttendanceCheckInRequest = {
   employee_id: string;
   assign_shift_id: number;
-  type: "CHECK_IN" | "CHECK_OUT";
   long: number;
   lat: number;
   attendance_file: Express.Multer.File | undefined;
 };
 
+export type AttendanceCheckOutRequest = {
+  attendance_id: number;
+  employee_id: string;
+  long: number;
+  lat: number;
+  attendance_file: Express.Multer.File | undefined;
+};
 export type AttendanceCheckResponse = {
   date: Date;
   from: string | undefined;
@@ -55,7 +63,8 @@ export type AttendanceTodayResponse = {
 };
 export type AttendanceRecapRequest = {
   employee_id: string;
-  month_and_year: string | undefined;
+  month: string;
+  year: string;
 };
 export type AttendanceRecapResponse = {
   number_of_attendees: number;

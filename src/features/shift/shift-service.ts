@@ -77,6 +77,14 @@ export class ShiftService {
       shift_id,
       employee_id,
     });
+    const shift = await prisma.shift.findFirst({
+      where: {
+        shift_id: request.shift_id,
+      },
+    });
+    if (!shift) {
+      throw new ErrorResponse("Shift not found", 404, ["shift_id"]);
+    }
     const employee = await prisma.assignShift.findFirst({
       where: {
         employee_id: request.employee_id,

@@ -1,7 +1,8 @@
 import { date } from "zod";
 import { prisma } from "../../applications";
 import {
-  AttendanceCheckRequest,
+  AttendanceCheckInRequest,
+  AttendanceCheckOutRequest,
   AttendanceCheckResponse,
   AttendanceRecapRequest,
   AttendanceRecapResponse,
@@ -13,6 +14,7 @@ import {
 import { Validation } from "../../validations";
 import { AttendanceValidation } from "./attendance_validation";
 import { pathToFileUrl } from "../../utils/format";
+import { ErrorResponse } from "../../models";
 
 export class AttendanceService {
   static async getShiftInfo({
@@ -25,6 +27,7 @@ export class AttendanceService {
         employee_id,
       },
       select: {
+        assign_shift_id: true,
         shift: {
           select: {
             shift_id: true,
@@ -77,19 +80,54 @@ export class AttendanceService {
       shift_id: shiftInfo.shift.shift_id,
       shift_name: shiftInfo?.shift.name,
       job_position: shiftInfo?.employee.job_position.name,
+      logo: shiftInfo?.employee.company_branch.company.company_logo?.file_url,
       company_branch_id: shiftInfo?.employee.company_branch.company_branch_id,
       city: shiftInfo?.employee.company_branch.city,
+      assign_shift_id: shiftInfo.assign_shift_id,
     };
   }
-  static async attendanceCheck({
+  static async attendanceCheckIn({
     employee_id,
     assign_shift_id,
-    type,
     long,
     lat,
     attendance_file,
-  }: AttendanceCheckRequest): Promise<AttendanceCheckResponse> {
+  }: AttendanceCheckInRequest): Promise<AttendanceCheckResponse> {
+    const request = Validation.validate(AttendanceValidation.CHECK_IN, {
+      assign_shift_id,
+      long,
+      lat,
+    });
     const date = new Date().toISOString();
+    const assign_shift = await prisma.assignShift.findUnique({
+      where: {
+        assign_shift_id: request.assign_shift_id,
+      },
+      select: {
+        shift: {
+          select: {
+            start_time: true,
+            end_time: true,
+          },
+        },
+      },
+    });
+    if (!assign_shift) {
+      throw new ErrorResponse(
+        "Assign shift not found",
+        404,
+        ["NOT_FOUND"],
+        "NOT_FOUND"
+      );
+    }
+    if (!attendance_file) {
+      throw new ErrorResponse(
+        "File not found",
+        404,
+        ["NOT_FOUND"],
+        "NOT_FOUND"
+      );
+    }
     const employee = await prisma.employee.findUnique({
       where: {
         employee_id,
@@ -99,20 +137,24 @@ export class AttendanceService {
       },
     });
     if (!employee) {
-      throw new Error("Employee not found");
+      throw new ErrorResponse(
+        "Employee not found",
+        404,
+        ["NOT_FOUND"],
+        "NOT_FOUND"
+      );
     }
     await prisma.attendance.create({
       data: {
         date: date,
-        assign_shift_id,
+        assign_shift_id: request.assign_shift_id,
         employee_id,
         company_branch_id: employee?.company_branch_id,
-
         attendance_check: {
           create: {
-            type,
-            long,
-            lat,
+            type: "CHECK_IN",
+            long: request.long,
+            lat: request.lat,
             status: "PENDING",
             time: date.substring(11, 19),
             employee_file: {
@@ -134,28 +176,111 @@ export class AttendanceService {
         },
       },
     });
-    const shiftInfo = await prisma.assignShift.findFirst({
+    return {
+      date: new Date(),
+      from: assign_shift.shift.start_time,
+      to: assign_shift.shift.end_time,
+      time: date.substring(11, 19),
+    };
+  }
+  static async attendanceCheckOut({
+    employee_id,
+    attendance_id,
+    attendance_file,
+    lat,
+    long,
+  }: AttendanceCheckOutRequest): Promise<AttendanceCheckResponse> {
+    const request = Validation.validate(AttendanceValidation.CHECK_OUT, {
+      attendance_id,
+      lat,
+      long,
+    });
+    const date = new Date().toISOString();
+    const attendance = await prisma.attendance.findUnique({
       where: {
-        assign_shift_id,
+        attendance_id: request.attendance_id,
       },
       select: {
-        shift: {
+        assign_shift: {
           select: {
-            start_time: true,
-            end_time: true,
+            shift: {
+              select: {
+                start_time: true,
+                end_time: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    if (!attendance) {
+      throw new ErrorResponse(
+        "Attendance not found",
+        404,
+        ["NOT_FOUND"],
+        "NOT_FOUND"
+      );
+    }
+    if (!attendance_file) {
+      throw new ErrorResponse(
+        "File not found",
+        404,
+        ["NOT_FOUND"],
+        "NOT_FOUND"
+      );
+    }
+    const employee = await prisma.employee.findUnique({
+      where: {
+        employee_id,
+      },
+      select: {
+        company_branch_id: true,
+      },
+    });
+    if (!employee) {
+      throw new ErrorResponse(
+        "Employee not found",
+        404,
+        ["NOT_FOUND"],
+        "NOT_FOUND"
+      );
+    }
+    await prisma.attendanceCheck.create({
+      data: {
+        lat: request.lat,
+        long: request.long,
+        status: "PENDING",
+        time: date.substring(11, 19),
+        type: "CHECK_OUT",
+        attendance: {
+          connect: { attendance_id: request.attendance_id },
+        },
+        employee_file: {
+          create: {
+            file_name: attendance_file?.originalname || "",
+            file_size: attendance_file?.size || 0,
+            file_type: attendance_file?.mimetype || "",
+            file_url: pathToFileUrl(
+              attendance_file?.path || "",
+              process.env.SERVER_URL || "http://localhost:3000"
+            ),
+            file_for: "BUKTI KEHADIRAN",
+            employee: {
+              connect: { employee_id },
+            },
           },
         },
       },
     });
     return {
       date: new Date(),
-      from: shiftInfo?.shift.start_time,
-      to: shiftInfo?.shift.end_time,
+      from: attendance.assign_shift.shift.start_time,
+      to: attendance.assign_shift.shift.end_time,
       time: date.substring(11, 19),
     };
   }
   static async getToday(employee_id: string): Promise<AttendanceTodayResponse> {
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString();
     const attendance = await prisma.attendance.findFirst({
       where: {
         employee_id,
@@ -202,30 +327,32 @@ export class AttendanceService {
 
   static async getRecap({
     employee_id,
-    month_and_year,
+    month,
+    year,
   }: AttendanceRecapRequest): Promise<AttendanceRecapResponse> {
     const request = Validation.validate(AttendanceValidation.GET_RECAP, {
-      month_and_year,
+      month,
+      year,
     });
+
     const attendances = await prisma.attendance.findMany({
       where: {
         employee_id,
         date: {
-          gte: `${request.month_and_year}-01`,
-          lte: `${request.month_and_year}-31`,
+          gte: `${request.year}-${request.month}-01T00:00:00Z`,
+          lte: `${
+            request.month === "12"
+              ? `${Number(request.year) + 1}-01`
+              : `${request.year}-${(Number(request.month) + 1)
+                  .toString()
+                  .padStart(2, "0")}`
+          }-01T00:00:00Z`,
         },
       },
       select: {
         attendance_id: true,
         date: true,
-        attendance_check: {
-          where: {
-            status: "ACCEPTED",
-          },
-          select: {
-            status: true,
-          },
-        },
+        attendance_check: true,
       },
     });
 
@@ -234,7 +361,9 @@ export class AttendanceService {
       let isPresent = false;
       if (
         attendance.attendance_check &&
-        attendance.attendance_check.length >= 2
+        attendance.attendance_check.length >= 2 &&
+        attendance.attendance_check[0].status === "ACCEPTED" &&
+        attendance.attendance_check[1].status === "ACCEPTED"
       ) {
         isPresent = true;
       }

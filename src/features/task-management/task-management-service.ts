@@ -4,10 +4,12 @@ import { Validation } from "../../validations";
 import {
   CreateTaskRequest,
   GetTaskEmployeeRequest,
+  GetTaskEmployeeResponse,
   UpdateTaskRequest,
 } from "./task-management-model";
 import { TaskManagementValidation } from "./task-management-validation";
 import { ErrorResponse } from "../../models";
+import { GetTaskTemplateResponse } from "aws-sdk/clients/connect";
 
 export class TaskManagementService {
   static async getTaskManagementFromCompany({
@@ -118,7 +120,7 @@ export class TaskManagementService {
     employee_id,
     start_date,
     end_date,
-  }: GetTaskEmployeeRequest): Promise<EmployeeTask[]> {
+  }: GetTaskEmployeeRequest): Promise<GetTaskEmployeeResponse[]> {
     const tasks = await prisma.employeeTask.findMany({
       where: {
         employee_id,
@@ -127,6 +129,25 @@ export class TaskManagementService {
         },
         start_date: {
           gte: start_date ? new Date(start_date) : undefined,
+        },
+      },
+      select: {
+        task_id: true,
+        title: true,
+        description: true,
+        start_date: true,
+        end_date: true,
+        given_by: {
+          select: {
+            employee_id: true,
+            first_name: true,
+            last_name: true,
+            job_position: {
+              select: {
+                name: true,
+              },
+            },
+          },
         },
       },
     });
