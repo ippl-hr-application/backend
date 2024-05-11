@@ -31,3 +31,7 @@ export type UpdateAttendanceRequest = {
   attendance_check_id: number;
   status: "ACCEPTED" | "REJECTED" | "PENDING";
 };
+export type GetAttendanceRequest = {
+  company_branch_id: string;
+  name: string;
+};
