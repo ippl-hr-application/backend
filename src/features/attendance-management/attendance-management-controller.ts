@@ -9,9 +9,11 @@ export class AttendanceManagementController {
   ) {
     try {
       const { company_branch_id } = res.locals.user;
-      const attendances = await AttendanceManagementService.getAllAttendances(
-        company_branch_id
-      );
+      const { name } = req.query;
+      const attendances = await AttendanceManagementService.getAllAttendances({
+        company_branch_id,
+        name: name as string,
+      });
       return res.status(201).json({
         success: true,
         data: attendances,
