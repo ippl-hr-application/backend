@@ -1,4 +1,4 @@
-import { EmployeeTask } from "@prisma/client";
+import { Employee, EmployeeTask } from "@prisma/client";
 import { prisma } from "../../applications";
 import { Validation } from "../../validations";
 import {
@@ -48,21 +48,56 @@ export class TaskManagementService {
   static async addTaskManagement(
     company_branch_id: string,
     data: CreateTaskRequest,
-    from: string
+    employee_id: string,
+    owner_id: string
   ): Promise<Number> {
     const request: CreateTaskRequest = Validation.validate(
       TaskManagementValidation.CREATE_TASK,
       data
     );
+    let userGive: Employee | null;
 
-    const userGive = await prisma.employee.findFirst({
+    if (owner_id) {
+      userGive = await prisma.employee.findFirst({
+        where: {
+          company_branch_id,
+          employee_id: owner_id,
+        },
+      });
+
+      if (!userGive) {
+        userGive = await prisma.employee.findFirst({
+          where: {
+            company_branch_id,
+            job_position: {
+              name: "Owner",
+            },
+          },
+        });
+      }
+    } else {
+      userGive = await prisma.employee.findFirst({
+        where: {
+          company_branch_id,
+          employee_id,
+        },
+      });
+    }
+
+    if (!userGive)
+      throw new ErrorResponse("Invalid Unique ID", 400, ["from", "token"]);
+
+    const allEmployees = await prisma.employee.findMany({
       where: {
-        employee_id: from,
+        company_branch_id,
+        employee_id: {
+          in: request.employee_id,
+        },
       },
     });
 
-    if (!userGive)
-      throw new ErrorResponse("Invalid Unique ID", 400, ["from", "unique_id"]);
+    if (allEmployees.length !== request.employee_id.length)
+      throw new ErrorResponse("Invalid Employee ID", 400, ["employee_id"]);
 
     const task = await prisma.employeeTask.createMany({
       data: request.employee_id.map((employee_id) => ({
@@ -72,11 +107,9 @@ export class TaskManagementService {
         description: request.description,
         start_date: new Date(request.start_date),
         end_date: new Date(request.end_date),
-        given_by_id: from,
+        given_by_id: userGive!.employee_id,
       })),
     });
-
-    console.log(task.count);
 
     return task.count;
   }

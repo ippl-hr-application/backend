@@ -41,7 +41,8 @@ export class TaskManagementController {
       const task_created = await TaskManagementService.addTaskManagement(
         company_branch_id,
         data,
-        employee_id || user_id,
+        employee_id,
+        user_id,
       );
       return res.status(201).json({
         success: true,
