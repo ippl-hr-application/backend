@@ -16,14 +16,23 @@ export class TaskManagementService {
     company_branch_id,
     start_date,
     end_date,
+    title,
   }: {
     company_branch_id: string;
-    [key: string]: string;
+    start_date: string;
+    end_date: string;
+    title?: string;
   }): Promise<EmployeeTask[]> {
-    console.log(start_date, end_date);
+    console.log(title);
     const tasks = await prisma.employeeTask.findMany({
       where: {
         company_branch_id,
+        title: title
+          ? {
+              contains: title,
+              mode: "insensitive",
+            }
+          : undefined,
         end_date: {
           lte: end_date ? new Date(end_date) : undefined,
         },

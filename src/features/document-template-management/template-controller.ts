@@ -10,9 +10,11 @@ export class TemplateController {
   ) {
     try {
       const { company_branch_id } = req.params;
+      const { desc } = req.query;
 
       const templates = await TemplateService.getAllTemplateDocuments(
-        company_branch_id
+        company_branch_id,
+        desc as string
       );
 
       return res.status(200).json({

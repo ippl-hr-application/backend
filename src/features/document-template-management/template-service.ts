@@ -7,10 +7,19 @@ import { addNewTemplateDocumentRequest } from "./template-model";
 import { TemplateValidation } from "./template-validation";
 
 export class TemplateService {
-  static async getAllTemplateDocuments(company_branch_id: string) {
+  static async getAllTemplateDocuments(
+    company_branch_id: string,
+    desc?: string
+  ) {
     const templates = await prisma.companyFile.findMany({
       where: {
         company_id: company_branch_id,
+        description: desc
+          ? {
+              contains: desc,
+              mode: "insensitive",
+            }
+          : undefined,
       },
     });
 
