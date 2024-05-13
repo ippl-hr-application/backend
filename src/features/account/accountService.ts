@@ -132,16 +132,19 @@ export class AccountService {
       join_date
     }: CreateRequest
   ): Promise<CreateResponse> {
-    identity_expired_date = new Date(
-      identity_expired_date
-    );
-    birth_date = new Date(birth_date);
+    if(identity_expired_date !== undefined){
+      identity_expired_date = new Date(
+        identity_expired_date
+      );
+    }
+    if(birth_date !== undefined){
+      birth_date = new Date(birth_date);
+    }
     if (join_date !== undefined){
       join_date = new Date(join_date);}
     else{
       join_date = new Date();
     }
-
 
     const request = Validation.validate(
       AccountValidation.CREATE_EMPLOYEE,
@@ -251,7 +254,7 @@ export class AccountService {
         join_date: request.join_date,
       },
     });
-
+    console.log(newEmployee)
     return {
       employee_id: newEmployee.employee_id,
       first_name: request.first_name,
