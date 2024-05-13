@@ -15,6 +15,7 @@ import {
 import { prisma } from '../../applications';
 import { ErrorResponse } from '../../models';
 import { promises } from 'dns';
+import { join } from 'path';
 
 export class AccountService {
   static async getAllEmployees({
@@ -135,7 +136,12 @@ export class AccountService {
       identity_expired_date
     );
     birth_date = new Date(birth_date);
-    join_date = new Date(join_date);
+    if (join_date !== undefined){
+      join_date = new Date(join_date);}
+    else{
+      join_date = new Date();
+    }
+
 
     const request = Validation.validate(
       AccountValidation.CREATE_EMPLOYEE,
@@ -166,15 +172,6 @@ export class AccountService {
         join_date
       }
     );
-
-    // if(company_branch_id !== company_branch_id_params){
-    //   throw new ErrorResponse(
-    //     'Company branch id not match with params',
-    //     400,
-    //     ['company_branch_id'],
-    //     'COMPANY_BRANCH_ID_NOT_MATCH'
-    //   );
-    // }
 
     const countEmailEmployee = await prisma.employee.count({
       where: { 
