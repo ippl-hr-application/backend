@@ -16,6 +16,23 @@ export class AuthController {
     }
   }
 
+  static async employeeManagerLogin(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { employee_id, password } = req.body;
+      const token = await AuthService.employeeManagerLogin({
+        employee_id,
+        password,
+      });
+      return res.status(200).json({
+        success: true,
+        data: { ...token },
+        message: "Employee logged in successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async employeeLogin(req: Request, res: Response, next: NextFunction) {
     try {
       const { employee_id, password } = req.body;

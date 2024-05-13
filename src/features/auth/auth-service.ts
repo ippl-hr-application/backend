@@ -144,6 +144,81 @@ export class AuthService {
     };
   }
 
+  static async employeeManagerLogin({
+    employee_id,
+    password,
+  }: LoginEmployeeRequest): Promise<LoginResponse> {
+    const request = Validation.validate(AuthValidation.EMPLOYEE_LOGIN, {
+      employee_id,
+      password,
+    });
+
+    const employee = await prisma.employee.findFirst({
+      where: {
+        employee_id: request.employee_id,
+      },
+      select: {
+        employee_id: true,
+        company_branch_id: true,
+        company_branch: {
+          select: {
+            company_id: true,
+          },
+        },
+        password: true,
+        job_position: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!employee) {
+      throw new ErrorResponse("Invalid unique id or password", 400, [
+        "unique_id",
+        "password",
+      ]);
+    }
+
+    if (employee.job_position.name !== "Manager") {
+      throw new ErrorResponse(
+        "You are not authorized to access this route",
+        403,
+        ["unique_id"]
+      );
+    }
+
+    const isPasswordValid: boolean = comparePassword(
+      request.password,
+      employee.password
+    );
+
+    if (!isPasswordValid) {
+      throw new ErrorResponse("Invalid unique id or password", 400, [
+        "unique_id",
+        "password",
+      ]);
+    }
+
+    const token = jwt.sign(
+      {
+        employee_id: employee.employee_id,
+        company_branch_id: employee.company_branch_id,
+        position: employee.job_position.name,
+        company_id: employee.company_branch.company_id,
+      },
+      process.env.JWT_SECRET!,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    return {
+      token,
+    };
+  }
+
   static async register(
     data: RegisterRequest
   ): Promise<RegisteredUserWithoutPassword> {
