@@ -59,8 +59,8 @@ export class AccountService {
     const findEmployee = await prisma.employee.findMany({
       where: {
         delete_at: null,
-        first_name: first_name,
-        last_name: last_name,
+        first_name: first_name ? { contains: first_name, mode: "insensitive" } : undefined,
+        last_name: last_name ? { contains: last_name, mode: "insensitive"} : undefined,
         gender: gender,
         company_branch_id: company_branch_id,
         hasResigned: hasResigned === 'true' ? true : false,
