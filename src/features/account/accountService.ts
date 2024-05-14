@@ -14,8 +14,6 @@ import {
 } from './accountModel';
 import { prisma } from '../../applications';
 import { ErrorResponse } from '../../models';
-import { promises } from 'dns';
-import { join } from 'path';
 
 export class AccountService {
   static async getAllEmployees({
@@ -60,6 +58,7 @@ export class AccountService {
 
     const findEmployee = await prisma.employee.findMany({
       where: {
+        delete_at: null,
         first_name: first_name,
         last_name: last_name,
         gender: gender,
@@ -87,6 +86,7 @@ export class AccountService {
   }: {company_branch_id: string, employee_id: string}) {
     const findEmployee = await prisma.employee.findUnique({
       where: {
+        delete_at: null,
         company_branch_id: company_branch_id,
         employee_id: employee_id,
       },
@@ -327,14 +327,14 @@ export class AccountService {
         ['employee_id'],
         'EMPLOYEE_NOT_FOUND'
       );
+    } else if (findEmployee.delete_at !== null) {
+      throw new ErrorResponse(
+        'Employee already deleted',
+        400,
+        ['employee_id'],
+        'EMPLOYEE_ALREADY_DELETED'
+      );
     }
-
-    // const employeeDelete = await prisma.employee.delete({
-    //   where: {
-    //     company_branch_id: request.company_branch_id,
-    //     employee_id: request.employee_id,
-    //   },
-    // });
 
     const employeeDelete = await prisma.employee.update({
       where: {
@@ -343,46 +343,12 @@ export class AccountService {
       },
       data: {
         hasResigned: true,
-        resign_date: new Date(),
+        delete_at: new Date(),
       },
     });
 
     return employeeDelete;
   }
-
-  // static async softDeleteEmployee({
-  //   employee_id,
-  //   company_branch_id,
-  // }: DeleteRequest) {
-  //   const deleteDate = new Date();
-  //   const findEmployee = await prisma.employee.findUnique({
-  //     where: {
-  //       company_branch_id,
-  //       employee_id,
-  //     },
-  //   });
-
-  //   if (!findEmployee) {
-  //     throw new ErrorResponse(
-  //       "Employee not found",
-  //       404,
-  //       ["employee_id"],
-  //       "EMPLOYEE_NOT_FOUND"
-  //     );
-  //   }
-
-  //   const employeeDelete = await prisma.employee.update({
-  //     where: {
-  //       company_branch_id,
-  //       employee_id,
-  //     },
-  //     data: {
-  //       delete_at: deleteDate,
-  //     },
-  //   });
-
-  //   return employeeDelete;
-  // }
 
   static async employeeResign({
     employee_id,
