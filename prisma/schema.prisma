@@ -407,9 +407,9 @@ model ResignSubmission {
 model AttendanceSubmission {
   attendance_submission_id Int        @id @default(autoincrement())
   submision_id             Int        @unique
-  attendance_id            Int        @unique
   reason                   String     @db.VarChar(100)
-  attendance               Attendance @relation(fields: [attendance_id], references: [attendance_id])
+  attendance_id           Int?    @unique   
+  attendance               Attendance?  @relation(fields: [attendance_id], references: [attendance_id])
   submission               Submission @relation(fields: [submision_id], references: [submission_id], onDelete: Cascade)
 
   @@map("attendance_submission")

@@ -136,6 +136,7 @@ export class SubmissionService {
           create: {
             from: request.from,
             to: request.to,
+
             leave_reason: request.leave_reason,
           },
         },
@@ -169,7 +170,7 @@ export class SubmissionService {
       data: {
         status: "PENDING",
         submission_date: new Date(),
-        type: "mutasi",
+        type: "MUTASI",
         employee: {
           connect: {
             employee_id: employee_id,
