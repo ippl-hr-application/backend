@@ -30,7 +30,7 @@ export class SubmissionValidation {
   });
   static readonly ATTENDANCE_LETTER: ZodType = z.object({
     reason: z.string().max(100),
-    attendance_id: z.number(),
+    attendance_id: z.number().optional(),
   });
   static readonly GET_SUBMISSION_HISTORY: ZodType = z.object({
     year: z.string(),
