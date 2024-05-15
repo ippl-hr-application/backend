@@ -15,6 +15,7 @@ export type GetEmployeeRequest = {
   job_position_name?: string | undefined;
   employment_status_name?: string | undefined;
   get_all?: string | undefined;
+  deleted?: string | undefined;
 };
 
 export type GetAllEmployeeResponse = Employee[];
@@ -94,6 +95,7 @@ export type DeleteRequest = {
 export type DeleteResponse = {
   employee_id: string;
   first_name: string;
+  last_name: string;
 };
 
 export type ResignRequest = DeleteRequest;
