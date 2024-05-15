@@ -5,6 +5,7 @@ import { JWTMiddleware } from "../../middlewares/jwt_middleware";
 const authRoute: Router = Router();
 
 authRoute.post("/login", AuthController.login);
+authRoute.post("/manager-login", AuthController.employeeManagerLogin);
 authRoute.post("/employee-login", AuthController.employeeLogin);
 authRoute.post("/register", AuthController.register);
 authRoute.get("/me", [

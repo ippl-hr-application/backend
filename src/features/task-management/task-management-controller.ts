@@ -10,11 +10,12 @@ export class TaskManagementController {
   ) {
     try {
       const { company_branch_id } = req.params;
-      const { start_date, end_date } = req.query;
+      const { start_date, end_date, title } = req.query;
       const tasks = await TaskManagementService.getTaskManagementFromCompany({
         company_branch_id,
         start_date: start_date as string,
         end_date: end_date as string,
+        title: title as string,
       });
 
       return res.status(201).json({
@@ -40,7 +41,8 @@ export class TaskManagementController {
       const task_created = await TaskManagementService.addTaskManagement(
         company_branch_id,
         data,
-        employee_id || user_id,
+        employee_id,
+        user_id,
       );
       return res.status(201).json({
         success: true,
