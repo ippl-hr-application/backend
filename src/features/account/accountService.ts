@@ -427,14 +427,29 @@ export class AccountService {
       );
     }
 
+    var status_resign = findEmployee.hasResigned;
+    var resign_date = findEmployee.resign_date;
+
+    if(status_resign === false){
+      status_resign = true;
+    } else {
+      status_resign = false;
+    }
+
+    if(resign_date === null){
+      resign_date = new Date();
+    } else {
+      resign_date = null;
+    }
+
     const employeeResign = await prisma.employee.update({
       where: {
         company_branch_id,
         employee_id,
       },
       data: {
-        hasResigned: true,
-        resign_date: new Date(),
+        hasResigned: status_resign,
+        resign_date: resign_date,
       },
     });
 
