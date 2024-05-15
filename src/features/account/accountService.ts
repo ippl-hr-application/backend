@@ -453,6 +453,11 @@ export class AccountService {
       },
     });
 
-    return employeeResign;
+    return {
+      employee_id: employeeResign.employee_id,
+      first_name: employeeResign.first_name,
+      last_name: employeeResign.last_name,
+      hasResigned: employeeResign.hasResigned,
+    };
   }
 }
