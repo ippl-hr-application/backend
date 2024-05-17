@@ -20,16 +20,16 @@ export type GetByIdResponse = {
     file_url: string;
   } | null;
   attendance_submission: {
-    reason: string;
     attendance_submission_id: number;
+    reason: string;
     attendance: {
-      date: Date;
       attendance_check: {
         type: $Enums.AttendanceCheckType;
         time: string;
         status: $Enums.AttendanceCheckStatus;
       }[];
-    };
+      date: Date;
+    } | null;
   } | null;
 };
 

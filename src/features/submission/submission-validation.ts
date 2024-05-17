@@ -35,7 +35,7 @@ export class SubmissionValidation {
   static readonly GET_SUBMISSION_HISTORY: ZodType = z.object({
     year: z.string(),
     month: z.string(),
-    status: z.enum(["PENDING", "ACCEPTED", "REJECTED"]).optional(),
+    status: z.enum(["PENDING", "ACCEPTED", "REJECTED", ""]).optional(),
   });
   static readonly DELETE_SUBMISSION: ZodType = z.object({
     submission_id: z.number(),
