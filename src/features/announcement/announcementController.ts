@@ -74,7 +74,7 @@ export class AnnouncementController {
     try {
       const { company_id, title, description, company_branch_id } = req.body;
       const file_attachment: Express.Multer.File | undefined = req.file;
-      const announcement = await AnnouncementService.addAnnouncement({
+      const announcement = await AnnouncementService.createAnnouncementAndNotifyEmployees({
         company_id,
         title,
         description,

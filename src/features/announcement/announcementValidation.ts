@@ -9,7 +9,7 @@ export class AnnouncementValidation {
 
   static readonly UPDATE_ANNOUNCEMENT: ZodType = z.object({
     company_id: z.string(),
-    company_announcement_id: z.string(),
+    company_announcement_id: z.number(),
     title: z.string().min(3).max(50).optional(),
     description: z.string().min(3).max(255).optional(),
   });

@@ -46,14 +46,6 @@ export class AccountService {
         },
       });
 
-      if(findEmployee[0] == undefined){
-        throw new ErrorResponse(
-          'Employee not found',
-          404,
-          ['employee'],
-          'EMPLOYEE_NOT_FOUND'
-        );
-      }
       return findEmployee;
     }
 
@@ -63,14 +55,6 @@ export class AccountService {
           NOT: {delete_at: null},
         },
       });
-      if(findEmployee[0] == undefined){
-        throw new ErrorResponse(
-          'Employee not found',
-          404,
-          ['employee'],
-          'EMPLOYEE_NOT_FOUND'
-        );
-      }
       return findEmployee;
     }
     
@@ -86,14 +70,6 @@ export class AccountService {
       },
     })
 
-    if(findEmployee[0] == undefined){
-      throw new ErrorResponse(
-        'Employee not found',
-        404,
-        ['employee'],
-        'EMPLOYEE_NOT_FOUND'
-      );
-    }
     return findEmployee;
   }
 
@@ -108,15 +84,6 @@ export class AccountService {
         employee_id: employee_id,
       },
     });
-
-    if (!findEmployee) {
-      throw new ErrorResponse(
-        'Employee not found',
-        404,
-        ['employee_id'],
-        'EMPLOYEE_NOT_FOUND'
-      );
-    }
 
     return findEmployee;
   }
