@@ -1,4 +1,4 @@
-import { $Enums } from "@prisma/client";
+import { SubmissionStatus } from "@prisma/client";
 
 export type GetAllByCompanyBranchIdRequest = {
   company_branch_id: string;
@@ -6,6 +6,7 @@ export type GetAllByCompanyBranchIdRequest = {
 export type GetAllByCompanyBranchIdResponse = {
   submission_id: number;
   submission_date: Date;
+  status: SubmissionStatus;
   type: string;
   employee: {
     first_name: string;
@@ -21,6 +22,7 @@ export type GetByIdResponse = {
   submission_id: number;
   submission_date: Date;
   type: string;
+  status: SubmissionStatus;
   employee: {
     first_name: string;
     last_name: string;

@@ -29,6 +29,7 @@ export class SickManagementService {
       select: {
         submission_id: true,
         submission_date: true,
+        status: true,
         type: true,
         employee: {
           select: {
@@ -46,17 +47,25 @@ export class SickManagementService {
     });
     return sick;
   }
-  static async getById(submission_id: number): Promise<GetByIdResponse> {
+  static async getById(
+    submission_id: number,
+    company_branch_id: string
+  ): Promise<GetByIdResponse> {
     const request = Validation.validate(SickManagementValidation.GET_BY_ID, {
       submission_id,
+      company_branch_id,
     });
     const sick = await prisma.submission.findUnique({
       where: {
         submission_id: request.submission_id,
+        employee: {
+          company_branch_id: request.company_branch_id,
+        },
       },
       select: {
         submission_id: true,
         submission_date: true,
+        status: true,
         type: true,
         employee: {
           select: {

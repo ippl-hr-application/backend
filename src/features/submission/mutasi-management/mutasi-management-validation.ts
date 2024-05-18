@@ -6,6 +6,7 @@ export class MutasiManagementValidation {
   });
   static readonly GET_BY_ID: ZodType = z.object({
     submission_id: z.number(),
+    company_branch_id: z.string(),
   });
   static readonly VALIDATE: ZodType = z.object({
     submission_id: z.number(),

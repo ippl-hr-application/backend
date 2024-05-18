@@ -30,6 +30,7 @@ export class PermissionManagementService {
         submission_id: true,
         submission_date: true,
         type: true,
+        status: true,
         employee: {
           select: {
             first_name: true,
@@ -46,21 +47,29 @@ export class PermissionManagementService {
     });
     return permission;
   }
-  static async getById(submission_id: number): Promise<GetByIdResponse> {
+  static async getById(
+    submission_id: number,
+    company_branch_id: string
+  ): Promise<GetByIdResponse> {
     const request = Validation.validate(
       PermissionManagementValidation.GET_BY_ID,
       {
         submission_id,
+        company_branch_id,
       }
     );
     const permission = await prisma.submission.findUnique({
       where: {
         submission_id: request.submission_id,
+        employee: {
+          company_branch_id: request.company_branch_id,
+        },
       },
       select: {
         submission_id: true,
         submission_date: true,
         type: true,
+        status: true,
         employee_file: {
           select: {
             file_url: true,

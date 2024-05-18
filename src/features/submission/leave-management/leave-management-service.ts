@@ -33,6 +33,7 @@ export class LeaveManagementService {
           select: {
             submission_id: true,
             submission_date: true,
+            status: true,
             type: true,
             employee: {
               select: {
@@ -55,6 +56,7 @@ export class LeaveManagementService {
         submission_id: l.submission.submission_id,
         submission_date: l.submission.submission_date,
         type: l.submission.type,
+        status: l.submission.status,
         employee: {
           first_name: l.submission.employee.first_name,
           last_name: l.submission.employee.last_name,
@@ -67,16 +69,24 @@ export class LeaveManagementService {
     });
     return leaveMapped;
   }
-  static async getById(submission_id: number): Promise<GetByIdResponse> {
+  static async getById(
+    submission_id: number,
+    company_branch_id: string
+  ): Promise<GetByIdResponse> {
     const request = Validation.validate(LeaveManagementValidation.GET_BY_ID, {
       submission_id,
+      company_branch_id,
     });
     const leave = await prisma.submission.findUnique({
       where: {
         submission_id: request.submission_id,
+        employee: {
+          company_branch_id: request.company_branch_id,
+        },
       },
       select: {
         submission_id: true,
+        status: true,
         submission_date: true,
         type: true,
         employee: {

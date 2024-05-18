@@ -15,7 +15,6 @@ export class MutasiManagementController {
       );
       return res.status(200).json({
         success: true,
-        code: 200,
         data: result,
         message: `Get All By Company Branch Id Success`,
       });
@@ -26,13 +25,13 @@ export class MutasiManagementController {
 
   static async getById(req: Request, res: Response, next: NextFunction) {
     try {
-      const { submission_id } = req.params;
+      const { submission_id, company_branch_id } = req.params;
       const result = await MutasiManagementService.getById(
-        Number(submission_id)
+        Number(submission_id),
+        company_branch_id
       );
       return res.status(200).json({
         success: true,
-        code: 200,
         data: result,
         message: "Get  By Id Success",
       });
@@ -50,7 +49,6 @@ export class MutasiManagementController {
       });
       return res.status(200).json({
         success: true,
-        code: 200,
         data: result,
         message: "Validate Success",
       });
@@ -66,7 +64,6 @@ export class MutasiManagementController {
       );
       return res.status(200).json({
         success: true,
-        code: 200,
         data: result,
         message: "Delete Success",
       });

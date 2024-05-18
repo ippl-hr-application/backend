@@ -8,7 +8,7 @@ sickManagementRoute.get("/:company_branch_id/all", [
   SickManagementController.getAllByCompanyBranchId,
 ]);
 
-sickManagementRoute.get("/:submission_id", [
+sickManagementRoute.get("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   SickManagementController.getById,
 ]);
