@@ -34,6 +34,13 @@ export class LeaveManagementService {
             submission_id: true,
             submission_date: true,
             type: true,
+            employee: {
+              select: {
+                first_name: true,
+                last_name: true,
+                employee_id: true,
+              },
+            },
             employee_file: {
               select: {
                 file_url: true,
@@ -48,6 +55,11 @@ export class LeaveManagementService {
         submission_id: l.submission.submission_id,
         submission_date: l.submission.submission_date,
         type: l.submission.type,
+        employee: {
+          first_name: l.submission.employee.first_name,
+          last_name: l.submission.employee.last_name,
+          employee_id: l.submission.employee.employee_id,
+        },
         employee_file: {
           file_url: l.submission.employee_file?.file_url,
         },
@@ -67,6 +79,13 @@ export class LeaveManagementService {
         submission_id: true,
         submission_date: true,
         type: true,
+        employee: {
+          select: {
+            first_name: true,
+            last_name: true,
+            employee_id: true,
+          },
+        },
         employee_file: {
           select: {
             file_url: true,

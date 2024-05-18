@@ -22,6 +22,7 @@ export class SubmissionController {
       });
       return res.status(201).json({
         success: true,
+        code: 201,
         data: {
           ...result,
         },
@@ -50,6 +51,7 @@ export class SubmissionController {
       });
       return res.status(201).json({
         success: true,
+        code: 201,
         data: {
           ...result,
         },
@@ -78,6 +80,7 @@ export class SubmissionController {
       });
       return res.status(201).json({
         success: true,
+        code: 201,
         data: {
           ...result,
         },
@@ -109,6 +112,7 @@ export class SubmissionController {
       });
       return res.status(201).json({
         success: true,
+        code: 201,
         data: {
           ...result,
         },
@@ -136,6 +140,7 @@ export class SubmissionController {
       });
       return res.status(201).json({
         success: true,
+        code: 201,
         data: {
           result,
         },
@@ -161,7 +166,9 @@ export class SubmissionController {
       });
       return res.status(200).json({
         success: true,
+        code: 200,
         data: result,
+        message: "Get Submission History Success",
       });
     } catch (error) {
       next(error);
@@ -179,7 +186,9 @@ export class SubmissionController {
       });
       return res.status(200).json({
         success: true,
+        code: 200,
         data: result,
+        message: "Delete Submission Success",
       });
     } catch (error) {
       next(error);
@@ -201,6 +210,7 @@ export class SubmissionController {
       });
       return res.status(201).json({
         success: true,
+        code: 201,
         data: {
           ...result,
         },
@@ -228,6 +238,7 @@ export class SubmissionController {
       });
       return res.status(201).json({
         success: true,
+        code: 201,
         data: {
           ...result,
         },
