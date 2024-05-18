@@ -42,4 +42,6 @@ export type GetByIdResponse = {
 export type ValidateRequest = {
   submission_id: number;
   status: "ACCEPTED" | "REJECTED" | "PENDING";
+
+  company_branch_id: string;
 };

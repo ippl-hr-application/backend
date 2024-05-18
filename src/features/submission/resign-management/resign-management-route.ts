@@ -13,11 +13,11 @@ resignManagementRoute.get("/:company_branch_id/:submission_id", [
   ResignManagementController.getById,
 ]);
 
-resignManagementRoute.put("/:submission_id", [
+resignManagementRoute.put("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   ResignManagementController.validateLetter,
 ]);
-resignManagementRoute.delete("/:submission_id", [
+resignManagementRoute.delete("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   ResignManagementController.deleteLetter,
 ]);

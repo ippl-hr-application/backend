@@ -13,11 +13,11 @@ permissionManagementRoute.get("/:company_branch_id/:submission_id", [
   PermissionManagementController.getById,
 ]);
 
-permissionManagementRoute.put("/:submission_id", [
+permissionManagementRoute.put("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   PermissionManagementController.validateLetter,
 ]);
-permissionManagementRoute.delete("/:submission_id", [
+permissionManagementRoute.delete("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   PermissionManagementController.deleteLetter,
 ]);

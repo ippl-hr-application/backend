@@ -13,11 +13,11 @@ mutasiManagementRoute.get("/:company_branch_id/:submission_id", [
   MutasiManagementController.getById,
 ]);
 
-mutasiManagementRoute.put("/:submission_id", [
+mutasiManagementRoute.put("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   MutasiManagementController.validateLetter,
 ]);
-mutasiManagementRoute.delete("/:submission_id", [
+mutasiManagementRoute.delete("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   MutasiManagementController.deleteLetter,
 ]);

@@ -41,11 +41,12 @@ export class ResignManagementController {
   }
   static async validateLetter(req: Request, res: Response, next: NextFunction) {
     try {
-      const { submission_id } = req.params;
+      const { submission_id, company_branch_id } = req.params;
       const { status } = req.body;
       const result = await ResignManagementService.validateLetter({
         submission_id: Number(submission_id),
         status: status as "ACCEPTED" | "REJECTED" | "PENDING",
+        company_branch_id: company_branch_id as string,
       });
       return res.status(200).json({
         success: true,
@@ -58,9 +59,10 @@ export class ResignManagementController {
   }
   static async deleteLetter(req: Request, res: Response, next: NextFunction) {
     try {
-      const { submission_id } = req.params;
+      const { submission_id, company_branch_id } = req.params;
       const result = await ResignManagementService.deleteLetter(
-        Number(submission_id)
+        Number(submission_id),
+        company_branch_id
       );
       return res.status(200).json({
         success: true,

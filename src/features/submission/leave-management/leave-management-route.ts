@@ -13,11 +13,11 @@ leaveManagementRoute.get("/:company_branch_id/:submission_id", [
   LeaveManagementController.getById,
 ]);
 
-leaveManagementRoute.put("/:submission_id", [
+leaveManagementRoute.put("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   LeaveManagementController.validateLetter,
 ]);
-leaveManagementRoute.delete("/:submission_id", [
+leaveManagementRoute.delete("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   LeaveManagementController.deleteLetter,
 ]);
