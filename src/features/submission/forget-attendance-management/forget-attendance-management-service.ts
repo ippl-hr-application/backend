@@ -2,7 +2,6 @@ import { prisma } from "../../../applications";
 import { ErrorResponse } from "../../../models";
 import { deleteFile } from "../../../utils/delete_file";
 import { Validation } from "../../../validations";
-import { AttendanceService } from "../../attendance/attendance-service";
 import {
   GetAllByCompanyBranchIdResponse,
   GetByIdResponse,
@@ -28,6 +27,13 @@ export class ForgetAttendanceManagementService {
         type: "SURAT",
       },
       select: {
+        employee: {
+          select: {
+            first_name: true,
+            last_name: true,
+            employee_id: true,
+          },
+        },
         submission_id: true,
         submission_date: true,
         type: true,
@@ -58,6 +64,13 @@ export class ForgetAttendanceManagementService {
         employee_file: {
           select: {
             file_url: true,
+          },
+        },
+        employee: {
+          select: {
+            employee_id: true,
+            last_name: true,
+            first_name: true,
           },
         },
         attendance_submission: {

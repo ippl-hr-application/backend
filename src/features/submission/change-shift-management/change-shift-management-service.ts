@@ -32,6 +32,13 @@ export class ChangeShiftManagementService {
         submission_id: true,
         submission_date: true,
         type: true,
+        employee: {
+          select: {
+            first_name: true,
+            last_name: true,
+            employee_id: true,
+          },
+        },
         employee_file: {
           select: {
             file_url: true,
@@ -56,6 +63,13 @@ export class ChangeShiftManagementService {
         submission_id: true,
         submission_date: true,
         type: true,
+        employee: {
+          select: {
+            first_name: true,
+            last_name: true,
+            employee_id: true,
+          },
+        },
         employee_file: {
           select: {
             file_url: true,
