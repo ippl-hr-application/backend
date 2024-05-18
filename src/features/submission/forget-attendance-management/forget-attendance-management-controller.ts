@@ -16,7 +16,6 @@ export class ForgetAttendanceManagementController {
         );
       return res.status(200).json({
         success: true,
-        code: 200,
         data: result,
         message: `Get All By Company Branch Id Success`,
       });
@@ -33,7 +32,6 @@ export class ForgetAttendanceManagementController {
       );
       return res.status(200).json({
         success: true,
-        code: 200,
         data: result,
         message: "Get  By Id Success",
       });
@@ -51,7 +49,6 @@ export class ForgetAttendanceManagementController {
       });
       return res.status(200).json({
         success: true,
-        code: 200,
         data: result,
         message: "Validate Success",
       });
@@ -67,7 +64,6 @@ export class ForgetAttendanceManagementController {
       );
       return res.status(200).json({
         success: true,
-        code: 200,
         data: result,
         message: "Delete Success",
       });

@@ -8,7 +8,7 @@ forgetAttendanceManagementRoute.get("/:company_branch_id/all", [
   ForgetAttendanceManagementController.getAllByCompanyBranchId,
 ]);
 
-forgetAttendanceManagementRoute.get("/:submission_id", [
+forgetAttendanceManagementRoute.get("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   ForgetAttendanceManagementController.getById,
 ]);

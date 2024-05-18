@@ -8,7 +8,7 @@ resignManagementRoute.get("/:company_branch_id/all", [
   ResignManagementController.getAllByCompanyBranchId,
 ]);
 
-resignManagementRoute.get("/:submission_id", [
+resignManagementRoute.get("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   ResignManagementController.getById,
 ]);

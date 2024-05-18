@@ -8,7 +8,7 @@ mutasiManagementRoute.get("/:company_branch_id/all", [
   MutasiManagementController.getAllByCompanyBranchId,
 ]);
 
-mutasiManagementRoute.get("/:submission_id", [
+mutasiManagementRoute.get("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   MutasiManagementController.getById,
 ]);

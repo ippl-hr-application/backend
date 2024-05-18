@@ -8,7 +8,7 @@ leaveManagementRoute.get("/:company_branch_id/all", [
   LeaveManagementController.getAllByCompanyBranchId,
 ]);
 
-leaveManagementRoute.get("/:submission_id", [
+leaveManagementRoute.get("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   LeaveManagementController.getById,
 ]);

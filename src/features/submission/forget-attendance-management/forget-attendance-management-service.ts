@@ -37,6 +37,7 @@ export class ForgetAttendanceManagementService {
         submission_id: true,
         submission_date: true,
         type: true,
+        status: true,
         employee_file: {
           select: {
             file_url: true,
@@ -66,6 +67,7 @@ export class ForgetAttendanceManagementService {
             file_url: true,
           },
         },
+        status: true,
         employee: {
           select: {
             employee_id: true,

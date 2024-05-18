@@ -8,7 +8,7 @@ permissionManagementRoute.get("/:company_branch_id/all", [
   PermissionManagementController.getAllByCompanyBranchId,
 ]);
 
-permissionManagementRoute.get("/:submission_id", [
+permissionManagementRoute.get("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   PermissionManagementController.getById,
 ]);

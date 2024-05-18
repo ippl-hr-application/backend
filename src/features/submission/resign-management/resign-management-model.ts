@@ -7,6 +7,7 @@ export type GetAllByCompanyBranchIdResponse = {
   submission_id: number;
   submission_date: Date;
   type: string;
+  status: $Enums.SubmissionStatus;
   employee_file: {
     file_url: string;
   } | null;
@@ -20,6 +21,7 @@ export type GetAllByCompanyBranchIdResponse = {
 export type GetByIdResponse = {
   submission_id: number;
   submission_date: Date;
+  status: $Enums.SubmissionStatus;
   type: string;
   employee: {
     first_name: string;

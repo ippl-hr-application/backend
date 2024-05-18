@@ -8,7 +8,7 @@ changeShiftManagementRoute.get("/:company_branch_id/all", [
   ChangeShiftManagementController.getAllByCompanyBranchId,
 ]);
 
-changeShiftManagementRoute.get("/:submission_id", [
+changeShiftManagementRoute.get("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   ChangeShiftManagementController.getById,
 ]);
