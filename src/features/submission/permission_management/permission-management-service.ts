@@ -97,17 +97,25 @@ export class PermissionManagementService {
     }
     return permission;
   }
-  static async validateLetter({ status, submission_id }: ValidateRequest) {
+  static async validateLetter({
+    status,
+    submission_id,
+    company_branch_id,
+  }: ValidateRequest) {
     const request = Validation.validate(
       PermissionManagementValidation.VALIDATE,
       {
         submission_id,
         status,
+        company_branch_id,
       }
     );
     const letter = await prisma.submission.findUnique({
       where: {
         submission_id: request.submission_id,
+        employee: {
+          company_branch_id: request.company_branch_id,
+        },
       },
     });
     if (!letter) {
@@ -122,16 +130,20 @@ export class PermissionManagementService {
       },
     });
   }
-  static async deleteLetter(submission_id: number) {
+  static async deleteLetter(submission_id: number, company_branch_id: string) {
     const request = Validation.validate(
       PermissionManagementValidation.GET_BY_ID,
       {
         submission_id,
+        company_branch_id,
       }
     );
     const letter = await prisma.submission.findUnique({
       where: {
         submission_id: request.submission_id,
+        employee: {
+          company_branch_id: request.company_branch_id,
+        },
       },
       select: {
         type: true,

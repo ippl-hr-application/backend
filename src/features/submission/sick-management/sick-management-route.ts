@@ -13,11 +13,11 @@ sickManagementRoute.get("/:company_branch_id/:submission_id", [
   SickManagementController.getById,
 ]);
 
-sickManagementRoute.put("/:submission_id", [
+sickManagementRoute.put("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   SickManagementController.validateLetter,
 ]);
-sickManagementRoute.delete("/:submission_id", [
+sickManagementRoute.delete("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   SickManagementController.deleteLetter,
 ]);

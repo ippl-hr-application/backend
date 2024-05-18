@@ -13,11 +13,11 @@ forgetAttendanceManagementRoute.get("/:company_branch_id/:submission_id", [
   ForgetAttendanceManagementController.getById,
 ]);
 
-forgetAttendanceManagementRoute.put("/:submission_id", [
+forgetAttendanceManagementRoute.put("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   ForgetAttendanceManagementController.validateLetter,
 ]);
-forgetAttendanceManagementRoute.delete("/:submission_id", [
+forgetAttendanceManagementRoute.delete("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   ForgetAttendanceManagementController.deleteLetter,
 ]);

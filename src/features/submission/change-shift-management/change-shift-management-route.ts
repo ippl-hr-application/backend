@@ -13,11 +13,11 @@ changeShiftManagementRoute.get("/:company_branch_id/:submission_id", [
   ChangeShiftManagementController.getById,
 ]);
 
-changeShiftManagementRoute.put("/:submission_id", [
+changeShiftManagementRoute.put("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   ChangeShiftManagementController.validateLetter,
 ]);
-changeShiftManagementRoute.delete("/:submission_id", [
+changeShiftManagementRoute.delete("/:company_branch_id/:submission_id", [
   JWTMiddleware.verifyToken,
   ChangeShiftManagementController.deleteLetter,
 ]);

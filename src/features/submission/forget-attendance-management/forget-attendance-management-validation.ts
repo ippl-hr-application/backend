@@ -10,6 +10,7 @@ export class ForgetAttendanceManagementValidation {
   });
   static readonly VALIDATE: ZodType = z.object({
     submission_id: z.number(),
+    company_branch_id: z.string(),
     status: z.enum(["ACCEPTED", "REJECTED", "PENDING"]),
   });
 }
