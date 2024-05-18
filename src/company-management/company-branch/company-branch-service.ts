@@ -168,9 +168,23 @@ export class CompanyBranchService {
       employeeGenderCount[data.gender] = data._count.employee_id;
     });
 
+    const jobPositionCount = await prisma.employee.count({
+      where: {
+        company_branch_id,
+      },
+    });
+
+    const employmentStatusCount = await prisma.employmentStatus.count({
+      where: {
+        company_branch_id,
+      },
+    });
+
     return {
       employee_count: employeeCount,
       employee_gender_count: employeeGenderCount,
+      job_position_count: jobPositionCount,
+      employment_status_count: employmentStatusCount,
     };
   }
 
