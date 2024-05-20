@@ -12,9 +12,9 @@ authRoute.get("/me", [
   JWTMiddleware.verifyToken,
   AuthController.getCurrentLoggedInUser,
 ]);
-authRoute.get("/forgot-password", AuthController.ownerForgotPassword);
+authRoute.post("/forgot-password", AuthController.ownerForgotPassword);
 authRoute.post("/reset-password", AuthController.resetPassword);
-authRoute.get("/employee-forgot-password", AuthController.employeeForgotPassword);
+authRoute.post("/employee-forgot-password", AuthController.employeeForgotPassword);
 authRoute.post("/employee-reset-password", AuthController.employeeResetPassword);
 
 export default authRoute;

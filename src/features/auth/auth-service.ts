@@ -402,14 +402,19 @@ export class AuthService {
     return user;
   }
 
-  static async resetPassword(token: string, newPassword: string) {
+  static async resetPassword(
+    token: string,
+    email: string,
+    newPassword: string
+  ) {
     const request = Validation.validate(AuthValidation.RESET_PASSWORD, {
       token,
+      email,
       newPassword,
     });
 
     const resetToken = await prisma.resetPasswordToken.findUnique({
-      where: { token: request.token },
+      where: { token: request.token, email: request.email },
     });
 
     if (
@@ -486,7 +491,7 @@ export class AuthService {
       subject: "Reset Password",
       text: `Click this link to reset your password: ${
         process.env.BASE_URL || "http://localhost:3000"
-      }/reset-password/${token} \n\n This link will be expired in 5 minutes.`,
+      }/verify-sandi?token=${token}&email=${email} \n\n This link will be expired in 5 minutes.`,
     });
   }
 
@@ -511,26 +516,25 @@ export class AuthService {
       },
     });
 
-    console.log(token);
-
     sendEmail({
       from: process.env.EMAIL,
       to: employee.email,
       subject: "Reset Password",
       text: `Click this link to reset your password: ${
         process.env.BASE_URL || "http://localhost:3000"
-      }/reset-password/${token} \n\n This link will be expired in 5 minutes.`,
+      }/verify-sandi?token=${token}&email=${employee.email} \n\n This link will be expired in 5 minutes.`,
     });
   }
 
-  static async employeeResetPassword(token: string, newPassword: string) {
+  static async employeeResetPassword(token: string, email: string, newPassword: string) {
     const request = Validation.validate(AuthValidation.RESET_PASSWORD, {
       token,
+      email,
       newPassword,
     });
 
     const resetToken = await prisma.resetPasswordToken.findUnique({
-      where: { token: request.token },
+      where: { token: request.token, email: request.email},
     });
 
     if (
