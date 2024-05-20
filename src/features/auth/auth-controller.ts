@@ -86,8 +86,8 @@ export class AuthController {
 
   static async resetPassword(req: Request, res: Response, next: NextFunction) {
     try {
-      const { token, new_password } = req.body;
-      await AuthService.resetPassword(token, new_password);
+      const { token, email, password } = req.body;
+      await AuthService.resetPassword(token, email, password);
       return res.status(200).json({
         success: true,
         message: "Password reset successfully",
@@ -137,8 +137,8 @@ export class AuthController {
     next: NextFunction
   ) {
     try {
-      const { token, new_password } = req.body;
-      await AuthService.employeeResetPassword(token, new_password);
+      const { token, email, password } = req.body;
+      await AuthService.employeeResetPassword(token, email, password);
       return res.status(200).json({
         success: true,
         message: "Password reset successfully",
