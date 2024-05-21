@@ -358,6 +358,10 @@ export class AuthService {
       );
     }
 
+    if (!comparePassword(request.old_password, user.password)) {
+      throw new ErrorResponse("Old password is incorrect", 400, ["old_password"]);
+    }
+
     if (request.password !== request.confirm_password) {
       throw new ErrorResponse(
         "Password and confirm password does not match",
@@ -387,6 +391,10 @@ export class AuthService {
     if (!employee) {
       throw new ErrorResponse("Employee not found", 404, ["employee_id"]);
     }
+
+    if (!comparePassword(request.old_password, employee.password)) {
+      throw new ErrorResponse("Old password is incorrect", 400, ["old_password"]);
+    }    
 
     if (request.password !== request.confirm_password) {
       throw new ErrorResponse(
