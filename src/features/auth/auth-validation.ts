@@ -20,6 +20,11 @@ export class AuthValidation {
     industry: z.string().optional(),
   });
 
+  static readonly CHANGE_PASSWORD: ZodType = z.object({
+    password: z.string().min(6).max(20),
+    confirm_password: z.string().min(6).max(20),
+  });
+
   static readonly RESET_PASSWORD: ZodType = z.object({
     token: z.string(),
     email: z.string().email(),
