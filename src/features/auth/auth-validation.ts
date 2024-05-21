@@ -21,6 +21,7 @@ export class AuthValidation {
   });
 
   static readonly CHANGE_PASSWORD: ZodType = z.object({
+    old_password: z.string().min(6).max(20),
     password: z.string().min(6).max(20),
     confirm_password: z.string().min(6).max(20),
   });
