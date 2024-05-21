@@ -23,6 +23,11 @@ export type RegisterRequest = {
   password: string;
 };
 
+export type ChangePasswordRequest = {
+  password: string;
+  confirm_password: string;
+};
+
 export type RegisteredUserWithoutPassword = Omit<RegisteredUser, "password">;
 
 export type CurrentLoggedInUserResponse = {

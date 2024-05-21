@@ -8,6 +8,16 @@ authRoute.post("/login", AuthController.login);
 authRoute.post("/manager-login", AuthController.employeeManagerLogin);
 authRoute.post("/employee-login", AuthController.employeeLogin);
 authRoute.post("/register", AuthController.register);
+authRoute.put("/change-password", [
+  JWTMiddleware.verifyToken,
+  JWTMiddleware.ownerOnly,
+  AuthController.changePasswordOwner
+]);
+authRoute.put("/change-password-employee", [
+  JWTMiddleware.verifyToken,
+  JWTMiddleware.employeeOnly,
+  AuthController.changePasswordEmployee
+]);
 authRoute.get("/me", [
   JWTMiddleware.verifyToken,
   AuthController.getCurrentLoggedInUser,

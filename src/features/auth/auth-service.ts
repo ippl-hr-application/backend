@@ -11,6 +11,7 @@ import {
   RegisterRequest,
   RegisteredUserWithoutPassword,
   CurrentEmployeeLoggedInUserResponse,
+  ChangePasswordRequest,
 } from "./auth-model";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -335,6 +336,74 @@ export class AuthService {
     return user;
   }
 
+  static async changePasswordOwner(
+    userId: string,
+    data: ChangePasswordRequest
+  ): Promise<void> {
+    const request = Validation.validate(AuthValidation.CHANGE_PASSWORD, data);
+
+    const user = await prisma.registeredUser.findUnique({
+      where: { user_id: userId },
+      include: {
+        company: true,
+      },
+    });
+
+    if (!user) {
+      throw new ErrorResponse(
+        "User not found",
+        404,
+        ["user_id"],
+        "USER_NOT_FOUND"
+      );
+    }
+
+    if (request.password !== request.confirm_password) {
+      throw new ErrorResponse(
+        "Password and confirm password does not match",
+        400,
+        ["password", "confirm_password"]
+      );
+    }
+
+    await prisma.registeredUser.update({
+      where: { user_id: userId },
+      data: {
+        password: hashPassword(request.password),
+      },
+    });
+  }
+
+  static async changePasswordEmployee(
+    employee_id: string,
+    data: ChangePasswordRequest
+  ): Promise<void> {
+    const request = Validation.validate(AuthValidation.CHANGE_PASSWORD, data);
+
+    const employee = await prisma.employee.findUnique({
+      where: { employee_id },
+    });
+
+    if (!employee) {
+      throw new ErrorResponse("Employee not found", 404, ["employee_id"]);
+    }
+
+    if (request.password !== request.confirm_password) {
+      throw new ErrorResponse(
+        "Password and confirm password does not match",
+        400,
+        ["password", "confirm_password"]
+      );
+    }
+
+    await prisma.employee.update({
+      where: { employee_id },
+      data: {
+        password: hashPassword(request.password),
+      },
+    });
+  }
+
   static async getCurrentLoggedInUser(
     userId: string,
     employee_id?: string
@@ -522,11 +591,17 @@ export class AuthService {
       subject: "Reset Password",
       text: `Click this link to reset your password: ${
         process.env.BASE_URL || "http://localhost:3000"
-      }/verify-sandi?token=${token}&email=${employee.email} \n\n This link will be expired in 5 minutes.`,
+      }/verify-sandi?token=${token}&email=${
+        employee.email
+      } \n\n This link will be expired in 5 minutes.`,
     });
   }
 
-  static async employeeResetPassword(token: string, email: string, newPassword: string) {
+  static async employeeResetPassword(
+    token: string,
+    email: string,
+    newPassword: string
+  ) {
     const request = Validation.validate(AuthValidation.RESET_PASSWORD, {
       token,
       email,
@@ -534,7 +609,7 @@ export class AuthService {
     });
 
     const resetToken = await prisma.resetPasswordToken.findUnique({
-      where: { token: request.token, email: request.email},
+      where: { token: request.token, email: request.email },
     });
 
     if (
