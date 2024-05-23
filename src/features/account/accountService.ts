@@ -14,6 +14,7 @@ import {
 } from './accountModel';
 import { prisma } from '../../applications';
 import { ErrorResponse } from '../../models';
+import { sendEmail } from '../../utils/nodemailer';
 
 export class AccountService {
   static async getAllEmployees({
@@ -86,6 +87,32 @@ export class AccountService {
     });
 
     return findEmployee;
+  }
+
+  static async createAccountEmployeeAndNotifyEmployees(
+    employee: {
+      employee_id: string,
+      company_branch_id: string,
+      password: string,
+    }
+  ) {
+    const findEmployee = await AccountService.searchEmployee(employee);
+    const findBranchName = await prisma.companyBranches.findUnique({
+      where: {
+        company_branch_id: findEmployee?.company_branch_id,
+      },
+      select: {
+        hq_initial: true,
+      }
+    });
+    const mailOptions = {
+      from: `Meraih <${process.env.EMAIL}>`, // sender address
+      to: "twin.panda999@gmail.com",//findEmployee?.email, // list of receivers
+      subject: 'Account Created', // Subject line
+      html: `<p>Account has been created for ${findEmployee?.first_name} ${findEmployee?.last_name} In company ${findBranchName?.hq_initial} and this is the password ${employee.password}</p>`, // html body
+    };
+
+    sendEmail(mailOptions);
   }
 
   static async createEmployee(
@@ -239,7 +266,13 @@ export class AccountService {
         join_date: request.join_date,
       },
     });
-    console.log(newEmployee)
+
+    await AccountService.createAccountEmployeeAndNotifyEmployees({
+      employee_id: newEmployee.employee_id,
+      company_branch_id: newEmployee.company_branch_id,
+      password: request.password,
+    });
+
     return {
       employee_id: newEmployee.employee_id,
       first_name: request.first_name,
