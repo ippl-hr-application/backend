@@ -262,4 +262,18 @@ export class CompanyBranchService {
       });
     });
   }
+
+  static async getBranchById(company_branch_id: string) {
+    const branch = await prisma.companyBranches.findFirst({
+      where: {
+        company_branch_id,
+      },
+    });
+
+    if (!branch) {
+      throw new ErrorResponse("Branch not found", 404, ["company_branch_id"]);
+    }
+
+    return branch;
+  }
 }
