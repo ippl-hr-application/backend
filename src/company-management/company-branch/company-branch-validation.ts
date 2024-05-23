@@ -3,7 +3,7 @@ import { z, ZodType } from "zod";
 export class CompanyBranchValidation {
   static readonly CREATE_NEW_BRANCH: ZodType = z.object({
     email: z.string().email().optional().or(z.literal("")),
-    phone_number: z.string().min(10).max(15).optional().or(z.literal("")),
+    phone_number: z.string().min(10).max(15),
     address: z.string().min(3).max(100).optional().or(z.literal("")),
     province: z.string().min(3).max(50).optional().or(z.literal("")),
     city: z.string().min(3).max(50).optional().or(z.literal("")),
