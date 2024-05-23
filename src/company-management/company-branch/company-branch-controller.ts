@@ -94,4 +94,23 @@ export class CompanyBranchController {
       next(error);
     }
   }
+
+  static async getBranchById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { company_branch_id } = req.params;
+      const branch = await CompanyBranchService.getBranchById(
+        company_branch_id
+      );
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          branch,
+        },
+        message: "Branch data retrieved successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
