@@ -66,14 +66,17 @@ export class TemplateService {
     company_id: string,
     template_document_id: number
   ) {
-    const template = await prisma.companyFile.findFirst({
+    const template = await prisma.companyFileTemplate.findFirst({
       where: {
         company_id,
-        company_file_id: template_document_id,
+        company_file_template_id: template_document_id,
       },
+      include: {
+        company_file: true,
+      }
     });
 
-    if (!template) {
+    if (!template || !template.company_file) {
       throw new ErrorResponse(
         "Template document not found",
         404,
@@ -82,7 +85,7 @@ export class TemplateService {
       );
     }
 
-    await deleteFile(template.file_url);
+    await deleteFile(template.company_file.file_url);
 
     await prisma.companyFileTemplate.delete({
       where: {

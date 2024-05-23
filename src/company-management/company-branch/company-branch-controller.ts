@@ -17,7 +17,7 @@ export class CompanyBranchController {
       return res.status(201).json({
         success: true,
         data: { company_branch: branch },
-        message: "Employee logged in successfully",
+        message: "Company Branch created successfully",
       });
     } catch (error) {
       next(error);
