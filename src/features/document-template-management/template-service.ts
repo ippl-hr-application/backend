@@ -97,7 +97,7 @@ export class TemplateService {
     await prisma.companyFile.delete({
       where: {
         company_id,
-        company_file_id: template_document_id,
+        company_file_id: template.company_file_id,
       },
     });
 
