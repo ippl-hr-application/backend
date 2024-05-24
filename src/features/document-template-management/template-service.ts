@@ -11,7 +11,7 @@ export class TemplateService {
     company_branch_id: string,
     desc?: string
   ) {
-    const templates = await prisma.companyFile.findMany({
+    const templates = await prisma.companyFileTemplate.findMany({
       where: {
         company_id: company_branch_id,
         description: desc
@@ -21,7 +21,24 @@ export class TemplateService {
             }
           : undefined,
       },
-    });
+      include: {
+        company_file: true,
+      },
+    })
+    // const templates = await prisma.companyFile.findMany({
+    //   where: {
+    //     company_id: company_branch_id,
+    //     description: desc
+    //       ? {
+    //           contains: desc,
+    //           mode: "insensitive",
+    //         }
+    //       : undefined,
+    //   },
+    //   include: {
+    //     company_file_template: true,
+    //   },
+    // });
 
     return templates;
   }
@@ -57,6 +74,9 @@ export class TemplateService {
           },
         },
       },
+      include: {
+        company_file_template: true,
+      }
     });
 
     return template;
