@@ -5,16 +5,19 @@ export class ShiftValidation {
     name: z.string(),
     end_time: z.string(),
     start_time: z.string(),
+    company_branch_id: z.string(),
   });
   static readonly DELETE_SHIFT: ZodType = z.object({
     shift_id: z.number(),
   });
   static readonly ADD_ASSIGN_SHIFT: ZodType = z.object({
     shift_id: z.number(),
+    company_branch_id: z.string(),
     employee_id: z.string(),
   });
   static readonly UPDATE_ASSIGN_SHIFT: ZodType = z.object({
     shift_id: z.number(),
     employee_id: z.string(),
+    company_branch_id: z.string(),
   });
 }

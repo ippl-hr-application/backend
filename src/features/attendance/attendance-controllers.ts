@@ -22,7 +22,7 @@ export class AttendanceController {
   static async checkIn(req: Request, res: Response, next: NextFunction) {
     try {
       const { employee_id } = res.locals.user;
-      const { assign_shift_id, long, lat } = req.body;
+      const { assign_shift_id } = req.body;
       const attendance_file = req.file;
       const result = await AttendanceService.attendanceCheckIn({
         employee_id,
@@ -43,7 +43,7 @@ export class AttendanceController {
   static async checkOut(req: Request, res: Response, next: NextFunction) {
     try {
       const { employee_id } = res.locals.user;
-      const { attendance_id, long, lat } = req.body;
+      const { attendance_id } = req.body;
       const attendance_file = req.file;
       const result = await AttendanceService.attendanceCheckOut({
         employee_id,
