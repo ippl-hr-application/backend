@@ -27,6 +27,7 @@ export class ShiftService {
       name,
       start_time,
       end_time,
+      company_branch_id,
     });
     const shift = await prisma.shift.create({
       data: {
@@ -78,6 +79,7 @@ export class ShiftService {
     const request = Validation.validate(ShiftValidation.ADD_ASSIGN_SHIFT, {
       shift_id,
       employee_id,
+      company_branch_id,
     });
     const shift = await prisma.shift.findFirst({
       where: {
@@ -114,6 +116,7 @@ export class ShiftService {
     const request = Validation.validate(ShiftValidation.UPDATE_ASSIGN_SHIFT, {
       employee_id,
       shift_id,
+      company_branch_id,
     });
     const employee = await prisma.assignShift.findFirst({
       where: {

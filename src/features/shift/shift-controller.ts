@@ -5,7 +5,7 @@ export class ShiftController {
   static async addShift(req: Request, res: Response, next: NextFunction) {
     try {
       const { name, start_time, end_time } = req.body;
-      const { company_branch_id } = res.locals.user;
+      const { company_branch_id } = req.params;
       const shift = await ShiftService.addShift({
         company_branch_id,
         name,
@@ -40,7 +40,7 @@ export class ShiftController {
   static async getAllshifts(req: Request, res: Response, next: NextFunction) {
     try {
       const { name } = req.query;
-      const { company_branch_id } = res.locals.user;
+      const { company_branch_id } = req.params;
       const shifts = await ShiftService.getAllShifts({
         company_branch_id,
         name: name as string,
@@ -57,7 +57,7 @@ export class ShiftController {
   static async addAssignShift(req: Request, res: Response, next: NextFunction) {
     try {
       const { shift_id, employee_id } = req.body;
-      const { company_branch_id } = res.locals.user;
+      const { company_branch_id } = req.params;
       const assignShift = await ShiftService.addAssignShift({
         employee_id,
         company_branch_id,
@@ -79,8 +79,7 @@ export class ShiftController {
   ) {
     try {
       const { shift_id } = req.body;
-      const { company_branch_id } = res.locals.user;
-      const { employee_id } = req.params;
+      const { employee_id, company_branch_id } = req.params;
       const assignShift = await ShiftService.updateAssignShift({
         employee_id,
         company_branch_id,
@@ -101,7 +100,7 @@ export class ShiftController {
     next: NextFunction
   ) {
     try {
-      const { company_branch_id } = res.locals.user;
+      const { company_branch_id } = req.params;
       const { name } = req.query;
       const assignShift = await ShiftService.getAllAsignShifts({
         company_branch_id,
