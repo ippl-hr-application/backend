@@ -16,7 +16,7 @@ taskManagementRouter.post("/:company_branch_id", [
   TaskManagementController.addTaskManagement,
 ]);
 
-taskManagementRouter.get("/employee", [
+taskManagementRouter.get("/:company_branch_id/employee", [
   JWTMiddleware.verifyToken,
   TaskManagementController.getTaskEmployee,
 ]);
