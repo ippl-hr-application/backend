@@ -333,6 +333,12 @@ export class AuthService {
       },
     });
 
+    sendEmail({
+      to: request.email,
+      subject: "Welcome to Meraih",
+      text: `Welcome to Meraih, ${request.full_name}! \n\n Your account has been successfully created. \n\n Your account details: \n Email: ${request.email} \n Employee Account ID: ${user_employee_account.employee_id} \n Password: ${request.password} \n\n Please keep your account details safe and do not share it with anyone. Employee Account ID is used when you want to log in as Employee. \n\n Best regards, \n Meraih Team`,
+    });
+
     return user;
   }
 

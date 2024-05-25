@@ -31,6 +31,6 @@ export class CompanyBranchValidation {
     umr_city: z.number().int().optional(),
     bpjs: z.string().min(3).max(50).optional(),
     longitute: z.number().optional(),
-    latitue: z.number().optional(),
+    latitude: z.number().optional(),
   });
 }
