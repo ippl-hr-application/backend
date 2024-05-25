@@ -23,6 +23,13 @@ export class PayrollService {
           company_branch_id,
           month,
           year,
+          employee: {
+            job_position: {
+              NOT: {
+                name: "Owner"
+              }
+            }
+          }
         },
         include: {
           employee: {
@@ -97,6 +104,11 @@ export class PayrollService {
     const employees = await prisma.employee.findMany({
       where: {
         company_branch_id,
+        job_position: {
+          NOT: {
+            name: "Owner"
+          }
+        }
       },
     });
 

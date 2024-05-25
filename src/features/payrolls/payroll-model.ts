@@ -1,5 +1,6 @@
 export type GetPayrollRequest = {
   company_branch_id: string;
+  company_id?: string;
   month: number;
   year: number;
 }
