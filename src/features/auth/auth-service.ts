@@ -359,7 +359,9 @@ export class AuthService {
     }
 
     if (!comparePassword(request.old_password, user.password)) {
-      throw new ErrorResponse("Old password is incorrect", 400, ["old_password"]);
+      throw new ErrorResponse("Old password is incorrect", 400, [
+        "old_password",
+      ]);
     }
 
     if (request.password !== request.confirm_password) {
@@ -393,8 +395,10 @@ export class AuthService {
     }
 
     if (!comparePassword(request.old_password, employee.password)) {
-      throw new ErrorResponse("Old password is incorrect", 400, ["old_password"]);
-    }    
+      throw new ErrorResponse("Old password is incorrect", 400, [
+        "old_password",
+      ]);
+    }
 
     if (request.password !== request.confirm_password) {
       throw new ErrorResponse(
@@ -460,6 +464,10 @@ export class AuthService {
                 city: true,
                 hq_code: true,
                 hq_initial: true,
+                created_at: true,
+              },
+              orderBy: {
+                created_at: "asc",
               },
             },
           },
