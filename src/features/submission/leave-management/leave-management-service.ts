@@ -12,12 +12,14 @@ import { deleteFile } from "../../../utils/delete_file";
 
 export class LeaveManagementService {
   static async getAllByCompanyBranchId(
-    company_branch_id: string
-  ): Promise<GetAllByCompanyBranchIdResponse[]> {
+    company_branch_id: string,
+    date: Date
+  ): Promise<GetAllByCompanyBranchIdResponse> {
     const request = Validation.validate(
       LeaveManagementValidation.GET_ALL_BY_COMPANY_BRANCH_ID,
       {
         company_branch_id,
+        date,
       }
     );
     const leave = await prisma.leaveSubmission.findMany({
@@ -26,6 +28,7 @@ export class LeaveManagementService {
           employee: {
             company_branch_id: request.company_branch_id,
           },
+          submission_date: request.date,
         },
       },
       select: {
@@ -67,7 +70,11 @@ export class LeaveManagementService {
         },
       };
     });
-    return leaveMapped;
+    return {
+      leave_data: leaveMapped,
+      num_not_validated: leave.filter((l) => l.submission.status === "PENDING")
+        .length,
+    };
   }
   static async getById(
     submission_id: number,

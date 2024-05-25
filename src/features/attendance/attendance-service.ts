@@ -410,11 +410,39 @@ export class AttendanceService {
       },
     });
     if (!attendance) {
-      throw new ErrorResponse("Attendance not found", 404, ["NOT_FOUND"]);
+      const assign_shift = await prisma.assignShift.findFirst({
+        orderBy: [{ assign_shift_id: "desc" }],
+        distinct: ["employee_id"],
+        where: {
+          employee_id,
+        },
+        select: {
+          shift: {
+            select: {
+              start_time: true,
+              end_time: true,
+            },
+          },
+        },
+      });
+      if (!assign_shift) {
+        throw new ErrorResponse(
+          "Assign shift not found",
+          404,
+          ["NOT_FOUND"],
+          "NOT_FOUND"
+        );
+      }
+
+      return {
+        date: request.date,
+        start_time: assign_shift?.shift?.start_time,
+        end_time: assign_shift?.shift?.end_time,
+      };
     }
     return {
       attendance_id: attendance.attendance_id,
-      date: attendance.date,
+      date: request.date,
       start_time: attendance.assign_shift?.shift?.start_time,
       end_time: attendance.assign_shift?.shift?.end_time,
       check_in_time: attendance.attendance_check[0]?.time,

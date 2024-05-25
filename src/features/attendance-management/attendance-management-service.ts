@@ -30,8 +30,7 @@ export class AttendanceManagementService {
         attendance_check: {
           select: {
             status: true,
-            long: true,
-            lat: true,
+
             time: true,
             type: true,
             employee_file: {
@@ -97,8 +96,7 @@ export class AttendanceManagementService {
         attendance_check: {
           select: {
             status: true,
-            long: true,
-            lat: true,
+
             time: true,
             type: true,
             employee_file: {

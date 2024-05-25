@@ -11,12 +11,14 @@ import { MutasiManagementValidation } from "./mutasi-management-validation";
 
 export class MutasiManagementService {
   static async getAllByCompanyBranchId(
-    company_branch_id: string
-  ): Promise<GetAllByCompanyBranchIdResponse[]> {
+    company_branch_id: string,
+    date: Date
+  ): Promise<GetAllByCompanyBranchIdResponse> {
     const request = Validation.validate(
       MutasiManagementValidation.GET_ALL_BY_COMPANY_BRANCH_ID,
       {
         company_branch_id,
+        date,
       }
     );
     const mutasi = await prisma.submission.findMany({
@@ -25,6 +27,7 @@ export class MutasiManagementService {
           company_branch_id: request.company_branch_id,
         },
         type: "MUTASI",
+        submission_date: request.date,
       },
       select: {
         submission_id: true,
@@ -45,7 +48,10 @@ export class MutasiManagementService {
         },
       },
     });
-    return mutasi;
+    return {
+      mutasi_data: mutasi,
+      num_not_validated: mutasi.filter((m) => m.status === "PENDING").length,
+    };
   }
   static async getById(
     submission_id: number,

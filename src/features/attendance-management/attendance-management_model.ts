@@ -4,8 +4,7 @@ type AttendanceCheckStatus = string; // Ganti dengan tipe data yang sesuai untuk
 type AttendanceCheck = {
   type: AttendanceCheckType;
   time: string;
-  long: number;
-  lat: number;
+
   status: AttendanceCheckStatus;
   employee_file: {
     file_url: string;

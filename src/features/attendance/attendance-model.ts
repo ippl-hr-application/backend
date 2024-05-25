@@ -80,10 +80,10 @@ export type GetHistoryAttendanceRequest = {
 };
 
 export type GetHistoryAttendanceResponse = {
-  attendance_id: number;
+  attendance_id?: number | null;
   date: Date;
   start_time: string;
   end_time: string;
-  check_in_time: string | null;
-  check_out_time: string | null;
+  check_in_time?: string | null;
+  check_out_time?: string | null;
 };

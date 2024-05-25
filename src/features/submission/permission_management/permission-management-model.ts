@@ -4,18 +4,21 @@ export type GetAllByCompanyBranchIdRequest = {
   company_branch_id: string;
 };
 export type GetAllByCompanyBranchIdResponse = {
-  submission_id: number;
-  submission_date: Date;
-  type: string;
-  status: SubmissionStatus;
-  employee_file: {
-    file_url: string;
-  } | null;
-  employee: {
-    first_name: string;
-    last_name: string;
-    employee_id: string;
-  };
+  permission_data: {
+    submission_id: number;
+    submission_date: Date;
+    type: string;
+    status: SubmissionStatus;
+    employee_file: {
+      file_url: string;
+    } | null;
+    employee: {
+      first_name: string;
+      last_name: string;
+      employee_id: string;
+    };
+  }[];
+  num_not_validated: number;
 };
 
 export type GetByIdResponse = {
