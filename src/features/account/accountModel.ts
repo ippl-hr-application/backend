@@ -62,6 +62,8 @@ export type UpdateRequest = {
   last_name?: string;
   email?: string;
   phone_number?: string;
+  place_of_birth?: string;
+  birth_date?: Date;
   marital_status?: string;
   blood_type?: string;
   religion?: string;
