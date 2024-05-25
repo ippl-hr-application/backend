@@ -22,8 +22,7 @@ export class TaskManagementService {
     start_date: string;
     end_date: string;
     title?: string;
-  }): Promise<EmployeeTask[]> {
-    console.log(title);
+  }) {
     const tasks = await prisma.employeeTask.findMany({
       where: {
         company_branch_id,
@@ -33,6 +32,13 @@ export class TaskManagementService {
               mode: "insensitive",
             }
           : undefined,
+        employee: {
+          hasResigned: false,
+          // NOT: {
+          //   resign_date: null,
+          // },
+          delete_at: null,
+        },
         end_date: {
           lte: end_date ? new Date(end_date) : undefined,
         },
@@ -40,6 +46,41 @@ export class TaskManagementService {
           gte: start_date ? new Date(start_date) : undefined,
         },
       },
+      select: {
+        task_id: true,
+        company_branch_id: true,
+        title: true,
+        description: true,
+        start_date: true,
+        end_date: true,
+        employee_id: true,
+        given_by: {
+          select: {
+            employee_id: true,
+            first_name: true,
+            last_name: true,
+            job_position: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        employee: {
+          select: {
+            first_name: true,
+            last_name: true,
+            job_position: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        end_date: "desc",
+      }
     });
 
     return tasks;
@@ -91,6 +132,13 @@ export class TaskManagementService {
       const employees = await prisma.employee.findMany({
         where: {
           company_branch_id,
+          hasResigned: false,
+          delete_at: null,
+          job_position: {
+            name: {
+              not: "Owner",
+            },
+          },
         },
         select: {
           employee_id: true,
@@ -117,6 +165,8 @@ export class TaskManagementService {
           employee_id: {
             in: request.employee_id,
           },
+          hasResigned: false,
+          delete_at: null,
         },
         select: {
           employee_id: true,
