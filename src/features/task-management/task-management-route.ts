@@ -13,6 +13,7 @@ taskManagementRouter.get("/:company_branch_id", [
 taskManagementRouter.post("/:company_branch_id", [
   JWTMiddleware.verifyToken,
   CompanyMiddleware.isCompanyBranchBelongsToCompany,
+  JWTMiddleware.ownerAndManagerOnly,
   TaskManagementController.addTaskManagement,
 ]);
 
@@ -30,12 +31,14 @@ taskManagementRouter.get("/:company_branch_id/:task_id", [
 taskManagementRouter.put("/:company_branch_id/:task_id", [
   JWTMiddleware.verifyToken,
   CompanyMiddleware.isCompanyBranchBelongsToCompany,
+  JWTMiddleware.ownerAndManagerOnly,
   TaskManagementController.updateTaskManagement,
 ]);
 
 taskManagementRouter.delete("/:company_branch_id/:task_id", [
   JWTMiddleware.verifyToken,
   CompanyMiddleware.isCompanyBranchBelongsToCompany,
+  JWTMiddleware.ownerAndManagerOnly,
   TaskManagementController.deleteTaskManagement,
 ]);
 
