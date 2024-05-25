@@ -27,4 +27,8 @@ attendanceRoute.get("/recap", [
   JWTMiddleware.verifyToken,
   AttendanceController.getRecap,
 ]);
+attendanceRoute.get("/history", [
+  JWTMiddleware.verifyToken,
+  AttendanceController.getHistoryAttendance,
+]);
 export default attendanceRoute;

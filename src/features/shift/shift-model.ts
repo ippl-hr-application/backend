@@ -1,10 +1,18 @@
 export type AddShiftRequest = {
   company_branch_id: string;
+
   name: string;
   start_time: string;
   end_time: string;
 };
-export type AddShiftResponse = AddShiftRequest;
+export type AddShiftResponse = {
+  shift_id: number;
+  company_branch_id: string;
+
+  name: string;
+  start_time: string;
+  end_time: string;
+};
 
 export type DeleteShiftRequest = {
   shift_id: number;
@@ -14,6 +22,7 @@ export type DeleteShiftResponse = AddShiftResponse;
 
 export type GetShiftRequest = {
   company_branch_id: string;
+  name: string;
 };
 
 export type GetShiftResponse = AddShiftResponse;
@@ -32,6 +41,7 @@ export type UpdateAssignShiftResponse = UpdateAssignShiftRequest;
 
 export type GetAllAsignShiftRequest = {
   company_branch_id: string;
+  name: string;
 };
 export type GetAllAsignShiftResponse = {
   assign_shift_id: number;

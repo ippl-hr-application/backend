@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { AttendanceService } from "./attendance-service";
+import { z } from "zod";
 export class AttendanceController {
   static async getShiftInfo(req: Request, res: Response, next: NextFunction) {
     try {
@@ -21,25 +22,14 @@ export class AttendanceController {
   static async checkIn(req: Request, res: Response, next: NextFunction) {
     try {
       const { employee_id } = res.locals.user;
-      const {
-        assign_shift_id,
-        long,
-        lat,
-        file_name,
-        file_size,
-        file_type,
-        file_url,
-      } = req.body;
-      const result = await AttendanceService.attendanceCheck({
+      const { assign_shift_id, long, lat } = req.body;
+      const attendance_file = req.file;
+      const result = await AttendanceService.attendanceCheckIn({
         employee_id,
-        type: "CHECK_IN",
         assign_shift_id: Number(assign_shift_id),
         long: Number(long),
         lat: Number(lat),
-        file_name,
-        file_size,
-        file_type,
-        file_url,
+        attendance_file,
       });
       return res.status(201).json({
         success: true,
@@ -54,27 +44,14 @@ export class AttendanceController {
   static async checkOut(req: Request, res: Response, next: NextFunction) {
     try {
       const { employee_id } = res.locals.user;
-      const {
-        assign_shift_id,
-        long,
-        lat,
-        file_name,
-        file_size,
-        file_type,
-        file_url,
-      } = req.body;
-
-      const result = await AttendanceService.attendanceCheck({
+      const { attendance_id, long, lat } = req.body;
+      const attendance_file = req.file;
+      const result = await AttendanceService.attendanceCheckOut({
         employee_id,
-
-        type: "CHECK_OUT",
-        assign_shift_id: Number(assign_shift_id),
+        attendance_id: Number(attendance_id),
         long: Number(long),
         lat: Number(lat),
-        file_name,
-        file_size,
-        file_type,
-        file_url,
+        attendance_file,
       });
       return res.status(201).json({
         success: true,
@@ -103,16 +80,41 @@ export class AttendanceController {
   static async getRecap(req: Request, res: Response, next: NextFunction) {
     try {
       const { employee_id } = res.locals.user;
-      const { month_and_year } = req.query;
+      const { month, year } = req.query;
       const result = await AttendanceService.getRecap({
         employee_id,
-        month_and_year: month_and_year as string,
+        month: month as string,
+        year: year as string,
       });
       return res.status(200).json({
         success: true,
         data: {
           ...result,
         },
+        message: "Recap Retrieved",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async getHistoryAttendance(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { employee_id } = res.locals.user;
+      const { date } = req.query;
+      const result = await AttendanceService.getHistoryAttendance({
+        employee_id,
+        date: new Date(date as string),
+      });
+      return res.status(200).json({
+        success: true,
+        data: {
+          ...result,
+        },
+        message: "History Retrieved",
       });
     } catch (error) {
       next(error);

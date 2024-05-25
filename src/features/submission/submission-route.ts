@@ -3,6 +3,14 @@ import { SubmissionController } from "./submission-controller";
 import { upload } from "../../middlewares/multer";
 import { JWTMiddleware } from "../../middlewares/jwt_middleware";
 
+import { changeShiftManagementRoute } from "./change-shift-management";
+import { sickManagementRoute } from "./sick-management";
+import { resignManagementRoute } from "./resign-management";
+import { permissionManagementRoute } from "./permission_management";
+import { leaveManagementRoute } from "./leave-management";
+import { mutasiManagementRoute } from "./mutasi-management";
+import { forgetAttendanceManagementRoute } from "./forget-attendance-management";
+
 const submissionRoute: Router = Router();
 
 submissionRoute.post("/permission", [
@@ -50,5 +58,14 @@ submissionRoute.post("/attendance", [
   upload.single("attendance_submission_file"),
   SubmissionController.createAttendanceLetter,
 ]);
-
+submissionRoute.use("/sick-management", sickManagementRoute);
+submissionRoute.use("/permission-management", permissionManagementRoute);
+submissionRoute.use("/change-shift-management", changeShiftManagementRoute);
+submissionRoute.use("/resign-management", resignManagementRoute);
+submissionRoute.use("/leave-management", leaveManagementRoute);
+submissionRoute.use("/mutation-management", mutasiManagementRoute);
+submissionRoute.use(
+  "/forget-attendance-management",
+  forgetAttendanceManagementRoute
+);
 export default submissionRoute;

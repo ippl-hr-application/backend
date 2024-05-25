@@ -72,7 +72,7 @@ export class PayrollController {
 
   static async createPayroll(req: Request, res: Response, next: NextFunction) {
     try {
-      const { company_branch_id } = res.locals.user as EmployeeToken;
+      const { company_branch_id } = req.params;
       const { month, year } = req.body;
       const payrolls = await PayrollService.createPayroll({
         company_branch_id,
@@ -92,8 +92,7 @@ export class PayrollController {
 
   static async updatePayroll(req: Request, res: Response, next: NextFunction) {
     try {
-      const { payroll_id } = req.params;
-      const { company_branch_id } = res.locals.user as EmployeeToken;
+      const { payroll_id, company_branch_id } = req.params;
       const { status } = req.body;
       const payroll = await PayrollService.updatePayroll({
         company_branch_id,

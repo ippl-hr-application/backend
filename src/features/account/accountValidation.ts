@@ -11,13 +11,13 @@ export class AccountValidation {
     password: z.string().min(6).max(20),
     phone_number: z.string().min(10).max(15),
     place_of_birth: z.string(),
-    birth_date: z.date(),
+    birth_date: z.date().optional(),
     marital_status: z.string().max(20),
     blood_type: z.string().min(1).max(3),
     religion: z.string().min(3).max(20),
-    identity_type: z.string().min(3).max(20),
-    identity_number: z.string().min(3).max(20),
-    identity_expired_date: z.date(),
+    identity_type: z.string().min(3).max(20).optional(),
+    identity_number: z.string().min(3).max(20).optional(),
+    identity_expired_date: z.date().optional(),
     postcal_code: z.string().min(3).max(10),
     citizen_id_address: z.string(),
     residential_address: z.string(),
@@ -25,7 +25,7 @@ export class AccountValidation {
     bank_type: z.string().max(20).optional(),
     wage: z.number(),
     gender: z.string().max(10),
-    join_date: z.date(),
+    join_date: z.date().optional(),
   });
 
   static readonly UPDATE_EMPLOYEE: ZodType = z.object({

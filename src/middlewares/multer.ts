@@ -43,11 +43,12 @@ const storage = multer.diskStorage({
     cb(null, dest);
   },
   filename: function (req, file, cb) {
+    const splittedOriginalName = file.originalname.split(".");
+    const extension = splittedOriginalName[splittedOriginalName.length - 1];
+    const formattedFileName = formatSpacedFileName(splittedOriginalName[0]);
     cb(
       null,
-      `${formatSpacedFileName(
-        file.originalname.split(".")[0]
-      )}-${new Date().getTime()}.${file.originalname.split(".")[1]}`
+      `${formattedFileName}-${new Date().getTime()}.${extension}`
     );
   },
 });

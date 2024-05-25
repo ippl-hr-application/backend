@@ -12,8 +12,10 @@ export type GetEmployeeRequest = {
   last_name?: string | undefined;
   hasResigned?: string | undefined;
   gender?: string | undefined;
-  job_position?: string | undefined;
-  employment_status?: string | undefined;
+  job_position_name?: string | undefined;
+  employment_status_name?: string | undefined;
+  get_all?: string | undefined;
+  deleted?: string | undefined;
 };
 
 export type GetAllEmployeeResponse = Employee[];
@@ -28,13 +30,13 @@ export type CreateRequest = {
   password: string;
   phone_number: string;
   place_of_birth: string;
-  birth_date: Date;
+  birth_date?: Date;
   marital_status: string;
   blood_type: string;
   religion: string;
-  identity_type: string;
-  identity_number: string;
-  identity_expired_date: Date;
+  identity_type?: string;
+  identity_number?: string;
+  identity_expired_date?: Date;
   postcal_code: string;
   citizen_id_address: string;
   residential_address: string;
@@ -42,7 +44,7 @@ export type CreateRequest = {
   bank_type?: string;
   wage: number;
   gender: string;
-  join_date: Date;
+  join_date?: Date;
 };
 
 export type CreateResponse = {
@@ -75,6 +77,7 @@ export type UpdateRequest = {
   hasresigned?: string;
   join_date?: Date;
   gender?: string;
+  resign_date?: Date;
 };
 
 export type UpdateResponse = {
@@ -92,6 +95,7 @@ export type DeleteRequest = {
 export type DeleteResponse = {
   employee_id: string;
   first_name: string;
+  last_name: string;
 };
 
 export type ResignRequest = DeleteRequest;

@@ -1,3 +1,8 @@
+import {
+  Attendance,
+  AttendanceCheckStatus,
+  AttendanceCheckType,
+} from "@prisma/client";
 import { number } from "zod";
 
 export type GetShiftInfoRequest = {
@@ -16,21 +21,26 @@ export type GetShiftInfoResponse = {
   shift_name: string;
   job_position: string;
   company_branch_id: string;
+  logo: string | undefined;
   city: string | null;
+  assign_shift_id: number;
 };
 
-export type AttendanceCheckRequest = {
+export type AttendanceCheckInRequest = {
   employee_id: string;
   assign_shift_id: number;
-  type: "CHECK_IN" | "CHECK_OUT";
   long: number;
   lat: number;
-  file_name: string;
-  file_url: string;
-  file_size: number;
-  file_type: string;
+  attendance_file: Express.Multer.File | undefined;
 };
 
+export type AttendanceCheckOutRequest = {
+  attendance_id: number;
+  employee_id: string;
+  long: number;
+  lat: number;
+  attendance_file: Express.Multer.File | undefined;
+};
 export type AttendanceCheckResponse = {
   date: Date;
   from: string | undefined;
@@ -43,15 +53,18 @@ export type AttendanceTodayResponse = {
   date: string;
   from: string | undefined;
   to: string | undefined;
-  check_in: {
-    time: string | undefined;
-    type: string | undefined;
-    status: string | undefined;
-  };
+  checks:
+    | {
+        time: string;
+        type: AttendanceCheckType;
+        status: AttendanceCheckStatus;
+      }[]
+    | undefined;
 };
 export type AttendanceRecapRequest = {
   employee_id: string;
-  month_and_year: string | undefined;
+  month: string;
+  year: string;
 };
 export type AttendanceRecapResponse = {
   number_of_attendees: number;
@@ -61,6 +74,20 @@ export type AttendanceRecapResponse = {
 
 export type DetailAttendanceRecap = {
   attendance_id: number;
-  date: string;
+  date: Date;
   isPresent: false | true;
+};
+
+export type GetHistoryAttendanceRequest = {
+  employee_id: string;
+  date: Date;
+};
+
+export type GetHistoryAttendanceResponse = {
+  attendance_id: number;
+  date: Date;
+  start_time: string;
+  end_time: string;
+  check_in_time: string | null;
+  check_out_time: string | null;
 };

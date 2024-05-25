@@ -5,7 +5,6 @@ import {
   AttendanceSubmissionResponse,
   ChangeShiftSubmissionRequest,
   ChangeShiftSubmissionResponse,
-  GetAttendanceDataResponse,
   GetSubmissionHistoryRequest,
   GetSubmissionHistoryResponse,
   LeaveSubmissionRequest,
@@ -19,6 +18,7 @@ import {
 } from "./submission-model";
 import { SubmissionValidation } from "./submission-validation";
 import { pathToFileUrl } from "../../utils/format";
+import { ErrorResponse } from "../../models";
 
 export class SubmissionService {
   static async createSickLetter({
@@ -35,7 +35,11 @@ export class SubmissionService {
       from,
       to,
     });
-
+    if (!sick_file) {
+      throw new ErrorResponse("Sick Letter File is required", 400, [
+        "sick_file",
+      ]);
+    }
     await prisma.submission.create({
       data: {
         submission_date: new Date(),
@@ -95,8 +99,12 @@ export class SubmissionService {
       to,
       leave_reason,
       leave_type,
-      employee_id,
     });
+    if (!leave_file) {
+      throw new ErrorResponse("Leave Letter File is required", 400, [
+        "leave_file",
+      ]);
+    }
     await prisma.submission.create({
       data: {
         status: "PENDING",
@@ -128,6 +136,7 @@ export class SubmissionService {
           create: {
             from: request.from,
             to: request.to,
+
             leave_reason: request.leave_reason,
           },
         },
@@ -151,14 +160,17 @@ export class SubmissionService {
       mutation_reason,
       current_company_branch_id,
       target_company_branch_id,
-      employee_id,
     });
-
+    if (!mutation_file) {
+      throw new ErrorResponse("Mutation Letter File is required", 400, [
+        "mutation_file",
+      ]);
+    }
     await prisma.submission.create({
       data: {
         status: "PENDING",
         submission_date: new Date(),
-        type: "mutasi",
+        type: "MUTASI",
         employee: {
           connect: {
             employee_id: employee_id,
@@ -238,19 +250,30 @@ export class SubmissionService {
     employee_id,
     year,
     status,
+    month,
   }: GetSubmissionHistoryRequest): Promise<GetSubmissionHistoryResponse[]> {
+    const request = Validation.validate(
+      SubmissionValidation.GET_SUBMISSION_HISTORY,
+      {
+        year,
+        month,
+        status,
+      }
+    );
     let submission: GetSubmissionHistoryResponse[] = [];
-
     const whereConditions: any = {
       employee_id,
     };
-
-    if (year) {
-      whereConditions.submission_date = {
-        gte: new Date(`${year}-01-01`),
-        lte: new Date(`${year}-12-31`),
-      };
-    }
+    whereConditions.submission_date = {
+      gte: `${request.year}-${request.month}-01T00:00:00Z`,
+      lte: `${
+        request.month === "12"
+          ? `${Number(request.year) + 1}-01`
+          : `${request.year}-${(Number(request.month) + 1)
+              .toString()
+              .padStart(2, "0")}`
+      }-01T00:00:00Z`,
+    };
 
     if (status) {
       whereConditions.status = status;
@@ -273,9 +296,15 @@ export class SubmissionService {
   }: {
     submission_id: number;
   }): Promise<void> {
+    const request = Validation.validate(
+      SubmissionValidation.DELETE_SUBMISSION,
+      {
+        submission_id,
+      }
+    );
     const submission = await prisma.submission.findUnique({
       where: {
-        submission_id,
+        submission_id: request.submission_id,
       },
       select: {
         employee_file: {
@@ -301,6 +330,11 @@ export class SubmissionService {
     const request = Validation.validate(SubmissionValidation.RESIGN_LETTER, {
       reason,
     });
+    if (!resign_file) {
+      throw new ErrorResponse("Resign Letter File is required", 400, [
+        "resign_file",
+      ]);
+    }
     await prisma.submission.create({
       data: {
         status: "PENDING",
@@ -354,6 +388,11 @@ export class SubmissionService {
         attendance_id,
       }
     );
+    if (!attendance_submission_file) {
+      throw new ErrorResponse("File not found", 400, [
+        "attendance_submission_file",
+      ]);
+    }
     await prisma.submission.create({
       data: {
         status: "PENDING",

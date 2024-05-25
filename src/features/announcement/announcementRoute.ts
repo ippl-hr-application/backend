@@ -5,24 +5,47 @@ import { JWTMiddleware } from '../../middlewares/jwt_middleware';
 
 const announcementRoute: Router = Router();
 
-announcementRoute.post('/', [
+announcementRoute.post('/create', [
   upload.single('announcement_file'),
+  JWTMiddleware.verifyToken,
   AnnouncementController.addAnnouncement,
 ]);
 
-announcementRoute.get('/:company_id', [
+announcementRoute.post('/:company_branch_id/create', [
+  upload.single('announcement_file'),
+  JWTMiddleware.verifyToken,
+  AnnouncementController.addAnnouncement,
+]);
+
+announcementRoute.get('/hq', [
+  JWTMiddleware.verifyToken,
   AnnouncementController.getAnnouncementCompany,
 ]);
 
-announcementRoute.get('/:company_id/title', [
-  AnnouncementController.getAnnouncementByTitle,
+announcementRoute.get('/branch', [
+  JWTMiddleware.verifyToken,
+  AnnouncementController.getAnnouncementCompanyBranch,
+]);
+
+announcementRoute.get('/:company_branch_id/branch', [
+  JWTMiddleware.verifyToken,
+  AnnouncementController.getAnnouncementCompanyBranch,
 ]);
 
 announcementRoute.get('/download/:company_id/:company_announcement_id', [
+  JWTMiddleware.verifyToken,
   AnnouncementController.downloadAnnouncementFile,
-  ]);
+]);
 
-announcementRoute.delete('/company/:company_id/announcement/:announcement_id', AnnouncementController.deleteAnnouncement)
+announcementRoute.delete('/company/:company_id/announcement/:announcement_id', [
+  JWTMiddleware.verifyToken,
+  AnnouncementController.deleteAnnouncement,
+]);
 
-
+// still have some bug
+announcementRoute.put('/update',[
+  upload.single('announcement_file'),
+  JWTMiddleware.verifyToken,
+  AnnouncementController.updateAnnouncement,
+])
 export default announcementRoute;

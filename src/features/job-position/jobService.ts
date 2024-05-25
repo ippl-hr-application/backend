@@ -7,6 +7,8 @@ import {
   CreateJobPositionResponse,
   UpdateJobPositionRequest,
   UpdateJobPositionResponse,
+  DeleteJobPositionRequest,
+  DeleteJobPositionResponse,
 } from "./jobModel";
 import { prisma } from "../../applications";
 import { ErrorResponse } from "../../models";
@@ -69,6 +71,19 @@ export class JobPositionService {
       },
       data: {
         name: validatedRequest.name,
+      },
+    });
+
+    return jobPosition;
+  }
+
+  static async deleteJobPosition({
+    job_position_id, company_branch_id
+  }: DeleteJobPositionRequest): Promise<DeleteJobPositionResponse> {
+    const jobPosition = await prisma.jobPosition.delete({
+      where: {
+        job_position_id: job_position_id,
+        company_branch_id: company_branch_id,
       },
     });
 

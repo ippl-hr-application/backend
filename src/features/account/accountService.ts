@@ -14,7 +14,7 @@ import {
 } from './accountModel';
 import { prisma } from '../../applications';
 import { ErrorResponse } from '../../models';
-import { promises } from 'dns';
+import { sendEmail } from '../../utils/nodemailer';
 
 export class AccountService {
   static async getAllEmployees({
@@ -23,27 +23,54 @@ export class AccountService {
     first_name,
     last_name, 
     gender,
-    job_position,
-    employment_status,
+    job_position_name,
+    employment_status_name,
+    get_all,
+    deleted,
   }: GetEmployeeRequest): Promise<GetAllEmployeeResponse> {
-    console.log(hasResigned);
+    const findJobPositionId = await prisma.jobPosition.findMany({
+      where: {
+        name: {contains: job_position_name, mode: 'insensitive'},
+      },
+    });
+
+    const findEmploymentStatusId = await prisma.employmentStatus.findMany({
+      where: {
+        name: {contains: employment_status_name, mode: 'insensitive'},
+      },
+    });
+
+    if(get_all === 'true'){
+      const findEmployee = await prisma.employee.findMany({
+        where: {
+          company_branch_id: company_branch_id,
+        },
+      });
+
+      return findEmployee;
+    }
+
+    if(deleted === 'true'){
+      const findEmployee = await prisma.employee.findMany({
+        where: {
+          NOT: {delete_at: null},
+        },
+      });
+      return findEmployee;
+    }
+    
     const findEmployee = await prisma.employee.findMany({
       where: {
-        first_name: first_name,
-        last_name: last_name,
+        first_name: first_name ? { contains: first_name, mode: "insensitive" } : undefined,
+        last_name: last_name ? { contains: last_name, mode: "insensitive"} : undefined,
         gender: gender,
         company_branch_id: company_branch_id,
         hasResigned: hasResigned === 'true' ? true : false,
+        job_position_id: {in: findJobPositionId.map((jobPosition) => jobPosition.job_position_id)},
+        employment_status_id: {in: findEmploymentStatusId.map((employmentStatus) => employmentStatus.employment_status_id)},
       },
     })
-    if(findEmployee[0] == undefined){
-      throw new ErrorResponse(
-        'Employee not found',
-        404,
-        ['employee'],
-        'EMPLOYEE_NOT_FOUND'
-      );
-    }
+
     return findEmployee;
   }
 
@@ -53,39 +80,119 @@ export class AccountService {
   }: {company_branch_id: string, employee_id: string}) {
     const findEmployee = await prisma.employee.findUnique({
       where: {
+        delete_at: null,
         company_branch_id: company_branch_id,
         employee_id: employee_id,
       },
     });
 
-    if (!findEmployee) {
-      throw new ErrorResponse(
-        'Employee not found',
-        404,
-        ['employee_id'],
-        'EMPLOYEE_NOT_FOUND'
-      );
-    }
-
     return findEmployee;
   }
 
+  static async createAccountEmployeeAndNotifyEmployees(
+    employee: {
+      employee_id: string,
+      company_branch_id: string,
+      password: string,
+    }
+  ) {
+    const findEmployee = await AccountService.searchEmployee(employee);
+    const findBranchName = await prisma.companyBranches.findUnique({
+      where: {
+        company_branch_id: findEmployee?.company_branch_id,
+      },
+      select: {
+        hq_initial: true,
+      }
+    });
+    const mailOptions = {
+      from: `Meraih <${process.env.EMAIL}>`, // sender address
+      to: "twin.panda999@gmail.com",//findEmployee?.email, // list of receivers
+      subject: 'Account Created', // Subject line
+      html: `<p>Account has been created for ${findEmployee?.first_name} ${findEmployee?.last_name} In company ${findBranchName?.hq_initial} and this is the password ${employee.password}</p>`, // html body
+    };
+
+    sendEmail(mailOptions);
+  }
+
   static async createEmployee(
-    employeeData: CreateRequest
+    {
+      company_branch_id,
+      job_position_id,
+      employment_status_id,
+      first_name,
+      last_name,
+      email,
+      password,
+      phone_number,
+      place_of_birth,
+      birth_date,       
+      marital_status,
+      blood_type,
+      religion,
+      identity_type,
+      identity_number,
+      identity_expired_date,       
+      postcal_code,
+      citizen_id_address,
+      residential_address,
+      bank_account_number,
+      bank_type,
+      wage,
+      gender,
+      join_date
+    }: CreateRequest
   ): Promise<CreateResponse> {
-    employeeData.identity_expired_date = new Date(
-      employeeData.identity_expired_date
-    );
-    employeeData.birth_date = new Date(employeeData.birth_date);
-    employeeData.join_date = new Date(employeeData.join_date);
+    if(identity_expired_date !== undefined){
+      identity_expired_date = new Date(
+        identity_expired_date
+      );
+    }
+    if(birth_date !== undefined){
+      birth_date = new Date(birth_date);
+    }
+    if (join_date !== undefined){
+      join_date = new Date(join_date);}
+    else{
+      join_date = new Date();
+    }
 
     const request = Validation.validate(
       AccountValidation.CREATE_EMPLOYEE,
-      employeeData
+      { 
+        company_branch_id,
+        job_position_id,
+        employment_status_id,
+        first_name,
+        last_name,
+        email,
+        password,
+        phone_number,
+        place_of_birth,
+        birth_date,       
+        marital_status,
+        blood_type,
+        religion,
+        identity_type,
+        identity_number,
+        identity_expired_date,       
+        postcal_code,
+        citizen_id_address,
+        residential_address,
+        bank_account_number,
+        bank_type,
+        wage,
+        gender,
+        join_date
+      }
     );
 
     const countEmailEmployee = await prisma.employee.count({
-      where: { email: request.email },
+      where: { 
+        company_branch_id: request.company_branch_id, 
+        email: request.email,
+        delete_at: null
+      },
     });
 
     if (countEmailEmployee > 0) {
@@ -97,6 +204,38 @@ export class AccountService {
       );
     }
 
+    const job_position = await prisma.jobPosition.findUnique({
+      where: {
+        job_position_id: request.job_position_id,
+        company_branch_id: request.company_branch_id,
+      },
+    });
+
+    if (!job_position) {
+      throw new ErrorResponse(
+        'Job position not found',
+        404,
+        ['job_position_id'],
+        'JOB_POSITION_NOT_FOUND'
+      );
+    }
+
+    const employment_status = await prisma.employmentStatus.findUnique({
+      where: {
+        employment_status_id: request.employment_status_id,
+        company_branch_id: request.company_branch_id,
+      },
+    });
+
+    if (!employment_status) {
+      throw new ErrorResponse(
+        'Employment status not found',
+        404,
+        ['employment_status_id'],
+        'EMPLOYMENT_STATUS_NOT_FOUND'
+      );
+    }
+    
     const hashedPassword = hashPassword(request.password);
 
     const newEmployee = await prisma.employee.create({
@@ -126,6 +265,12 @@ export class AccountService {
         gender: request.gender,
         join_date: request.join_date,
       },
+    });
+
+    await AccountService.createAccountEmployeeAndNotifyEmployees({
+      employee_id: newEmployee.employee_id,
+      company_branch_id: newEmployee.company_branch_id,
+      password: request.password,
     });
 
     return {
@@ -167,7 +312,7 @@ export class AccountService {
 
     const employeeUpdate = await prisma.employee.update({
       where: {
-        company_branch_id: request.company_branch_id, // pake user local?
+        company_branch_id: request.company_branch_id,
         employee_id: request.employee_id,
       },
       data: { ...request },
@@ -180,7 +325,54 @@ export class AccountService {
     };
   }
 
-  static async deleteEmployee(data: DeleteRequest): Promise<DeleteResponse> {
+  static async softDeleteEmployee(data: DeleteRequest): Promise<DeleteResponse> {
+    const request = Validation.validate(
+      AccountValidation.DELETE_EMPLOYEE,
+      data
+    );
+
+    const findEmployee = await prisma.employee.findUnique({
+      where: {
+        company_branch_id: request.company_branch_id,
+        employee_id: request.employee_id,
+      },
+    });
+
+    if (!findEmployee) {
+      throw new ErrorResponse(
+        'Employee not found',
+        404,
+        ['employee_id'],
+        'EMPLOYEE_NOT_FOUND'
+      );
+    } else if (findEmployee.delete_at !== null) {
+      throw new ErrorResponse(
+        'Employee already deleted',
+        400,
+        ['employee_id'],
+        'EMPLOYEE_ALREADY_DELETED'
+      );
+    }
+
+    const employeeDelete = await prisma.employee.update({
+      where: {
+        company_branch_id: request.company_branch_id,
+        employee_id: request.employee_id,
+      },
+      data: {
+        hasResigned: true,
+        delete_at: new Date(),
+      },
+    });
+
+    return {
+      employee_id: employeeDelete.employee_id,
+      first_name: employeeDelete.first_name,
+      last_name: employeeDelete.last_name,
+    };
+  }
+
+  static async deleteEmployeeFromDatabase(data: DeleteRequest): Promise<DeleteResponse> {
     const request = Validation.validate(
       AccountValidation.DELETE_EMPLOYEE,
       data
@@ -209,43 +401,12 @@ export class AccountService {
       },
     });
 
-    return employeeDelete;
+    return {
+      employee_id: employeeDelete.employee_id,
+      first_name: employeeDelete.first_name,
+      last_name: employeeDelete.last_name,
+    };
   }
-
-  // static async softDeleteEmployee({
-  //   employee_id,
-  //   company_branch_id,
-  // }: DeleteRequest) {
-  //   const deleteDate = new Date();
-  //   const findEmployee = await prisma.employee.findUnique({
-  //     where: {
-  //       company_branch_id,
-  //       employee_id,
-  //     },
-  //   });
-
-  //   if (!findEmployee) {
-  //     throw new ErrorResponse(
-  //       "Employee not found",
-  //       404,
-  //       ["employee_id"],
-  //       "EMPLOYEE_NOT_FOUND"
-  //     );
-  //   }
-
-  //   const employeeDelete = await prisma.employee.update({
-  //     where: {
-  //       company_branch_id,
-  //       employee_id,
-  //     },
-  //     data: {
-  //       delete_at: deleteDate,
-  //     },
-  //   });
-
-  //   return employeeDelete;
-  // }
-
   static async employeeResign({
     employee_id,
     company_branch_id,
@@ -266,16 +427,37 @@ export class AccountService {
       );
     }
 
+    var status_resign = findEmployee.hasResigned;
+    var resign_date = findEmployee.resign_date;
+
+    if(status_resign === false){
+      status_resign = true;
+    } else {
+      status_resign = false;
+    }
+
+    if(resign_date === null){
+      resign_date = new Date();
+    } else {
+      resign_date = null;
+    }
+
     const employeeResign = await prisma.employee.update({
       where: {
         company_branch_id,
         employee_id,
       },
       data: {
-        hasResigned: true,
+        hasResigned: status_resign,
+        resign_date: resign_date,
       },
     });
 
-    return employeeResign;
+    return {
+      employee_id: employeeResign.employee_id,
+      first_name: employeeResign.first_name,
+      last_name: employeeResign.last_name,
+      hasResigned: employeeResign.hasResigned,
+    };
   }
 }

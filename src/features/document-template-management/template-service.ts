@@ -7,12 +7,38 @@ import { addNewTemplateDocumentRequest } from "./template-model";
 import { TemplateValidation } from "./template-validation";
 
 export class TemplateService {
-  static async getAllTemplateDocuments(company_branch_id: string) {
-    const templates = await prisma.companyFile.findMany({
+  static async getAllTemplateDocuments(
+    company_branch_id: string,
+    desc?: string
+  ) {
+    const templates = await prisma.companyFileTemplate.findMany({
       where: {
         company_id: company_branch_id,
+        description: desc
+          ? {
+              contains: desc,
+              mode: "insensitive",
+            }
+          : undefined,
       },
-    });
+      include: {
+        company_file: true,
+      },
+    })
+    // const templates = await prisma.companyFile.findMany({
+    //   where: {
+    //     company_id: company_branch_id,
+    //     description: desc
+    //       ? {
+    //           contains: desc,
+    //           mode: "insensitive",
+    //         }
+    //       : undefined,
+    //   },
+    //   include: {
+    //     company_file_template: true,
+    //   },
+    // });
 
     return templates;
   }
@@ -48,6 +74,9 @@ export class TemplateService {
           },
         },
       },
+      include: {
+        company_file_template: true,
+      }
     });
 
     return template;
@@ -57,14 +86,17 @@ export class TemplateService {
     company_id: string,
     template_document_id: number
   ) {
-    const template = await prisma.companyFile.findFirst({
+    const template = await prisma.companyFileTemplate.findFirst({
       where: {
         company_id,
-        company_file_id: template_document_id,
+        company_file_template_id: template_document_id,
       },
+      include: {
+        company_file: true,
+      }
     });
 
-    if (!template) {
+    if (!template || !template.company_file) {
       throw new ErrorResponse(
         "Template document not found",
         404,
@@ -73,7 +105,7 @@ export class TemplateService {
       );
     }
 
-    await deleteFile(template.file_url);
+    await deleteFile(template.company_file.file_url);
 
     await prisma.companyFileTemplate.delete({
       where: {
@@ -85,7 +117,7 @@ export class TemplateService {
     await prisma.companyFile.delete({
       where: {
         company_id,
-        company_file_id: template_document_id,
+        company_file_id: template.company_file_id,
       },
     });
 

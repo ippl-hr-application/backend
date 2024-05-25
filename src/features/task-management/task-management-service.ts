@@ -1,27 +1,38 @@
-import { EmployeeTask } from "@prisma/client";
+import { Employee, EmployeeTask } from "@prisma/client";
 import { prisma } from "../../applications";
 import { Validation } from "../../validations";
 import {
   CreateTaskRequest,
   GetTaskEmployeeRequest,
+  GetTaskEmployeeResponse,
   UpdateTaskRequest,
 } from "./task-management-model";
 import { TaskManagementValidation } from "./task-management-validation";
 import { ErrorResponse } from "../../models";
+import { GetTaskTemplateResponse } from "aws-sdk/clients/connect";
 
 export class TaskManagementService {
   static async getTaskManagementFromCompany({
     company_branch_id,
     start_date,
     end_date,
+    title,
   }: {
     company_branch_id: string;
-    [key: string]: string;
+    start_date: string;
+    end_date: string;
+    title?: string;
   }): Promise<EmployeeTask[]> {
-    console.log(start_date, end_date);
+    console.log(title);
     const tasks = await prisma.employeeTask.findMany({
       where: {
         company_branch_id,
+        title: title
+          ? {
+              contains: title,
+              mode: "insensitive",
+            }
+          : undefined,
         end_date: {
           lte: end_date ? new Date(end_date) : undefined,
         },
@@ -35,38 +46,102 @@ export class TaskManagementService {
   }
 
   static async addTaskManagement(
+    company_branch_id: string,
     data: CreateTaskRequest,
-    from: string
+    employee_id: string,
+    owner_id: string
   ): Promise<Number> {
     const request: CreateTaskRequest = Validation.validate(
       TaskManagementValidation.CREATE_TASK,
       data
     );
+    let userGive: Employee | null;
 
-    const userGive = await prisma.employee.findFirst({
-      where: {
-        employee_id: from,
-      },
-    });
+    if (owner_id) {
+      userGive = await prisma.employee.findFirst({
+        where: {
+          company_branch_id,
+          employee_id: owner_id,
+        },
+      });
+
+      if (!userGive) {
+        userGive = await prisma.employee.findFirst({
+          where: {
+            company_branch_id,
+            job_position: {
+              name: "Owner",
+            },
+          },
+        });
+      }
+    } else {
+      userGive = await prisma.employee.findFirst({
+        where: {
+          company_branch_id,
+          employee_id,
+        },
+      });
+    }
 
     if (!userGive)
-      throw new ErrorResponse("Invalid Unique ID", 400, ["from", "unique_id"]);
+      throw new ErrorResponse("Invalid Unique ID", 400, ["from", "token"]);
 
-    const task = await prisma.employeeTask.createMany({
-      data: request.employee_id.map((employee_id) => ({
-        company_branch_id: request.company_branch_id,
-        employee_id,
-        title: request.title,
-        description: request.description,
-        start_date: new Date(request.start_date),
-        end_date: new Date(request.end_date),
-        given_by_id: from,
-      })),
-    });
+    if (request.all_assignes) {
+      const employees = await prisma.employee.findMany({
+        where: {
+          company_branch_id,
+        },
+        select: {
+          employee_id: true,
+        },
+      });
 
-    console.log(task.count);
+      const task = await prisma.employeeTask.createMany({
+        data: employees.map((employee) => ({
+          company_branch_id,
+          employee_id: employee.employee_id,
+          title: request.title,
+          description: request.description,
+          start_date: new Date(request.start_date),
+          end_date: new Date(request.end_date),
+          given_by_id: userGive!.employee_id,
+        })),
+      });
 
-    return task.count;
+      return task.count;
+    } else if (request.employee_id) {
+      const allEmployees = await prisma.employee.findMany({
+        where: {
+          company_branch_id,
+          employee_id: {
+            in: request.employee_id,
+          },
+        },
+        select: {
+          employee_id: true,
+        },
+      });
+
+      if (allEmployees.length !== request.employee_id.length)
+        throw new ErrorResponse("Invalid Employee ID", 400, ["employee_id"]);
+
+      const task = await prisma.employeeTask.createMany({
+        data: request.employee_id.map((employee_id) => ({
+          company_branch_id,
+          employee_id,
+          title: request.title,
+          description: request.description,
+          start_date: new Date(request.start_date),
+          end_date: new Date(request.end_date),
+          given_by_id: userGive!.employee_id,
+        })),
+      });
+
+      return task.count;
+    } else {
+      throw new ErrorResponse("Please fill one out of two options (all_assignes, employee_id)", 400, ["employee_id"]);
+    }
   }
 
   static async updateTaskManagement(
@@ -86,7 +161,11 @@ export class TaskManagementService {
 
     const task = await prisma.employeeTask.update({
       where: { task_id, company_branch_id },
-      data: request,
+      data: {
+        ...request,
+        start_date: new Date(request.start_date),
+        end_date: new Date(request.end_date),
+      },
     });
 
     return task;
@@ -96,6 +175,13 @@ export class TaskManagementService {
     task_id: number,
     company_branch_id: string
   ): Promise<EmployeeTask> {
+    const isTaskExist = await prisma.employeeTask.findUnique({
+      where: { task_id, company_branch_id },
+    });
+
+    if (!isTaskExist)
+      throw new ErrorResponse("Task not found", 404, ["task_id"]);
+
     const task = await prisma.employeeTask.delete({
       where: { task_id, company_branch_id },
     });
@@ -106,7 +192,7 @@ export class TaskManagementService {
     employee_id,
     start_date,
     end_date,
-  }: GetTaskEmployeeRequest): Promise<EmployeeTask[]> {
+  }: GetTaskEmployeeRequest): Promise<GetTaskEmployeeResponse[]> {
     const tasks = await prisma.employeeTask.findMany({
       where: {
         employee_id,
@@ -115,6 +201,25 @@ export class TaskManagementService {
         },
         start_date: {
           gte: start_date ? new Date(start_date) : undefined,
+        },
+      },
+      select: {
+        task_id: true,
+        title: true,
+        description: true,
+        start_date: true,
+        end_date: true,
+        given_by: {
+          select: {
+            employee_id: true,
+            first_name: true,
+            last_name: true,
+            job_position: {
+              select: {
+                name: true,
+              },
+            },
+          },
         },
       },
     });

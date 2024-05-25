@@ -11,8 +11,11 @@ import {
   RegisterRequest,
   RegisteredUserWithoutPassword,
   CurrentEmployeeLoggedInUserResponse,
+  ChangePasswordRequest,
 } from "./auth-model";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { sendEmail } from "../../utils/nodemailer";
 
 export class AuthService {
   static async login({
@@ -88,9 +91,21 @@ export class AuthService {
       where: {
         employee_id: request.employee_id,
       },
-      include: {
-        job_position: true,
-      }
+      select: {
+        employee_id: true,
+        company_branch_id: true,
+        company_branch: {
+          select: {
+            company_id: true,
+          },
+        },
+        password: true,
+        job_position: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
 
     if (!employee) {
@@ -117,6 +132,82 @@ export class AuthService {
         employee_id: employee.employee_id,
         company_branch_id: employee.company_branch_id,
         position: employee.job_position.name,
+        company_id: employee.company_branch.company_id,
+      },
+      process.env.JWT_SECRET!,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    return {
+      token,
+    };
+  }
+
+  static async employeeManagerLogin({
+    employee_id,
+    password,
+  }: LoginEmployeeRequest): Promise<LoginResponse> {
+    const request = Validation.validate(AuthValidation.EMPLOYEE_LOGIN, {
+      employee_id,
+      password,
+    });
+
+    const employee = await prisma.employee.findFirst({
+      where: {
+        employee_id: request.employee_id,
+      },
+      select: {
+        employee_id: true,
+        company_branch_id: true,
+        company_branch: {
+          select: {
+            company_id: true,
+          },
+        },
+        password: true,
+        job_position: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!employee) {
+      throw new ErrorResponse("Invalid unique id or password", 400, [
+        "unique_id",
+        "password",
+      ]);
+    }
+
+    if (employee.job_position.name !== "Manager") {
+      throw new ErrorResponse(
+        "You are not authorized to access this route",
+        403,
+        ["unique_id"]
+      );
+    }
+
+    const isPasswordValid: boolean = comparePassword(
+      request.password,
+      employee.password
+    );
+
+    if (!isPasswordValid) {
+      throw new ErrorResponse("Invalid unique id or password", 400, [
+        "unique_id",
+        "password",
+      ]);
+    }
+
+    const token = jwt.sign(
+      {
+        employee_id: employee.employee_id,
+        company_branch_id: employee.company_branch_id,
+        position: employee.job_position.name,
+        company_id: employee.company_branch.company_id,
       },
       process.env.JWT_SECRET!,
       {
@@ -204,18 +295,27 @@ export class AuthService {
           ],
         },
       },
+      include: {
+        job_positions: true,
+        employment_statuses: true,
+      },
     });
 
     const user_employee_account = await prisma.employee.create({
       data: {
+        employee_id: user.user_id,
         company_branch_id: companyBranch.company_branch_id,
         email: request.email,
         password: hashedPassword,
         first_name: (request.full_name as string).split(" ")[0],
         last_name: (request.full_name as string).split(" ")[1] || "",
         phone_number: request.phone_number,
-        job_position_id: 1,
-        employment_status_id: 1,
+        job_position_id: companyBranch.job_positions.find(
+          (job) => job.name === "Owner"
+        )!.job_position_id,
+        employment_status_id: companyBranch.employment_statuses.find(
+          (status) => status.name === "Permanent"
+        )!.employment_status_id,
         birth_date: new Date(),
         marital_status: "",
         blood_type: "",
@@ -231,9 +331,85 @@ export class AuthService {
         residential_address: "",
         wage: 0,
       },
-    })
+    });
 
     return user;
+  }
+
+  static async changePasswordOwner(
+    userId: string,
+    data: ChangePasswordRequest
+  ): Promise<void> {
+    const request = Validation.validate(AuthValidation.CHANGE_PASSWORD, data);
+
+    const user = await prisma.registeredUser.findUnique({
+      where: { user_id: userId },
+      include: {
+        company: true,
+      },
+    });
+
+    if (!user) {
+      throw new ErrorResponse(
+        "User not found",
+        404,
+        ["user_id"],
+        "USER_NOT_FOUND"
+      );
+    }
+
+    if (!comparePassword(request.old_password, user.password)) {
+      throw new ErrorResponse("Old password is incorrect", 400, ["old_password"]);
+    }
+
+    if (request.password !== request.confirm_password) {
+      throw new ErrorResponse(
+        "Password and confirm password does not match",
+        400,
+        ["password", "confirm_password"]
+      );
+    }
+
+    await prisma.registeredUser.update({
+      where: { user_id: userId },
+      data: {
+        password: hashPassword(request.password),
+      },
+    });
+  }
+
+  static async changePasswordEmployee(
+    employee_id: string,
+    data: ChangePasswordRequest
+  ): Promise<void> {
+    const request = Validation.validate(AuthValidation.CHANGE_PASSWORD, data);
+
+    const employee = await prisma.employee.findUnique({
+      where: { employee_id },
+    });
+
+    if (!employee) {
+      throw new ErrorResponse("Employee not found", 404, ["employee_id"]);
+    }
+
+    if (!comparePassword(request.old_password, employee.password)) {
+      throw new ErrorResponse("Old password is incorrect", 400, ["old_password"]);
+    }    
+
+    if (request.password !== request.confirm_password) {
+      throw new ErrorResponse(
+        "Password and confirm password does not match",
+        400,
+        ["password", "confirm_password"]
+      );
+    }
+
+    await prisma.employee.update({
+      where: { employee_id },
+      data: {
+        password: hashPassword(request.password),
+      },
+    });
   }
 
   static async getCurrentLoggedInUser(
@@ -303,14 +479,31 @@ export class AuthService {
     return user;
   }
 
-  static async resetPassword(email: string, newPassword: string) {
+  static async resetPassword(
+    token: string,
+    email: string,
+    newPassword: string
+  ) {
     const request = Validation.validate(AuthValidation.RESET_PASSWORD, {
+      token,
       email,
       newPassword,
     });
 
+    const resetToken = await prisma.resetPasswordToken.findUnique({
+      where: { token: request.token, email: request.email },
+    });
+
+    if (
+      !resetToken ||
+      resetToken.expired_at < new Date() ||
+      resetToken.is_used
+    ) {
+      throw new ErrorResponse("Token is invalid", 404, ["token"]);
+    }
+
     const user = await prisma.registeredUser.findUnique({
-      where: { email: request.email },
+      where: { email: resetToken.email },
     });
 
     if (!user) {
@@ -325,28 +518,125 @@ export class AuthService {
     const hashedPassword = hashPassword(request.newPassword);
 
     await prisma.registeredUser.update({
-      where: { email: request.email },
+      where: { email: resetToken.email },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    await prisma.resetPasswordToken.update({
+      where: { token },
+      data: {
+        is_used: true,
+      },
+    });
+
+    await prisma.employee.update({
+      where: { employee_id: user.user_id },
       data: {
         password: hashedPassword,
       },
     });
   }
 
-  static async employeeResetPassword(uniqueId: string, newPassword: string) {
+  static async ownerForgotPassword(email: string) {
+    const user = await prisma.registeredUser.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new ErrorResponse("Email is not registered in the system", 404, [
+        "email",
+      ]);
+    }
+
+    const token = crypto.randomBytes(16).toString("hex");
+    const expiredAt = new Date(new Date().getTime() + 5 * 60000);
+
+    await prisma.resetPasswordToken.create({
+      data: {
+        token,
+        email,
+        user_id: user.user_id,
+        expired_at: expiredAt,
+      },
+    });
+
+    sendEmail({
+      from: process.env.EMAIL,
+      to: email,
+      subject: "Reset Password",
+      text: `Click this link to reset your password: ${
+        process.env.BASE_URL || "http://localhost:3000"
+      }/verify-sandi?token=${token}&email=${email} \n\n This link will be expired in 5 minutes.`,
+    });
+  }
+
+  static async employeeForgotPassword(employee_id: string) {
+    const employee = await prisma.employee.findUnique({
+      where: { employee_id },
+    });
+
+    if (!employee) {
+      throw new ErrorResponse("Employee not found", 404, ["employee_id"]);
+    }
+
+    const token = crypto.randomBytes(16).toString("hex");
+    const expiredAt = new Date(new Date().getTime() + 5 * 60000);
+
+    await prisma.resetPasswordToken.create({
+      data: {
+        token,
+        user_id: employee_id,
+        email: employee.email,
+        expired_at: expiredAt,
+      },
+    });
+
+    sendEmail({
+      from: process.env.EMAIL,
+      to: employee.email,
+      subject: "Reset Password",
+      text: `Click this link to reset your password: ${
+        process.env.BASE_URL || "http://localhost:3000"
+      }/verify-sandi?token=${token}&email=${
+        employee.email
+      } \n\n This link will be expired in 5 minutes.`,
+    });
+  }
+
+  static async employeeResetPassword(
+    token: string,
+    email: string,
+    newPassword: string
+  ) {
     const request = Validation.validate(AuthValidation.RESET_PASSWORD, {
-      email: uniqueId,
+      token,
+      email,
       newPassword,
     });
 
-    const employee = await prisma.employee.findFirst({
-      where: { email: request.email },
+    const resetToken = await prisma.resetPasswordToken.findUnique({
+      where: { token: request.token, email: request.email },
+    });
+
+    if (
+      !resetToken ||
+      resetToken.expired_at < new Date() ||
+      resetToken.is_used
+    ) {
+      throw new ErrorResponse("Token is invalid", 404, ["token"]);
+    }
+
+    const employee = await prisma.employee.findUnique({
+      where: { employee_id: resetToken.user_id! },
     });
 
     if (!employee) {
       throw new ErrorResponse(
         "Employee not found",
         404,
-        ["uniqueId"],
+        ["email"],
         "EMPLOYEE_NOT_FOUND"
       );
     }
@@ -354,9 +644,16 @@ export class AuthService {
     const hashedPassword = hashPassword(request.newPassword);
 
     await prisma.employee.update({
-      where: { email: request.email },
+      where: { employee_id: resetToken.user_id! },
       data: {
         password: hashedPassword,
+      },
+    });
+
+    await prisma.resetPasswordToken.update({
+      where: { token },
+      data: {
+        is_used: true,
       },
     });
   }

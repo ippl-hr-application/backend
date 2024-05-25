@@ -14,13 +14,14 @@ import { attendanceRoute } from "./features/attendance";
 import { jobPositionRoute } from "./features/job-position";
 import { employmentRoute } from "./features/employment-status";
 import { documentRoute } from "./features/document-management";
-import { companyBranchRoute } from "./features/company-branch";
+import { companyRoute } from "./company-management/";
 import { imagekit } from "./utils/image-kit";
 import { announcementRoute } from "./features/announcement";
 import { payrollRoute } from "./features/payrolls";
 import { meraihRoute } from "./features/meraih-exclusive";
 import cron from "node-cron";
 import { PackageTypeMiddleware } from "./middlewares/package_type_middleware";
+import { attendanceManagementRoute } from "./features/attendance-management";
 
 dotenv.config();
 const app: Express = express();
@@ -41,6 +42,7 @@ app.get("/", (req, res) => {
 app.use("/auth", authRoute);
 app.use("/attendance", attendanceRoute);
 app.use("/submission", submissionRoute);
+app.use("/attendance-management", attendanceManagementRoute);
 app.use("/shift", shiftRoute);
 app.use("/profile", profileRoute);
 app.use("/account", accountRoute);
@@ -48,7 +50,7 @@ app.use("/task-management", taskManagementRoute);
 app.use("/job-position", jobPositionRoute);
 app.use("/employment-status", employmentRoute);
 app.use("/doc", documentRoute);
-app.use("/company-branch", companyBranchRoute);
+app.use("/company", companyRoute);
 app.get("/auth-imagekit", function (req, res) {
   const result = imagekit.getAuthenticationParameters();
   res.send(result);

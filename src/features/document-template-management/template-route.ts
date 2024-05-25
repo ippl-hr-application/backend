@@ -2,31 +2,33 @@ import { Router } from "express";
 import { JWTMiddleware } from "../../middlewares/jwt_middleware";
 import { TemplateController } from "./template-controller";
 import { upload } from "../../middlewares/multer";
+import { CompanyMiddleware } from "../../middlewares/company_middleware";
 
 const templateRoute: Router = Router();
 
-templateRoute.get("/", [
+templateRoute.get("/:company_branch_id", [
   JWTMiddleware.verifyToken,
+  CompanyMiddleware.isCompanyBranchBelongsToCompany,
   TemplateController.getAllTemplateDocuments,
 ])
 
-templateRoute.post("/", [
+templateRoute.post("/:company_branch_id", [
   JWTMiddleware.verifyToken,
-  JWTMiddleware.employeeOnly,
+  CompanyMiddleware.isCompanyBranchBelongsToCompany,
   upload.single("template_file"),
   TemplateController.addNewTemplateDocument,
 ])
 
-templateRoute.post("/:template_id", [
+templateRoute.post("/:company_branch_id/:template_id", [
   JWTMiddleware.verifyToken,
-  JWTMiddleware.employeeOnly,
+  CompanyMiddleware.isCompanyBranchBelongsToCompany,
   upload.single("template_file"),
   TemplateController.updateTemplateDocument,
 ])
 
-templateRoute.delete("/:template_id", [
+templateRoute.delete("/:company_branch_id/:template_id", [
   JWTMiddleware.verifyToken,
-  JWTMiddleware.employeeOnly,
+  CompanyMiddleware.isCompanyBranchBelongsToCompany,
   TemplateController.deleteTemplateDocument,
 ])
 

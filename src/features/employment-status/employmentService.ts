@@ -7,6 +7,8 @@ import {
   CreateEmploymentStatusResponse,
   UpdateEmploymentStatusRequest,
   UpdateEmploymentStatusResponse,
+  DeleteEmploymentStatusRequest,
+  DeleteEmploymentStatusResponse,
 } from './employmentModel';
 import { prisma } from '../../applications';
 import { ErrorResponse } from '../../models';
@@ -81,6 +83,20 @@ export class EmploymentStatusService {
       },
       data: {
         name: validatedRequest.name,
+      },
+    });
+
+    return employmentStatus;
+  }
+
+  static async deleteEmploymentStatus({
+    company_branch_id,
+    employment_status_id,
+  }: DeleteEmploymentStatusRequest): Promise<DeleteEmploymentStatusResponse> {
+    const employmentStatus = await prisma.employmentStatus.delete({
+      where: {
+        employment_status_id: employment_status_id,
+        company_branch_id: company_branch_id,
       },
     });
 

@@ -50,6 +50,7 @@ export class SubmissionController {
       });
       return res.status(201).json({
         success: true,
+
         data: {
           ...result,
         },
@@ -109,6 +110,7 @@ export class SubmissionController {
       });
       return res.status(201).json({
         success: true,
+
         data: {
           ...result,
         },
@@ -136,6 +138,7 @@ export class SubmissionController {
       });
       return res.status(201).json({
         success: true,
+
         data: {
           result,
         },
@@ -152,15 +155,18 @@ export class SubmissionController {
   ) {
     try {
       const { employee_id } = res.locals.user;
-      const { year, status } = req.query;
+      const { year, month, status } = req.query;
       const result = await SubmissionService.getSubmissionHistory({
         employee_id,
-        year: Number(year),
+        year: year as string,
+        month: month as string,
         status: status as SubmissionStatus,
       });
       return res.status(200).json({
         success: true,
+
         data: result,
+        message: "Get Submission History Success",
       });
     } catch (error) {
       next(error);
@@ -223,7 +229,7 @@ export class SubmissionController {
         reason,
         employee_id,
         attendance_submission_file,
-        attendance_id,
+        attendance_id: Number(attendance_id),
       });
       return res.status(201).json({
         success: true,

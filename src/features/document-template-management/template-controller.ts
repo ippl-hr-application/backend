@@ -9,10 +9,12 @@ export class TemplateController {
     next: NextFunction
   ) {
     try {
-      const { company_branch_id } = res.locals.user as EmployeeToken;
+      const { company_branch_id } = req.params;
+      const { desc } = req.query;
 
       const templates = await TemplateService.getAllTemplateDocuments(
-        company_branch_id
+        company_branch_id,
+        desc as string
       );
 
       return res.status(200).json({
@@ -31,7 +33,7 @@ export class TemplateController {
     next: NextFunction
   ) {
     try {
-      const { company_branch_id } = res.locals.user as EmployeeToken;
+      const { company_branch_id } = req.params;
       const { description } = req.body;
       const document = req.file as Express.Multer.File;
 
@@ -56,7 +58,7 @@ export class TemplateController {
     next: NextFunction
   ) {
     try {
-      const { company_branch_id } = res.locals.user as EmployeeToken;
+      const { company_branch_id } = req.params;
       const { template_id } = req.params;
 
       const template = await TemplateService.deleteTemplateDocument(
@@ -80,8 +82,7 @@ export class TemplateController {
     next: NextFunction
   ) {
     try {
-      const { company_branch_id } = res.locals.user as UserToken;
-      const { template_id } = req.params;
+      const { company_branch_id, template_id } = req.params;
       const { description } = req.body;
       const document = req.file as Express.Multer.File;
 

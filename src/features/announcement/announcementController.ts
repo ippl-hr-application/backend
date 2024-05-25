@@ -1,15 +1,41 @@
 import { Request, Response, NextFunction } from 'express';
 import { AnnouncementService } from './announcementService';
+import { EmployeeToken } from '../../models';
 
 export class AnnouncementController {
+  // Get announcement company branch by company_branch_id from token employee
   static async getAnnouncementCompany(req: Request, res: Response, next: NextFunction) {
     try {
+      const { company_branch_id } = res.locals.user ;
+      const title = req.query.title as string;
       const announcements = await AnnouncementService.getAnnouncementCompany({
-        company_id: req.params.company_id,
+        company_branch_id,
+        title,
       });
       
       res.status(200).json({
         status: 'success',
+        message: 'Announcement from HQ retrieved successfully',
+        data: announcements,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getAnnouncementCompanyBranch(req: Request, res: Response, next: NextFunction) {
+    try {
+      const company_branch_id_token = res.locals.user.company_branch_id as EmployeeToken;
+      const company_branch_id = String(req.params.company_branch_id || company_branch_id_token);
+      const title = req.query.title as string;
+      const announcements = await AnnouncementService.getAnnouncementCompanyBranch({
+        company_branch_id,
+        title
+      });
+
+      res.status(200).json({
+        status: 'success getAnnouncementCompanyBranch',
+        message: 'Announcement from branch retrieved successfully',
         data: announcements,
       });
     } catch (error) {
@@ -39,20 +65,6 @@ export class AnnouncementController {
     }
   }
 
-  // static async getAnnouncementCompanyBranch(req: Request, res: Response, next: NextFunction) {
-  //   try {
-  //     const announcements = await AnnouncementService.getAnnouncementCompanyBranch({
-  //       company_branch_id: req.params.company_branch_id,
-  //     });
-
-  //     res.status(200).json({
-  //       status: 'success',
-  //       data: announcements,
-  //     });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
 
   static async addAnnouncement(
     req: Request,
@@ -62,7 +74,7 @@ export class AnnouncementController {
     try {
       const { company_id, title, description, company_branch_id } = req.body;
       const file_attachment: Express.Multer.File | undefined = req.file;
-      const announcement = await AnnouncementService.addAnnouncement({
+      const announcement = await AnnouncementService.createAnnouncementAndNotifyEmployees({
         company_id,
         title,
         description,
@@ -103,24 +115,38 @@ export class AnnouncementController {
     }
   }
 
-  static async getAnnouncementByTitle(
+  static async updateAnnouncement(
     req: Request,
     res: Response,
     next: NextFunction
   ) {
     try {
-      const { company_id, title } = req.params;
-      const announcement = await AnnouncementService.getAnnouncementByTitle({
+      const { 
         company_id,
-        title
+        company_announcement_id,
+        title,
+        description,
+        company_branch_id_add,
+        company_branch_id_remove 
+      } = req.body;
+      const file_attachment: Express.Multer.File | undefined = req.file;
+      const announcement = await AnnouncementService.updateAnnouncement({
+        company_id,
+        company_announcement_id: parseInt(company_announcement_id),
+        title,
+        description,
+        file_attachment,
+        company_branch_id_add,
+        company_branch_id_remove,
       });
 
       res.status(200).json({
         status: 'success',
+        message: 'Announcement updated successfully',
         data: announcement,
       });
     } catch (error) {
       next(error);
     }
   }
-}
+};

@@ -60,4 +60,20 @@ export class EmploymentController {
       next(error);
     }
   }
+
+  static async deleteEmploymentStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { employment_status_id, company_branch_id } = req.body;
+      const employmentStatus = await EmploymentStatusService.deleteEmploymentStatus({employment_status_id, company_branch_id});
+      res.status(200).json({
+        success: true,
+        data: {
+          employmentStatus,
+        },
+        message: 'Employment status deleted successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
