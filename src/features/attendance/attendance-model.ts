@@ -29,16 +29,12 @@ export type GetShiftInfoResponse = {
 export type AttendanceCheckInRequest = {
   employee_id: string;
   assign_shift_id: number;
-  long: number;
-  lat: number;
   attendance_file: Express.Multer.File | undefined;
 };
 
 export type AttendanceCheckOutRequest = {
   attendance_id: number;
   employee_id: string;
-  long: number;
-  lat: number;
   attendance_file: Express.Multer.File | undefined;
 };
 export type AttendanceCheckResponse = {
@@ -84,10 +80,10 @@ export type GetHistoryAttendanceRequest = {
 };
 
 export type GetHistoryAttendanceResponse = {
-  attendance_id: number;
+  attendance_id?: number | null;
   date: Date;
   start_time: string;
   end_time: string;
-  check_in_time: string | null;
-  check_out_time: string | null;
+  check_in_time?: string | null;
+  check_out_time?: string | null;
 };

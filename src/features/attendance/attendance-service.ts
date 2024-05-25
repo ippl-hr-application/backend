@@ -51,6 +51,8 @@ export class AttendanceService {
               select: {
                 company_branch_id: true,
                 city: true,
+                latitude: true,
+                longitute: true,
                 company: {
                   select: {
                     name: true,
@@ -91,14 +93,11 @@ export class AttendanceService {
   static async attendanceCheckIn({
     employee_id,
     assign_shift_id,
-    long,
-    lat,
+
     attendance_file,
   }: AttendanceCheckInRequest): Promise<AttendanceCheckResponse> {
     const request = Validation.validate(AttendanceValidation.CHECK_IN, {
       assign_shift_id,
-      long,
-      lat,
     });
     const date = new Date().toISOString();
     const assign_shift = await prisma.assignShift.findUnique({
@@ -155,8 +154,6 @@ export class AttendanceService {
         attendance_check: {
           create: {
             type: "CHECK_IN",
-            long: request.long,
-            lat: request.lat,
             status: "PENDING",
             time: date.substring(11, 19),
             employee_file: {
@@ -189,13 +186,9 @@ export class AttendanceService {
     employee_id,
     attendance_id,
     attendance_file,
-    lat,
-    long,
   }: AttendanceCheckOutRequest): Promise<AttendanceCheckResponse> {
     const request = Validation.validate(AttendanceValidation.CHECK_OUT, {
       attendance_id,
-      lat,
-      long,
     });
     const date = new Date().toISOString();
     const attendance = await prisma.attendance.findUnique({
@@ -249,8 +242,6 @@ export class AttendanceService {
     }
     await prisma.attendanceCheck.create({
       data: {
-        lat: request.lat,
-        long: request.long,
         status: "PENDING",
         time: date.substring(11, 19),
         type: "CHECK_OUT",
@@ -419,11 +410,39 @@ export class AttendanceService {
       },
     });
     if (!attendance) {
-      throw new ErrorResponse("Attendance not found", 404, ["NOT_FOUND"]);
+      const assign_shift = await prisma.assignShift.findFirst({
+        orderBy: [{ assign_shift_id: "desc" }],
+        distinct: ["employee_id"],
+        where: {
+          employee_id,
+        },
+        select: {
+          shift: {
+            select: {
+              start_time: true,
+              end_time: true,
+            },
+          },
+        },
+      });
+      if (!assign_shift) {
+        throw new ErrorResponse(
+          "Assign shift not found",
+          404,
+          ["NOT_FOUND"],
+          "NOT_FOUND"
+        );
+      }
+
+      return {
+        date: request.date,
+        start_time: assign_shift?.shift?.start_time,
+        end_time: assign_shift?.shift?.end_time,
+      };
     }
     return {
       attendance_id: attendance.attendance_id,
-      date: attendance.date,
+      date: request.date,
       start_time: attendance.assign_shift?.shift?.start_time,
       end_time: attendance.assign_shift?.shift?.end_time,
       check_in_time: attendance.attendance_check[0]?.time,

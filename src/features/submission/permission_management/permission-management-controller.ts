@@ -9,9 +9,10 @@ export class PermissionManagementController {
   ) {
     try {
       const { company_branch_id } = req.params;
-
+      const { date } = req.query;
       const result = await PermissionManagementService.getAllByCompanyBranchId(
-        company_branch_id as string
+        company_branch_id as string,
+        new Date(date as string)
       );
       return res.status(200).json({
         success: true,

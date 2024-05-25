@@ -12,12 +12,14 @@ import { ResignManagementValidation } from "./resign-management-validation";
 
 export class ResignManagementService {
   static async getAllByCompanyBranchId(
-    company_branch_id: string
+    company_branch_id: string,
+    date: Date
   ): Promise<GetAllByCompanyBranchIdResponse[]> {
     const request = Validation.validate(
       ResignManagementValidation.GET_ALL_BY_COMPANY_BRANCH_ID,
       {
         company_branch_id,
+        date,
       }
     );
     const resign = await prisma.submission.findMany({
@@ -26,6 +28,7 @@ export class ResignManagementService {
           company_branch_id: request.company_branch_id,
         },
         type: "RESIGN",
+        submission_date: request.date,
       },
       select: {
         submission_id: true,

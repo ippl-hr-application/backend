@@ -18,17 +18,19 @@ export class CompanyBranchValidation {
   });
 
   static readonly EDIT_BRANCH: ZodType = z.object({
-    email: z.string().email().optional().or(z.literal("")),
-    phone_number: z.string().min(10).max(15).optional().or(z.literal("")),
-    address: z.string().min(3).max(100).optional().or(z.literal("")),
-    province: z.string().min(3).max(50).optional().or(z.literal("")),
-    city: z.string().min(3).max(50).optional().or(z.literal("")),
-    size: z.number().int().optional().or(z.literal("")).nullable(),
-    hq_initial: z.string().min(3).max(50).optional().or(z.literal("")),
-    hq_code: z.string().min(3).max(50).optional().or(z.literal("")).nullable(),
-    umr: z.number().int().optional().or(z.literal("")).nullable(),
-    umr_province: z.number().int().optional().or(z.literal("")).nullable(),
-    umr_city: z.number().int().optional().or(z.literal("")).nullable(),
-    bpjs: z.string().min(3).max(50).optional().or(z.literal("")).nullable(),
+    email: z.string().email().optional(),
+    phone_number: z.string().min(10).max(15).optional(),
+    address: z.string().min(3).max(100).optional(),
+    province: z.string().min(3).max(50).optional(),
+    city: z.string().min(3).max(50).optional(),
+    size: z.number().int().optional(),
+    hq_initial: z.string().min(3).max(50).optional(),
+    hq_code: z.string().min(3).max(50).optional(),
+    umr: z.number().int().optional(),
+    umr_province: z.number().int().optional(),
+    umr_city: z.number().int().optional(),
+    bpjs: z.string().min(3).max(50).optional(),
+    longitute: z.number().optional(),
+    latitue: z.number().optional(),
   });
 }
