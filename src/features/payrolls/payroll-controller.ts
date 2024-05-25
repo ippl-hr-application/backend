@@ -30,7 +30,8 @@ export class PayrollController {
     next: NextFunction
   ) {
     try {
-      const { company_branch_id, employee_id } = res.locals
+      const { company_branch_id } = req.params;
+      const { employee_id } = res.locals
         .user as EmployeeToken;
       const { year } = req.query;
 
