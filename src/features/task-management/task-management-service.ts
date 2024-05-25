@@ -10,6 +10,7 @@ import {
 import { TaskManagementValidation } from "./task-management-validation";
 import { ErrorResponse } from "../../models";
 import { GetTaskTemplateResponse } from "aws-sdk/clients/connect";
+import { sendEmail } from "../../utils/nodemailer";
 
 export class TaskManagementService {
   static async getTaskManagementFromCompany({
@@ -142,6 +143,7 @@ export class TaskManagementService {
         },
         select: {
           employee_id: true,
+          email: true,
         },
       });
 
@@ -157,6 +159,14 @@ export class TaskManagementService {
         })),
       });
 
+      const employeeEmails = employees.map((employee) => employee.email);
+      // send email to employees
+      sendEmail({
+        to: employeeEmails,
+        subject: "Task Assigned",
+        text: `You have been assigned a task by ${userGive.first_name} ${userGive.last_name}. Please open your mobile application to see the detail.`,
+      })
+
       return task.count;
     } else if (request.employee_id) {
       const allEmployees = await prisma.employee.findMany({
@@ -170,6 +180,7 @@ export class TaskManagementService {
         },
         select: {
           employee_id: true,
+          email: true,
         },
       });
 
@@ -187,6 +198,15 @@ export class TaskManagementService {
           given_by_id: userGive!.employee_id,
         })),
       });
+
+      const employeeEmails = allEmployees.map((employee) => employee.email);
+
+      // send email to employees
+      sendEmail({
+        to: employeeEmails,
+        subject: "Task Assigned",
+        text: `You have been assigned a task by ${userGive.first_name} ${userGive.last_name}. Please open your mobile application to see the detail.`,
+      })
 
       return task.count;
     } else {
@@ -217,6 +237,23 @@ export class TaskManagementService {
         end_date: new Date(request.end_date),
       },
     });
+
+    const employee = await prisma.employee.findFirst({
+      where: {
+        employee_id: task.employee_id,
+      },
+      select: {
+        email: true,
+      },
+    });
+
+    // send email to employee
+
+    sendEmail({
+      to: employee!.email,
+      subject: "Task Updated",
+      text: `Your task has been updated. Please open your mobile application to see the detail.`,
+    })
 
     return task;
   }

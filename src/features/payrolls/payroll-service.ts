@@ -9,6 +9,8 @@ import {
   UpdatePayrollRequest,
 } from "./payroll-model";
 import { PayrollValidation } from "./payroll-validation";
+import { sendEmail } from "../../utils/nodemailer";
+import { numberToMonthName } from "../../utils/format";
 
 export class PayrollService {
   static async getPayrolls(data: GetPayrollRequest) {
@@ -154,7 +156,16 @@ export class PayrollService {
       data: {
         status,
       },
+      include: {
+        employee: true
+      }
     });
+
+    sendEmail({
+      to: payroll.employee.email,
+      subject: "Payroll Status",
+      text: `Your payroll status in ${numberToMonthName(payroll.month)} has been updated to ${status}`,
+    })
 
     return payroll;
   }
