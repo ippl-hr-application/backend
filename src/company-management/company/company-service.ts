@@ -38,4 +38,21 @@ export class CompanyService {
 
     return updatedCompany;
   }
+
+  static async getCompany(company_id: string): Promise<Company> {
+    const company = await prisma.company.findFirst({
+      where: {
+        company_id,
+      },
+      include: {
+        company_branches: true,
+      }
+    });
+
+    if (!company) {
+      throw new ErrorResponse("Company not found", 404, ["company_id"]);
+    }
+
+    return company;
+  }
 }

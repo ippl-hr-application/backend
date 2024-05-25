@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { AuthService } from "./auth-service";
+import { EmployeeToken, UserToken } from "../../models";
 
 export class AuthController {
   static async login(req: Request, res: Response, next: NextFunction) {
@@ -16,7 +17,11 @@ export class AuthController {
     }
   }
 
-  static async employeeManagerLogin(req: Request, res: Response, next: NextFunction) {
+  static async employeeManagerLogin(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { employee_id, password } = req.body;
       const token = await AuthService.employeeManagerLogin({
@@ -64,6 +69,44 @@ export class AuthController {
     }
   }
 
+  static async changePasswordOwner(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { user_id } = res.locals.user as UserToken;
+      const data = req.body;
+      await AuthService.changePasswordOwner(user_id, data);
+      return res.status(200).json({
+        success: true,
+        data: undefined,
+        message: "Password changed successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async changePasswordEmployee(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { employee_id } = res.locals.user as EmployeeToken;
+      const data = req.body;
+      await AuthService.changePasswordEmployee(employee_id, data);
+      return res.status(200).json({
+        success: true,
+        data: undefined,
+        message: "Password changed successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async getCurrentLoggedInUser(
     _req: Request,
     res: Response,
@@ -86,8 +129,8 @@ export class AuthController {
 
   static async resetPassword(req: Request, res: Response, next: NextFunction) {
     try {
-      const { token, new_password } = req.body;
-      await AuthService.resetPassword(token, new_password);
+      const { token, email, password } = req.body;
+      await AuthService.resetPassword(token, email, password);
       return res.status(200).json({
         success: true,
         message: "Password reset successfully",
@@ -137,8 +180,8 @@ export class AuthController {
     next: NextFunction
   ) {
     try {
-      const { token, new_password } = req.body;
-      await AuthService.employeeResetPassword(token, new_password);
+      const { token, email, password } = req.body;
+      await AuthService.employeeResetPassword(token, email, password);
       return res.status(200).json({
         success: true,
         message: "Password reset successfully",

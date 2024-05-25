@@ -2,11 +2,12 @@ import { EmployeeTask } from "@prisma/client";
 
 export type CreateTaskRequest = {
   company_branch_id: string;
-  employee_id: string[];
+  employee_id?: string[];
   title: string;
   description: string;
   start_date: string;
   end_date: string;
+  all_assignes?: boolean;
 };
 
 export type UpdateTaskRequest = Omit<

@@ -19,4 +19,19 @@ export class CompanyController {
       next(error);
     }
   }
+
+  static async getCompany(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { company_id } = res.locals.user as UserToken;
+      const company = await CompanyService.getCompany(company_id);
+
+      return res.status(200).json({
+        success: true,
+        data: { company },
+        message: "Company retrieved successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

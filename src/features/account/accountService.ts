@@ -14,6 +14,7 @@ import {
 } from './accountModel';
 import { prisma } from '../../applications';
 import { ErrorResponse } from '../../models';
+import { sendEmail } from '../../utils/nodemailer';
 
 export class AccountService {
   static async getAllEmployees({
@@ -25,16 +26,17 @@ export class AccountService {
     job_position_name,
     employment_status_name,
     get_all,
+    deleted,
   }: GetEmployeeRequest): Promise<GetAllEmployeeResponse> {
     const findJobPositionId = await prisma.jobPosition.findMany({
       where: {
-        name: {contains: job_position_name},
+        name: {contains: job_position_name, mode: 'insensitive'},
       },
     });
 
     const findEmploymentStatusId = await prisma.employmentStatus.findMany({
       where: {
-        name: {contains: employment_status_name},
+        name: {contains: employment_status_name, mode: 'insensitive'},
       },
     });
 
@@ -45,20 +47,20 @@ export class AccountService {
         },
       });
 
-      if(findEmployee[0] == undefined){
-        throw new ErrorResponse(
-          'Employee not found',
-          404,
-          ['employee'],
-          'EMPLOYEE_NOT_FOUND'
-        );
-      }
       return findEmployee;
     }
 
+    if(deleted === 'true'){
+      const findEmployee = await prisma.employee.findMany({
+        where: {
+          NOT: {delete_at: null},
+        },
+      });
+      return findEmployee;
+    }
+    
     const findEmployee = await prisma.employee.findMany({
       where: {
-        delete_at: null,
         first_name: first_name ? { contains: first_name, mode: "insensitive" } : undefined,
         last_name: last_name ? { contains: last_name, mode: "insensitive"} : undefined,
         gender: gender,
@@ -69,14 +71,6 @@ export class AccountService {
       },
     })
 
-    if(findEmployee[0] == undefined){
-      throw new ErrorResponse(
-        'Employee not found',
-        404,
-        ['employee'],
-        'EMPLOYEE_NOT_FOUND'
-      );
-    }
     return findEmployee;
   }
 
@@ -92,16 +86,33 @@ export class AccountService {
       },
     });
 
-    if (!findEmployee) {
-      throw new ErrorResponse(
-        'Employee not found',
-        404,
-        ['employee_id'],
-        'EMPLOYEE_NOT_FOUND'
-      );
-    }
-
     return findEmployee;
+  }
+
+  static async createAccountEmployeeAndNotifyEmployees(
+    employee: {
+      employee_id: string,
+      company_branch_id: string,
+      password: string,
+    }
+  ) {
+    const findEmployee = await AccountService.searchEmployee(employee);
+    const findBranchName = await prisma.companyBranches.findUnique({
+      where: {
+        company_branch_id: findEmployee?.company_branch_id,
+      },
+      select: {
+        hq_initial: true,
+      }
+    });
+    const mailOptions = {
+      from: `Meraih <${process.env.EMAIL}>`, // sender address
+      to: "twin.panda999@gmail.com",//findEmployee?.email, // list of receivers
+      subject: 'Account Created', // Subject line
+      html: `<p>Account has been created for ${findEmployee?.first_name} ${findEmployee?.last_name} In company ${findBranchName?.hq_initial} and this is the password ${employee.password}</p>`, // html body
+    };
+
+    sendEmail(mailOptions);
   }
 
   static async createEmployee(
@@ -179,7 +190,8 @@ export class AccountService {
     const countEmailEmployee = await prisma.employee.count({
       where: { 
         company_branch_id: request.company_branch_id, 
-        email: request.email
+        email: request.email,
+        delete_at: null
       },
     });
 
@@ -254,7 +266,13 @@ export class AccountService {
         join_date: request.join_date,
       },
     });
-    console.log(newEmployee)
+
+    await AccountService.createAccountEmployeeAndNotifyEmployees({
+      employee_id: newEmployee.employee_id,
+      company_branch_id: newEmployee.company_branch_id,
+      password: request.password,
+    });
+
     return {
       employee_id: newEmployee.employee_id,
       first_name: request.first_name,
@@ -307,7 +325,7 @@ export class AccountService {
     };
   }
 
-  static async deleteEmployee(data: DeleteRequest): Promise<DeleteResponse> {
+  static async softDeleteEmployee(data: DeleteRequest): Promise<DeleteResponse> {
     const request = Validation.validate(
       AccountValidation.DELETE_EMPLOYEE,
       data
@@ -347,9 +365,48 @@ export class AccountService {
       },
     });
 
-    return employeeDelete;
+    return {
+      employee_id: employeeDelete.employee_id,
+      first_name: employeeDelete.first_name,
+      last_name: employeeDelete.last_name,
+    };
   }
 
+  static async deleteEmployeeFromDatabase(data: DeleteRequest): Promise<DeleteResponse> {
+    const request = Validation.validate(
+      AccountValidation.DELETE_EMPLOYEE,
+      data
+    );
+
+    const findEmployee = await prisma.employee.findUnique({
+      where: {
+        company_branch_id: request.company_branch_id,
+        employee_id: request.employee_id,
+      },
+    });
+
+    if (!findEmployee) {
+      throw new ErrorResponse(
+        'Employee not found',
+        404,
+        ['employee_id'],
+        'EMPLOYEE_NOT_FOUND'
+      );
+    }
+
+    const employeeDelete = await prisma.employee.delete({
+      where: {
+        company_branch_id: request.company_branch_id,
+        employee_id: request.employee_id,
+      },
+    });
+
+    return {
+      employee_id: employeeDelete.employee_id,
+      first_name: employeeDelete.first_name,
+      last_name: employeeDelete.last_name,
+    };
+  }
   static async employeeResign({
     employee_id,
     company_branch_id,
@@ -370,16 +427,37 @@ export class AccountService {
       );
     }
 
+    var status_resign = findEmployee.hasResigned;
+    var resign_date = findEmployee.resign_date;
+
+    if(status_resign === false){
+      status_resign = true;
+    } else {
+      status_resign = false;
+    }
+
+    if(resign_date === null){
+      resign_date = new Date();
+    } else {
+      resign_date = null;
+    }
+
     const employeeResign = await prisma.employee.update({
       where: {
         company_branch_id,
         employee_id,
       },
       data: {
-        hasResigned: true,
+        hasResigned: status_resign,
+        resign_date: resign_date,
       },
     });
 
-    return employeeResign;
+    return {
+      employee_id: employeeResign.employee_id,
+      first_name: employeeResign.first_name,
+      last_name: employeeResign.last_name,
+      hasResigned: employeeResign.hasResigned,
+    };
   }
 }

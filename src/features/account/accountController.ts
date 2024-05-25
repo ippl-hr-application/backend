@@ -17,6 +17,7 @@ export class AccountController {
       const job_position_name = req.query.job_position_name as string;
       const employment_status_name = req.query.employment_status_name as string;
       const get_all = req.query.get_all as string;
+      const deleted = req.query.deleted as string;
       const employees = await AccountService.getAllEmployees({
         company_branch_id,
         hasResigned,
@@ -26,6 +27,7 @@ export class AccountController {
         job_position_name,
         employment_status_name,
         get_all,
+        deleted,
       });
       res.status(200).json({
         success: true,
@@ -185,44 +187,41 @@ export class AccountController {
     }
   }
 
-  static async deleteEmployee(req: Request, res: Response, next: NextFunction) {
+  static async softDeleteEmployee(req: Request, res: Response, next: NextFunction) {
     try {
       const employee_id = req.params.employee_id;
       const company_branch_id = req.params.company_branch_id;
-      const deletingEmployee = await AccountService.deleteEmployee({
+      const deletingEmployee = await AccountService.softDeleteEmployee({
         company_branch_id,
         employee_id,
       });
       res.status(200).json({
         success: true,
         data: deletingEmployee,
-        message: "Employee deleted successfully",
+        message: "Employee soft deleted successfully",
       });
     } catch (error) {
       next(error);
     }
   }
 
-  // static async softDeleteEmployee(
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ) {
-  //   try {
-  //     const { employee_id, company_branch_id } = req.body;
-  //     const softDeleteEmployee = await AccountService.softDeleteEmployee({
-  //       employee_id,
-  //       company_branch_id,
-  //     });
-  //     return res.status(200).json({
-  //       success: true,
-  //       data: softDeleteEmployee,
-  //       message: "Successfully soft delete employee",
-  //     });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
+  static  async deleteEmployeeFromDatabase(req: Request, res: Response, next: NextFunction) {
+    try {
+      const employee_id = req.params.employee_id;
+      const company_branch_id = req.params.company_branch_id;
+      const deletingEmployee = await AccountService.deleteEmployeeFromDatabase({
+        company_branch_id,
+        employee_id,
+      });
+      res.status(200).json({
+        success: true,
+        data: deletingEmployee,
+        message: "Employee deleted permanently successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 
   static async employeeResign(req: Request, res: Response, next: NextFunction) {
     try {

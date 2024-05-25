@@ -87,31 +87,61 @@ export class TaskManagementService {
     if (!userGive)
       throw new ErrorResponse("Invalid Unique ID", 400, ["from", "token"]);
 
-    const allEmployees = await prisma.employee.findMany({
-      where: {
-        company_branch_id,
-        employee_id: {
-          in: request.employee_id,
+    if (request.all_assignes) {
+      const employees = await prisma.employee.findMany({
+        where: {
+          company_branch_id,
         },
-      },
-    });
+        select: {
+          employee_id: true,
+        },
+      });
 
-    if (allEmployees.length !== request.employee_id.length)
-      throw new ErrorResponse("Invalid Employee ID", 400, ["employee_id"]);
+      const task = await prisma.employeeTask.createMany({
+        data: employees.map((employee) => ({
+          company_branch_id,
+          employee_id: employee.employee_id,
+          title: request.title,
+          description: request.description,
+          start_date: new Date(request.start_date),
+          end_date: new Date(request.end_date),
+          given_by_id: userGive!.employee_id,
+        })),
+      });
 
-    const task = await prisma.employeeTask.createMany({
-      data: request.employee_id.map((employee_id) => ({
-        company_branch_id,
-        employee_id,
-        title: request.title,
-        description: request.description,
-        start_date: new Date(request.start_date),
-        end_date: new Date(request.end_date),
-        given_by_id: userGive!.employee_id,
-      })),
-    });
+      return task.count;
+    } else if (request.employee_id) {
+      const allEmployees = await prisma.employee.findMany({
+        where: {
+          company_branch_id,
+          employee_id: {
+            in: request.employee_id,
+          },
+        },
+        select: {
+          employee_id: true,
+        },
+      });
 
-    return task.count;
+      if (allEmployees.length !== request.employee_id.length)
+        throw new ErrorResponse("Invalid Employee ID", 400, ["employee_id"]);
+
+      const task = await prisma.employeeTask.createMany({
+        data: request.employee_id.map((employee_id) => ({
+          company_branch_id,
+          employee_id,
+          title: request.title,
+          description: request.description,
+          start_date: new Date(request.start_date),
+          end_date: new Date(request.end_date),
+          given_by_id: userGive!.employee_id,
+        })),
+      });
+
+      return task.count;
+    } else {
+      throw new ErrorResponse("Please fill one out of two options (all_assignes, employee_id)", 400, ["employee_id"]);
+    }
   }
 
   static async updateTaskManagement(

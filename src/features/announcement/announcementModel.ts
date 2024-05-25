@@ -19,6 +19,7 @@ export type CreateAnnouncementResponse = {
   description: string;
   company_announcement_id: number;
   file_name: string;
+  file_url: string;
   company_branch_id: string;
   date: Date;
 };

@@ -168,9 +168,23 @@ export class CompanyBranchService {
       employeeGenderCount[data.gender] = data._count.employee_id;
     });
 
+    const jobPositionCount = await prisma.employee.count({
+      where: {
+        company_branch_id,
+      },
+    });
+
+    const employmentStatusCount = await prisma.employmentStatus.count({
+      where: {
+        company_branch_id,
+      },
+    });
+
     return {
       employee_count: employeeCount,
       employee_gender_count: employeeGenderCount,
+      job_position_count: jobPositionCount,
+      employment_status_count: employmentStatusCount,
     };
   }
 
@@ -247,5 +261,19 @@ export class CompanyBranchService {
         },
       });
     });
+  }
+
+  static async getBranchById(company_branch_id: string) {
+    const branch = await prisma.companyBranches.findFirst({
+      where: {
+        company_branch_id,
+      },
+    });
+
+    if (!branch) {
+      throw new ErrorResponse("Branch not found", 404, ["company_branch_id"]);
+    }
+
+    return branch;
   }
 }
