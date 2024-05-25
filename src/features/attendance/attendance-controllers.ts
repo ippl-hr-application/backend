@@ -27,8 +27,7 @@ export class AttendanceController {
       const result = await AttendanceService.attendanceCheckIn({
         employee_id,
         assign_shift_id: Number(assign_shift_id),
-        long: Number(long),
-        lat: Number(lat),
+
         attendance_file,
       });
       return res.status(201).json({
@@ -49,8 +48,6 @@ export class AttendanceController {
       const result = await AttendanceService.attendanceCheckOut({
         employee_id,
         attendance_id: Number(attendance_id),
-        long: Number(long),
-        lat: Number(lat),
         attendance_file,
       });
       return res.status(201).json({

@@ -24,7 +24,10 @@ export type BranchResponse = Omit<CreateCompanyBranch, "password"> & {
   company_branch_id: string;
 };
 
-export type EditCompanyBranch = Omit<CreateCompanyBranch, "password">;
+export type EditCompanyBranch = Omit<CreateCompanyBranch, "password"> & {
+  longitute: number | null;
+  latitute: number | null;
+};
 
 export type GetAllBranchesResponse = {
   company_branch_id: string;
