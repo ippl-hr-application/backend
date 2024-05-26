@@ -9,12 +9,13 @@ import {
 import { ChangeShiftManagementValidation } from "./change-shift-management-validation";
 import { ShiftService } from "../../shift/shift-service";
 import { deleteFile } from "../../../utils/delete_file";
+import { start } from "repl";
 
 export class ChangeShiftManagementService {
   static async getAllByCompanyBranchId(
     company_branch_id: string,
-    start_date: Date,
-    end_date: Date
+    start_date: string,
+    end_date: string
   ): Promise<GetAllByCompanyBranchIdResponse> {
     const request = Validation.validate(
       ChangeShiftManagementValidation.GET_ALL_BY_COMPANY_BRANCH_ID,
@@ -29,8 +30,8 @@ export class ChangeShiftManagementService {
         },
         type: "PERUBAHAN SHIFT",
         submission_date: {
-          gte: start_date,
-          lte: end_date,
+          gte: start_date ? new Date(start_date) : undefined,
+          lte: end_date ? new Date(end_date) : undefined,
         },
       },
       select: {

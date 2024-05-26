@@ -13,8 +13,8 @@ export class ForgetAttendanceManagementController {
       const result =
         await ForgetAttendanceManagementService.getAllByCompanyBranchId(
           company_branch_id as string,
-          new Date(start_date as string),
-          new Date(end_date as string)
+          start_date as string,
+          end_date as string
         );
       return res.status(200).json({
         success: true,
