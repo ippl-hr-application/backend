@@ -333,6 +333,12 @@ export class AuthService {
       },
     });
 
+    sendEmail({
+      to: request.email,
+      subject: "Welcome to Meraih",
+      text: `Welcome to Meraih, ${request.full_name}! \n\n Your account has been successfully created. \n\n Your account details: \n Email: ${request.email} \n Employee Account ID: ${user_employee_account.employee_id} \n Password: ${request.password} \n\n Please keep your account details safe and do not share it with anyone. Employee Account ID is used when you want to log in as Employee. \n\n Best regards, \n Meraih Team`,
+    });
+
     return user;
   }
 
@@ -359,7 +365,9 @@ export class AuthService {
     }
 
     if (!comparePassword(request.old_password, user.password)) {
-      throw new ErrorResponse("Old password is incorrect", 400, ["old_password"]);
+      throw new ErrorResponse("Old password is incorrect", 400, [
+        "old_password",
+      ]);
     }
 
     if (request.password !== request.confirm_password) {
@@ -393,8 +401,10 @@ export class AuthService {
     }
 
     if (!comparePassword(request.old_password, employee.password)) {
-      throw new ErrorResponse("Old password is incorrect", 400, ["old_password"]);
-    }    
+      throw new ErrorResponse("Old password is incorrect", 400, [
+        "old_password",
+      ]);
+    }
 
     if (request.password !== request.confirm_password) {
       throw new ErrorResponse(
@@ -422,7 +432,11 @@ export class AuthService {
       const employee = await prisma.employee.findUnique({
         where: { employee_id: employee_id },
         include: {
-          company_branch: true,
+          company_branch: {
+            include: {
+              company: true,
+            }
+          },
           employment_status: true,
           job_position: true,
         },
@@ -460,6 +474,10 @@ export class AuthService {
                 city: true,
                 hq_code: true,
                 hq_initial: true,
+                created_at: true,
+              },
+              orderBy: {
+                created_at: "asc",
               },
             },
           },

@@ -162,6 +162,7 @@ export class ShiftService {
         },
         employee: {
           select: {
+            employee_id: true,
             first_name: true,
             last_name: true,
           },

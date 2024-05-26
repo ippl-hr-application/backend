@@ -9,6 +9,8 @@ import {
   UpdatePayrollRequest,
 } from "./payroll-model";
 import { PayrollValidation } from "./payroll-validation";
+import { sendEmail } from "../../utils/nodemailer";
+import { numberToMonthName } from "../../utils/format";
 
 export class PayrollService {
   static async getPayrolls(data: GetPayrollRequest) {
@@ -23,6 +25,13 @@ export class PayrollService {
           company_branch_id,
           month,
           year,
+          employee: {
+            job_position: {
+              NOT: {
+                name: "Owner"
+              }
+            }
+          }
         },
         include: {
           employee: {
@@ -97,6 +106,11 @@ export class PayrollService {
     const employees = await prisma.employee.findMany({
       where: {
         company_branch_id,
+        job_position: {
+          NOT: {
+            name: "Owner"
+          }
+        }
       },
     });
 
@@ -142,7 +156,16 @@ export class PayrollService {
       data: {
         status,
       },
+      include: {
+        employee: true
+      }
     });
+
+    sendEmail({
+      to: payroll.employee.email,
+      subject: "Payroll Status",
+      text: `Your payroll status in ${numberToMonthName(payroll.month)} has been updated to ${status}`,
+    })
 
     return payroll;
   }

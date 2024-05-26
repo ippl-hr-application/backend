@@ -10,6 +10,7 @@ import {
 import { TaskManagementValidation } from "./task-management-validation";
 import { ErrorResponse } from "../../models";
 import { GetTaskTemplateResponse } from "aws-sdk/clients/connect";
+import { sendEmail } from "../../utils/nodemailer";
 
 export class TaskManagementService {
   static async getTaskManagementFromCompany({
@@ -22,8 +23,7 @@ export class TaskManagementService {
     start_date: string;
     end_date: string;
     title?: string;
-  }): Promise<EmployeeTask[]> {
-    console.log(title);
+  }) {
     const tasks = await prisma.employeeTask.findMany({
       where: {
         company_branch_id,
@@ -33,6 +33,13 @@ export class TaskManagementService {
               mode: "insensitive",
             }
           : undefined,
+        employee: {
+          hasResigned: false,
+          // NOT: {
+          //   resign_date: null,
+          // },
+          delete_at: null,
+        },
         end_date: {
           lte: end_date ? new Date(end_date) : undefined,
         },
@@ -40,6 +47,41 @@ export class TaskManagementService {
           gte: start_date ? new Date(start_date) : undefined,
         },
       },
+      select: {
+        task_id: true,
+        company_branch_id: true,
+        title: true,
+        description: true,
+        start_date: true,
+        end_date: true,
+        employee_id: true,
+        given_by: {
+          select: {
+            employee_id: true,
+            first_name: true,
+            last_name: true,
+            job_position: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        employee: {
+          select: {
+            first_name: true,
+            last_name: true,
+            job_position: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        end_date: "desc",
+      }
     });
 
     return tasks;
@@ -91,9 +133,17 @@ export class TaskManagementService {
       const employees = await prisma.employee.findMany({
         where: {
           company_branch_id,
+          hasResigned: false,
+          delete_at: null,
+          job_position: {
+            name: {
+              not: "Owner",
+            },
+          },
         },
         select: {
           employee_id: true,
+          email: true,
         },
       });
 
@@ -109,6 +159,14 @@ export class TaskManagementService {
         })),
       });
 
+      const employeeEmails = employees.map((employee) => employee.email);
+      // send email to employees
+      sendEmail({
+        to: employeeEmails,
+        subject: "Task Assigned",
+        text: `You have been assigned a task by ${userGive.first_name} ${userGive.last_name}. Please open your mobile application to see the detail.`,
+      })
+
       return task.count;
     } else if (request.employee_id) {
       const allEmployees = await prisma.employee.findMany({
@@ -117,9 +175,12 @@ export class TaskManagementService {
           employee_id: {
             in: request.employee_id,
           },
+          hasResigned: false,
+          delete_at: null,
         },
         select: {
           employee_id: true,
+          email: true,
         },
       });
 
@@ -137,6 +198,15 @@ export class TaskManagementService {
           given_by_id: userGive!.employee_id,
         })),
       });
+
+      const employeeEmails = allEmployees.map((employee) => employee.email);
+
+      // send email to employees
+      sendEmail({
+        to: employeeEmails,
+        subject: "Task Assigned",
+        text: `You have been assigned a task by ${userGive.first_name} ${userGive.last_name}. Please open your mobile application to see the detail.`,
+      })
 
       return task.count;
     } else {
@@ -167,6 +237,23 @@ export class TaskManagementService {
         end_date: new Date(request.end_date),
       },
     });
+
+    const employee = await prisma.employee.findFirst({
+      where: {
+        employee_id: task.employee_id,
+      },
+      select: {
+        email: true,
+      },
+    });
+
+    // send email to employee
+
+    sendEmail({
+      to: employee!.email,
+      subject: "Task Updated",
+      text: `Your task has been updated. Please open your mobile application to see the detail.`,
+    })
 
     return task;
   }

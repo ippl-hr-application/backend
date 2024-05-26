@@ -15,3 +15,21 @@ export const pathToFileFolder = (filePath: string) => {
 export const formatSpacedFileName = (fileName: string): string => {
   return fileName.replace(/ /g, "_");
 };
+
+export const numberToMonthName = (month: number): string => {
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  return months[month - 1];
+};

@@ -201,6 +201,15 @@ export class CompanyBranchService {
         "BRANCH_NOT_FOUND"
       );
 
+    if (company_branch_id === company_id) {
+      throw new ErrorResponse(
+        "You can't delete the main branch",
+        400,
+        ["company_branch_id"],
+        "DELETE_MAIN_BRANCH"
+      );
+    }
+
     return prisma.$transaction(async (prisma) => {
       await prisma.companyAnnouncementTo.deleteMany({
         where: { company_branch_id },

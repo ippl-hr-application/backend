@@ -15,6 +15,7 @@ templateRoute.get("/:company_branch_id", [
 templateRoute.post("/:company_branch_id", [
   JWTMiddleware.verifyToken,
   CompanyMiddleware.isCompanyBranchBelongsToCompany,
+  JWTMiddleware.ownerAndManagerOnly,
   upload.single("template_file"),
   TemplateController.addNewTemplateDocument,
 ])
@@ -22,6 +23,7 @@ templateRoute.post("/:company_branch_id", [
 templateRoute.post("/:company_branch_id/:template_id", [
   JWTMiddleware.verifyToken,
   CompanyMiddleware.isCompanyBranchBelongsToCompany,
+  JWTMiddleware.ownerAndManagerOnly,
   upload.single("template_file"),
   TemplateController.updateTemplateDocument,
 ])
@@ -29,6 +31,7 @@ templateRoute.post("/:company_branch_id/:template_id", [
 templateRoute.delete("/:company_branch_id/:template_id", [
   JWTMiddleware.verifyToken,
   CompanyMiddleware.isCompanyBranchBelongsToCompany,
+  JWTMiddleware.ownerAndManagerOnly,
   TemplateController.deleteTemplateDocument,
 ])
 
