@@ -12,13 +12,13 @@ import { PermissionManagementValidation } from "./permission-management-validati
 export class PermissionManagementService {
   static async getAllByCompanyBranchId(
     company_branch_id: string,
-    date: Date
+    start_date: Date,
+    end_date: Date
   ): Promise<GetAllByCompanyBranchIdResponse> {
     const request = Validation.validate(
       PermissionManagementValidation.GET_ALL_BY_COMPANY_BRANCH_ID,
       {
         company_branch_id,
-        date,
       }
     );
     const permission = await prisma.submission.findMany({
@@ -27,7 +27,10 @@ export class PermissionManagementService {
           company_branch_id: request.company_branch_id,
         },
         type: "IZIN",
-        submission_date: request.date,
+        submission_date: {
+          gte: start_date,
+          lte: end_date,
+        },
       },
       select: {
         submission_id: true,

@@ -47,7 +47,7 @@ export class CompanyBranchController {
   }
   static async getAllBranches(req: Request, res: Response, next: NextFunction) {
     try {
-      const { company_id } = res.locals.user as UserToken;
+      const { company_id } = req.params;
       const branches = await CompanyBranchService.getAllBranches(company_id);
       return res.status(200).json({
         success: true,

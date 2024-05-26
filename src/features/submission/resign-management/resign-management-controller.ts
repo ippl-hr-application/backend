@@ -9,10 +9,11 @@ export class ResignManagementController {
   ) {
     try {
       const { company_branch_id } = req.params;
-      const { date } = req.query;
+      const { start_date, end_date } = req.query;
       const result = await ResignManagementService.getAllByCompanyBranchId(
         company_branch_id as string,
-        new Date(date as string)
+        new Date(start_date as string),
+        new Date(end_date as string)
       );
       return res.status(200).json({
         success: true,

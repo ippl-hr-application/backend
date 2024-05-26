@@ -6,7 +6,6 @@ import { CompanyMiddleware } from "../../middlewares/company_middleware";
 
 const companyBranchRoute: Router = Router();
 
-
 companyBranchRoute.post("/create", [
   JWTMiddleware.verifyToken,
   JWTMiddleware.ownerOnly,
@@ -14,7 +13,7 @@ companyBranchRoute.post("/create", [
   CompanyBranchController.addNewBranch,
 ]);
 
-companyBranchRoute.get("/all", [
+companyBranchRoute.get("/:company_id/all", [
   JWTMiddleware.verifyToken,
   CompanyBranchController.getAllBranches,
 ]);
@@ -23,7 +22,7 @@ companyBranchRoute.get("/:company_branch_id", [
   JWTMiddleware.verifyToken,
   CompanyMiddleware.isCompanyBranchBelongsToCompany,
   CompanyBranchController.getBranchById,
-])
+]);
 
 companyBranchRoute.get("/statistics/:company_branch_id", [
   JWTMiddleware.verifyToken,

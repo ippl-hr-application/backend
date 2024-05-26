@@ -12,13 +12,13 @@ import { ForgetAttendanceManagementValidation } from "./forget-attendance-manage
 export class ForgetAttendanceManagementService {
   static async getAllByCompanyBranchId(
     company_branch_id: string,
-    date: Date
+    start_date: Date,
+    end_date: Date
   ): Promise<GetAllByCompanyBranchIdResponse> {
     const request = Validation.validate(
       ForgetAttendanceManagementValidation.GET_ALL_BY_COMPANY_BRANCH_ID,
       {
         company_branch_id,
-        date,
       }
     );
     const forgetAttendance = await prisma.submission.findMany({
@@ -27,7 +27,10 @@ export class ForgetAttendanceManagementService {
           company_branch_id: request.company_branch_id,
         },
         type: "SURAT",
-        submission_date: request.date,
+        submission_date: {
+          gte: start_date,
+          lte: end_date,
+        },
       },
       select: {
         employee: {

@@ -13,13 +13,13 @@ import { deleteFile } from "../../../utils/delete_file";
 export class LeaveManagementService {
   static async getAllByCompanyBranchId(
     company_branch_id: string,
-    date: Date
+    start_date: Date,
+    end_date: Date
   ): Promise<GetAllByCompanyBranchIdResponse> {
     const request = Validation.validate(
       LeaveManagementValidation.GET_ALL_BY_COMPANY_BRANCH_ID,
       {
         company_branch_id,
-        date,
       }
     );
     const leave = await prisma.leaveSubmission.findMany({
@@ -28,7 +28,10 @@ export class LeaveManagementService {
           employee: {
             company_branch_id: request.company_branch_id,
           },
-          submission_date: request.date,
+          submission_date: {
+            gte: start_date,
+            lte: end_date,
+          },
         },
       },
       select: {
