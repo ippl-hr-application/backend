@@ -75,8 +75,6 @@ export class JWTMiddleware {
           },
         });
 
-        console.log(userData?.job_position)
-
         if (
           userData &&
           userData.job_position.name !== "Owner" &&
