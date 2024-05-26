@@ -64,10 +64,14 @@ export class AnnouncementService {
   static async getAnnouncementCompanyBranch({
     company_branch_id,
     title,
+    page
   }: {
     company_branch_id: string;
     title: string;
+    page: number;
   }): Promise<CompanyAnnouncement[]> {
+    const pageSize = 3;
+    const skip = (page - 1) * pageSize;
 
     const announcements_id = await prisma.companyAnnouncementTo.findMany({
       where: { company_branch_id: company_branch_id},
@@ -77,10 +81,12 @@ export class AnnouncementService {
     });
     
     const announcements = await prisma.companyAnnouncement.findMany({
-      where: { 
+      where: {
         title: { contains: title },
-        company_announcement_id: { in: announcements_id.map((announcement) => announcement.company_announcement_id) }
-    },
+        company_announcement_id: {
+          in: announcements_id.map((announcement) => announcement.company_announcement_id),
+        },
+      },
       include: {
         company_announcement_to: {
           select: {
@@ -95,11 +101,16 @@ export class AnnouncementService {
                 file_size: true,
                 file_type: true,
                 file_url: true,
-              }
+              },
             },
           },
         },
       },
+      orderBy: {
+        company_announcement_id: 'desc',
+      },
+      skip: skip, // Skip the number of records based on the page number
+      take: pageSize, // Take only the page size number of records
     });
 
     return announcements;
@@ -241,9 +252,10 @@ export class AnnouncementService {
     const date = new Date()
     const announcement = await prisma.companyAnnouncement.create({
       data: {
-        ...request,
+        title: request.title,
+        description: request.description,
         company_id: request.company_id,
-        date,
+        date: date,
       },
     });
 
@@ -328,7 +340,7 @@ export class AnnouncementService {
         'Failed_Create_Company_Announcement_File_Attachment',
       ])
     }
-
+    
     const branch_names = await prisma.companyBranches.findMany({
       where: {
         company_branch_id: {

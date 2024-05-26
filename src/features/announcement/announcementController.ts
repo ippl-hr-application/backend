@@ -30,7 +30,8 @@ export class AnnouncementController {
       const title = req.query.title as string;
       const announcements = await AnnouncementService.getAnnouncementCompanyBranch({
         company_branch_id,
-        title
+        title,
+        page: parseInt(req.query.page as string) || 1,
       });
 
       res.status(200).json({
