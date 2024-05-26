@@ -5,8 +5,7 @@ import { EmployeeToken } from "../../models";
 export class PayrollController {
   static async getPayrolls(req: Request, res: Response, next: NextFunction) {
     try {
-      const { company_id: company_branch_id } = res.locals
-        .user as EmployeeToken;
+      const { company_branch_id } = req.params;
       const { month, year } = req.query;
       const [payrolls, totalWage] = await PayrollService.getPayrolls({
         company_branch_id,
