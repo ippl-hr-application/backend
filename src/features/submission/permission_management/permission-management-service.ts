@@ -12,8 +12,8 @@ import { PermissionManagementValidation } from "./permission-management-validati
 export class PermissionManagementService {
   static async getAllByCompanyBranchId(
     company_branch_id: string,
-    start_date: Date,
-    end_date: Date
+    start_date: string,
+    end_date: string
   ): Promise<GetAllByCompanyBranchIdResponse> {
     const request = Validation.validate(
       PermissionManagementValidation.GET_ALL_BY_COMPANY_BRANCH_ID,
@@ -28,8 +28,8 @@ export class PermissionManagementService {
         },
         type: "IZIN",
         submission_date: {
-          gte: start_date,
-          lte: end_date,
+          gte: start_date ? new Date(start_date) : undefined,
+          lte: end_date ? new Date(end_date) : undefined,
         },
       },
       select: {
