@@ -62,7 +62,7 @@ export class JWTMiddleware {
       const { employee_id } = res.locals.user as EmployeeToken;
 
       if (employee_id) {
-        const userData = prisma.employee.findFirst({
+        const userData = await prisma.employee.findFirst({
           where: {
             employee_id,
           },
@@ -74,6 +74,8 @@ export class JWTMiddleware {
             },
           },
         });
+
+        console.log(userData?.job_position)
 
         if (
           userData &&
