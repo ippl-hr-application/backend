@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AnnouncementService } from './announcementService';
-import { EmployeeToken } from '../../models';
+import { EmployeeToken, UserToken } from '../../models';
+import { User } from 'aws-sdk/clients/budgets';
 
 export class AnnouncementController {
   static async getAnnouncementCompanyBranch(req: Request, res: Response, next: NextFunction) {
@@ -30,7 +31,8 @@ export class AnnouncementController {
     next: NextFunction
   ) {
     try {
-      const { company_id, title, description, company_branch_id} = req.body;
+      const { title, description, company_branch_id} = req.body;
+      const { company_id } = res.locals.user as EmployeeToken | UserToken;
       const file_attachment: Express.Multer.File | undefined = req.file;
       const announcement = await AnnouncementService.createAnnouncementAndNotifyEmployees({
         company_id,
