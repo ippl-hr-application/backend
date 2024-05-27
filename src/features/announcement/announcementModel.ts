@@ -26,7 +26,15 @@ export type UpdateAnnouncementRequest = Omit<
     company_branch_id_remove?: string[];
 };
 
-export type UpdateAnnouncementResponse = UpdateAnnouncementRequest
+export type UpdateAnnouncementResponse = {
+  company_id: string;
+  title: string;
+  description: string;
+  company_announcement_id: number;
+  file_name: string;
+  file_url: string; 
+  company_branch_id_add?: string[]; 
+  company_branch_id_remove?: string[]};
 
 export type EzCreateAnnouncementRequest = {
   company_branch_id: string;

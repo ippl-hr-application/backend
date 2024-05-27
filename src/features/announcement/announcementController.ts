@@ -60,9 +60,11 @@ export class AnnouncementController {
     next: NextFunction
   ) {
     try {
-      const { company_id, announcement_id } = req.params;
+      const { company_announcement_id } = req.body;
+      const { company_id, employee_id } = res.locals.user as EmployeeToken | UserToken;
       await AnnouncementService.deleteAnnouncement(
-        announcement_id,
+        employee_id,
+        company_announcement_id,
         company_id,
       );
 
@@ -81,14 +83,14 @@ export class AnnouncementController {
     next: NextFunction
   ) {
     try {
-      const { 
-        company_id,
+      const {
         company_announcement_id,
         title,
         description,
         company_branch_id_add,
         company_branch_id_remove 
       } = req.body;
+      const { company_id } = res.locals.user as EmployeeToken | UserToken;
       const file_attachment: Express.Multer.File | undefined = req.file;
       const announcement = await AnnouncementService.updateAnnouncement({
         company_id,

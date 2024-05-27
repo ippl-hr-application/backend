@@ -15,23 +15,22 @@ announcementRoute.get('/:company_branch_id/branch', [
 announcementRoute.post('/create', [
   JWTMiddleware.verifyToken,
   JWTMiddleware.ownerAndManagerOnly,
-  // CompanyMiddleware.isCompanyBranchBelongsToCompany,
   upload.single('announcement_file'),
   AnnouncementController.addAnnouncement,
 ]);
 
-announcementRoute.delete('/company/:company_id/announcement/:announcement_id', [
+announcementRoute.delete('/delete', [
   JWTMiddleware.verifyToken,
   JWTMiddleware.ownerAndManagerOnly,
   AnnouncementController.deleteAnnouncement,
 ]);
 
-// announcementRoute.put('/update',[
-//   JWTMiddleware.verifyToken,
-//   JWTMiddleware.ownerAndManagerOnly,
-//   upload.single('announcement_file'),
-//   AnnouncementController.updateAnnouncement,
-// ])
+announcementRoute.put('/update',[
+  JWTMiddleware.verifyToken,
+  JWTMiddleware.ownerAndManagerOnly,
+  upload.single('announcement_file'),
+  AnnouncementController.updateAnnouncement,
+])
 
 // versi 1 // versi 1 // versi 1 //
 announcementRoute.post('/:company_branch_id/create', [

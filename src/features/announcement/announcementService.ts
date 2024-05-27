@@ -259,6 +259,11 @@ export class AnnouncementService {
         company_branch_id_remove
       }
     );
+    var file_url = ""
+
+    if(file_attachment !== undefined){
+      file_url = pathToFileUrl( file_attachment?.path || "", process.env.SERVER_URL || "http://localhost:3000");
+    }
 
     const branchesToAdd = Array.isArray(company_branch_id_add) ? company_branch_id_add : [company_branch_id_add];
     const branchesToRemove = Array.isArray(company_branch_id_remove) ? company_branch_id_remove : [company_branch_id_remove];
@@ -281,25 +286,52 @@ export class AnnouncementService {
       data: {
         title: request.title,
         description: request.description,
-
       },
     });
-    // if (branchesToAdd[0] !== undefined && branchesToAdd.length > 0) {
-    //   for (const branchId of branchesToAdd) {
-    //     const isCreated = await prisma.companyAnnouncementTo.findFirst({ 
-    //       where: {
-    //         company_announcement_id: request.company_announcement_id,
-    //         company_branch_id: branchId ?? '', 
-    //       },
-    //     });
-    //     if (!isCreated) {
-    //       await AnnouncementService.createAnnouncementToBranch({
-    //         company_announcement_id: request.company_announcement_id,
-    //         company_branch_id: branchId ?? '',
-    //       });
-    //     }
-    //   }
-    // }
+
+    const company_file_id = await prisma.companyAnnouncementFileAttachment.findFirst({
+      where: {
+        company_announcement_id: request.company_announcement_id,
+      },
+      select: {
+        company_file_id: true,
+      },
+
+    });
+
+    await prisma.companyFile.update({
+      where: {
+        company_file_id: company_file_id?.company_file_id,
+      },
+      data: {
+        company_id: request.company_id,
+        file_name: file_attachment?.originalname || '',
+        file_size: file_attachment?.size || 0,
+        file_type: file_attachment?.mimetype || '',
+        file_url: file_url,
+        description: description,
+      },
+    });
+
+    if (branchesToAdd[0] !== undefined && branchesToAdd.length > 0) {
+      const validBranches = branchesToAdd.filter(branchId => typeof branchId === 'string' && branchId.trim() !== '');
+      for (const branchId of validBranches) {
+        const isCreated = await prisma.companyAnnouncementTo.findFirst({ 
+          where: {
+            company_announcement_id: request.company_announcement_id,
+            company_branch_id: branchId ?? '', 
+          },
+        });
+        if (!isCreated) {
+          await prisma.companyAnnouncementTo.create({
+            data: {
+              company_announcement_id: request.company_announcement_id,
+              company_branch_id: branchId ?? '',
+            },
+          });
+        }
+      }
+    }
 
     if (branchesToRemove !== undefined && branchesToRemove.length > 0) {
       for (const branchId of branchesToRemove) {
@@ -313,55 +345,52 @@ export class AnnouncementService {
         }
       }
     }
-    const company_file_id = await prisma.companyAnnouncementFileAttachment.findFirst({
-      where: {
-        company_announcement_id: request.company_announcement_id,
-      },
-      select: {
-        company_file_id: true,
-      },
 
-    });
-    const addCompanyFile = await prisma.companyFile.update({
-      where: {
-        company_file_id: company_file_id?.company_file_id,
-      },
-      data: {
-        company_id: request.company_id,
-        file_name: file_attachment?.originalname || '',
-        file_size: file_attachment?.size || 0,
-        file_type: file_attachment?.mimetype || '',
-        file_url: pathToFileUrl(
-          file_attachment?.path || "",
-          process.env.SERVER_URL || "http://localhost:3000"
-        ),
-        description: description,
-      },
-    });
-
-    return {company_id,
+    return {
+      company_id,
       company_announcement_id,
       title,
       description,
       company_branch_id_add,
       company_branch_id_remove,
-      file_attachment
+      file_name: file_attachment?.originalname || '',
+      file_url: file_url,
     };
   }
 
   static async deleteAnnouncement(
+    employee_id: string,
     announcement_id: string,
     company_id: string
   ) {
-
-    const isDeleted = await prisma.companyAnnouncement.findFirst({
+    const userData = await prisma.employee.findFirst({
+      where: {
+        employee_id,
+      },
+      select: {
+        job_position: {
+          select: {
+            name: true,
+          },
+        },
+        company_branch_id: true,
+      },
+    });
+    const announcement = await prisma.companyAnnouncement.findFirst({
       where: {
         company_announcement_id: parseInt(announcement_id),
         company_id: company_id
+      }, 
+      include: {
+        company_announcement_to: {
+          select: {
+            company_branch_id: true,
+          }
+        }
       }
     });
 
-    if (!isDeleted) {
+    if (!announcement) {
       throw new ErrorResponse(
         'Announcement not found',
         404, 
@@ -371,26 +400,62 @@ export class AnnouncementService {
         "ANNOUNCEMENT_NOT_FOUND"
       );
     }
-
-    await prisma.companyAnnouncementTo.deleteMany({
-      where: {
-        company_announcement_id: parseInt(announcement_id)
-      }
-    });
-  
-    await prisma.companyAnnouncementFileAttachment.deleteMany({
-      where: {
-        company_announcement_id: parseInt(announcement_id)
-      }
-    });
-  
-    const announcement = await prisma.companyAnnouncement.deleteMany({
-      where: {
-        company_announcement_id: parseInt(announcement_id),
-        company_id: company_id
-      }
-    });
-  
+    if (
+      userData &&
+      userData.job_position.name === "Manager" &&
+      announcement.company_announcement_to.length < 2 &&
+      announcement.company_announcement_to[0].company_branch_id === userData.company_branch_id
+    ) {
+      await prisma.companyAnnouncementTo.deleteMany({
+        where: {
+          company_announcement_id: parseInt(announcement_id)
+        }
+      });
+    
+      await prisma.companyAnnouncementFileAttachment.deleteMany({
+        where: {
+          company_announcement_id: parseInt(announcement_id)
+        }
+      });
+    
+      await prisma.companyAnnouncement.deleteMany({
+        where: {
+          company_announcement_id: parseInt(announcement_id),
+          company_id: company_id
+        }
+      });
+    } else if (
+      userData &&
+      userData.job_position.name === "Owner")
+      {
+        await prisma.companyAnnouncementTo.deleteMany({
+          where: {
+            company_announcement_id: parseInt(announcement_id)
+          }
+        });
+      
+        await prisma.companyAnnouncementFileAttachment.deleteMany({
+          where: {
+            company_announcement_id: parseInt(announcement_id)
+          }
+        });
+      
+        await prisma.companyAnnouncement.deleteMany({
+          where: {
+            company_announcement_id: parseInt(announcement_id),
+            company_id: company_id
+          }
+        });
+      } else {
+      throw new ErrorResponse(
+        'You are not allowed to delete this announcement',
+        403, 
+        [
+        'FORBIDDEN',
+        ],
+        "FORBIDDEN"
+      );
+    }
     return announcement;
   }
 
