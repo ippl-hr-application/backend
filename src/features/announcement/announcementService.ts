@@ -1,8 +1,5 @@
 import {
-  CompanyAnnouncement,
-  CompanyAnnouncementFileAttachment,
-  CompanyAnnouncementTo,
-  CompanyFile,
+  CompanyAnnouncement
 } from '@prisma/client';
 import { prisma } from '../../applications';
 import { ErrorResponse } from '../../models';
@@ -49,11 +46,6 @@ export class AnnouncementService {
         },
       },
       include: {
-        company_announcement_to: {
-          select: {
-            company_branch_id: true,
-          },
-        },
         company_announcement_file_attachments: {
           include: {
             company_file: {
@@ -152,7 +144,6 @@ export class AnnouncementService {
 
     return announcementTo;
   } 
-
 
   static async addAnnouncement({
     company_id,
@@ -568,8 +559,7 @@ export class AnnouncementService {
         text: `${announcement.description}`, // plain text body
         attachments: [] as { filename:string, path: string }[], // Initialize attachments as an empty array
         html: `
-        <h1>ini title: ${announcement.title}</h1>
-        <b>ini desc: ${announcement.description}</b>
+        <p>${announcement.description}</p>
         `, // html body
       };
   
@@ -577,8 +567,7 @@ export class AnnouncementService {
         mailOptions.attachments.push({filename: data.file_attachment.originalname, path: file_url})
       }
       // Send the email to the employees
-      // await sendEmail(mailOptions);
-      console.log(employee.email)
+      await sendEmail(mailOptions);
     }
     return {
       company_branch_id: data.company_branch_id,
@@ -592,7 +581,9 @@ export class AnnouncementService {
     };
   }
 
-  static async ezUpdateAnnouncement(data: EzUpdateAnnouncementRequest): Promise<EzUpdateAnnouncementResponse> {
+  static async ezUpdateAnnouncement(
+    data: EzUpdateAnnouncementRequest
+  ): Promise<EzUpdateAnnouncementResponse> {
     const request = Validation.validate(
       AnnouncementValidation.EZ_UPDATE_ANNOUNCEMENT,
       data
@@ -621,6 +612,8 @@ export class AnnouncementService {
     });
 
     if(data.file_attachment !== undefined){
+      const file_url = pathToFileUrl( data.file_attachment?.path || "", process.env.SERVER_URL || "http://localhost:3000");
+
       const company_file_id = await prisma.companyAnnouncementFileAttachment.findFirst({
         where: {
           company_announcement_id: data.company_announcement_id,
@@ -639,10 +632,7 @@ export class AnnouncementService {
           file_name: data.file_attachment?.originalname || '',
           file_size: data.file_attachment?.size || 0,
           file_type: data.file_attachment?.mimetype || '',
-          file_url: pathToFileUrl(
-            data.file_attachment?.path || "",
-            process.env.SERVER_URL || "http://localhost:3000"
-          ),
+          file_url: file_url,
           description: data.description,
         },
       });
@@ -658,17 +648,58 @@ export class AnnouncementService {
         );
     }
     return {
+      company_announcement_id: data.company_announcement_id,
       company_branch_id: data.company_branch_id,
       title: data.title,
-      description: data.description,
-      company_announcement_id: announcement.company_announcement_id,
-      file_name: data.file_attachment?.originalname || '',
-      file_url: pathToFileUrl(
-        data.file_attachment?.path || "",
-        process.env.SERVER_URL || "http://localhost:3000"
-      ),
-      date: announcement.date,
-      created_at: announcement.created_at,
+      description: data.description
     };
+  }
+
+  static async ezDeleteAnnouncement(
+    data:{ 
+      company_branch_id: string,
+      company_announcement_id: string 
+    }) { 
+    const isDeleted = await prisma.companyAnnouncement.findFirst({
+      where: {
+        company_announcement_id: parseInt(data.company_announcement_id),
+        company_announcement_to: {
+          some: {
+            company_branch_id: data.company_branch_id,
+          },
+        },
+      }
+    });
+
+    if (!isDeleted) {
+      throw new ErrorResponse(
+        'Announcement not found',
+        404, 
+        [
+        'company_announcement_id',
+        ],
+        "ANNOUNCEMENT_NOT_FOUND"
+      );
+    }
+
+    await prisma.companyAnnouncementTo.deleteMany({
+      where: {
+        company_announcement_id: parseInt(data.company_announcement_id),
+      }
+    });
+  
+    await prisma.companyAnnouncementFileAttachment.deleteMany({
+      where: {
+        company_announcement_id: parseInt(data.company_announcement_id)
+      }
+    });
+  
+    const announcement = await prisma.companyAnnouncement.deleteMany({
+      where: {
+        company_announcement_id: parseInt(data.company_announcement_id),
+      }
+    });
+  
+    return announcement;
   }
 }
