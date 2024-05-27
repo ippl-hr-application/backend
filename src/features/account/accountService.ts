@@ -105,11 +105,82 @@ export class AccountService {
         hq_initial: true,
       }
     });
+    
+    const htmlTemplate = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                width: 80%;
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            h1 {
+                color: #444444;
+            }
+            p {
+                font-size: 1rem;
+            }
+            .strike-through {
+                text-decoration: line-through;
+            }
+            .credentials {
+                background-color: #f9f9f9;
+                padding: 15px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                margin-top: 20px;
+            }
+            .credentials p {
+                margin: 5px 0;
+            }
+            .footer {
+                margin-top: 30px;
+                font-size: 0.8rem;
+                color: #777777;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Selamat Datang, ${findEmployee?.first_name} ${findEmployee?.last_name}!</h1>
+            <p>Anda telah menjadi <span class="strike-through">budak</span> karyawan baru di perusahaan kami. Kami sangat senang Anda bergabung dengan tim kami. Berikut adalah kredensial Anda:</p>
+            
+            <div class="credentials">
+                <p><strong>Employee ID:</strong> ${employee.employee_id}</p>
+                <p><strong>Password:</strong> ${employee.password}</p>
+            </div>
+    
+            <p>Harap simpan informasi ini dengan aman dan jangan bagikan dengan siapa pun.</p>
+            
+            <div class="footer">
+                <p>&copy; ${new Date().getFullYear()} Perusahaan Kami. Semua hak dilindungi.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    `;  
+
     const mailOptions = {
       from: `Meraih <${process.env.EMAIL}>`, // sender address
-      to: "twin.panda999@gmail.com",//findEmployee?.email, // list of receivers
+      to: findEmployee?.email, // list of receivers
       subject: 'Account Created', // Subject line
-      html: `<p>Account has been created for ${findEmployee?.first_name} ${findEmployee?.last_name} In company ${findBranchName?.hq_initial} and this is the password ${employee.password}</p>`, // html body
+      html: htmlTemplate, // html body
     };
 
     sendEmail(mailOptions);
