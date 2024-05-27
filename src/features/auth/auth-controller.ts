@@ -167,7 +167,7 @@ export class AuthController {
       await AuthService.employeeForgotPassword(employee_id);
       return res.status(200).json({
         success: true,
-        message: "Password reset successfully",
+        message: "Please check your email for password reset link",
       });
     } catch (error) {
       next(error);

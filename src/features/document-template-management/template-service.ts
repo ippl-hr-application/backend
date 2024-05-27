@@ -11,9 +11,31 @@ export class TemplateService {
     company_branch_id: string,
     desc?: string
   ) {
+    const companyBranch = await prisma.companyBranches.findFirst({
+      where: {
+        company_branch_id,
+      },
+      select: {
+        company: {
+          select: {
+            company_id: true,
+          },
+        }
+      }
+    });
+
+    if (!companyBranch) {
+      throw new ErrorResponse(
+        "Company branch not found",
+        404,
+        ["company_branch_id"],
+        "COMPANY_BRANCH_NOT_FOUND"
+      );
+    }
+
     const templates = await prisma.companyFileTemplate.findMany({
       where: {
-        company_id: company_branch_id,
+        company_id: companyBranch.company.company_id,
         description: desc
           ? {
               contains: desc,
@@ -52,11 +74,34 @@ export class TemplateService {
       data
     );
 
+    
+    const companyBranch = await prisma.companyBranches.findFirst({
+      where: {
+        company_branch_id: company_id,
+      },
+      select: {
+        company: {
+          select: {
+            company_id: true,
+          },
+        }
+      }
+    });
+
+    if (!companyBranch) {
+      throw new ErrorResponse(
+        "Company branch not found",
+        404,
+        ["company_branch_id"],
+        "COMPANY_BRANCH_NOT_FOUND"
+      );
+    }
+
     const template = await prisma.companyFile.create({
       data: {
         company: {
           connect: {
-            company_id,
+            company_id: companyBranch.company.company_id,
           },
         },
         file_name: document.originalname,
@@ -69,7 +114,7 @@ export class TemplateService {
         ),
         company_file_template: {
           create: {
-            company_id,
+            company_id: companyBranch.company.company_id,
             description,
           },
         },
@@ -86,9 +131,31 @@ export class TemplateService {
     company_id: string,
     template_document_id: number
   ) {
+    const companyBranch = await prisma.companyBranches.findFirst({
+      where: {
+        company_branch_id: company_id,
+      },
+      select: {
+        company: {
+          select: {
+            company_id: true,
+          },
+        }
+      }
+    });
+
+    if (!companyBranch) {
+      throw new ErrorResponse(
+        "Company branch not found",
+        404,
+        ["company_branch_id"],
+        "COMPANY_BRANCH_NOT_FOUND"
+      );
+    }
+
     const template = await prisma.companyFileTemplate.findFirst({
       where: {
-        company_id,
+        company_id: companyBranch.company.company_id,
         company_file_template_id: template_document_id,
       },
       include: {
@@ -133,6 +200,28 @@ export class TemplateService {
       TemplateValidation.ADD_NEW_TEMPLATE_DOCUMENT,
       data
     );
+
+    const companyBranch = await prisma.companyBranches.findFirst({
+      where: {
+        company_branch_id: company_id,
+      },
+      select: {
+        company: {
+          select: {
+            company_id: true,
+          },
+        }
+      }
+    });
+
+    if (!companyBranch) {
+      throw new ErrorResponse(
+        "Company branch not found",
+        404,
+        ["company_branch_id"],
+        "COMPANY_BRANCH_NOT_FOUND"
+      );
+    }
 
     const template = await prisma.companyFile.findFirst({
       where: {
