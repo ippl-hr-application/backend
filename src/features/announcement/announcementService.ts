@@ -80,22 +80,30 @@ export class AnnouncementService {
   ) {
     // Create the announcement
     const announcement = await AnnouncementService.addAnnouncement(announcementData);
+
+    if(!announcement){
+      throw new ErrorResponse(
+        'Failed to create announcement', 
+        400, 
+        [
+        'company_id',
+        'title',
+        'description',
+        ],
+        "FAILED_CREATE_ANNOUNCEMENT"
+      );
+    }
+    // Get email of employees in the company branch
     if (announcementData.company_branch_id !== undefined && announcementData.company_branch_id.length > 0) {
-      for (let i = 0; i < (announcementData.company_branch_id ?? []).length; i++) {
+      for (const branches of announcementData.company_branch_id) {
         const getEmailEmployees = await prisma.employee.findMany({
           where: {
-            company_branch_id: announcementData.company_branch_id[i],
+            company_branch_id: branches,
           },
           select: {
             email: true,
           }
-        });
-
-        if (!getEmailEmployees || getEmailEmployees.length === 0) {
-          throw new ErrorResponse('Failed to create announcement', 400, [
-            'Failed_Create_Announcement_To_Company_Branch',
-          ]);
-        }
+        })
           // Prepare the email content
         for( const employee of getEmailEmployees){
           const mailOptions = {
@@ -105,8 +113,9 @@ export class AnnouncementService {
             text: `${announcement.description}`, // plain text body
             attachments: [] as { filename:string, path: string }[], // Initialize attachments as an empty array
             html: `
-            <h1>ini title: ${announcement.title}</h1>
-            <b>ini desc: ${announcement.description}</b>
+            <h1>${announcement.title}</h1>
+            </br>
+            <b>${announcement.description}</b>
             `, // html body
           };
       
@@ -115,35 +124,11 @@ export class AnnouncementService {
           }
           // Send the email to the employees
           await sendEmail(mailOptions);
-          // console.log(employee.email)
         }
       }
     }
     return announcement;
   }
-
-  static async createAnnouncementToBranch({
-    company_announcement_id,
-    company_branch_id,
-  }: {
-    company_announcement_id: number;
-    company_branch_id: string;
-  }) {
-    const announcementTo = await prisma.companyAnnouncementTo.create({
-      data: {
-        company_announcement_id,
-        company_branch_id,
-      },
-    });
-
-    if (!announcementTo) {
-      throw new ErrorResponse('Failed to create announcement', 400, [
-        'Failed_Create_Announcement_To_Company_Branch',
-      ]);
-    }
-
-    return announcementTo;
-  } 
 
   static async addAnnouncement({
     company_id,
@@ -156,9 +141,9 @@ export class AnnouncementService {
       AnnouncementValidation.CREATE_ANNOUNCEMENT,
       { company_id, title, description }
     );
+    const branchesToAdd = Array.isArray(company_branch_id) ? company_branch_id : [company_branch_id];
     if (company_branch_id) {
       for(const company_branch of company_branch_id){
-        console.log(company_branch)
         const company = await prisma.company.findFirst({
           where: { 
             company_id: request.company_id,
@@ -174,21 +159,47 @@ export class AnnouncementService {
           throw new ErrorResponse(
             'Company Branch Id is Not Belong To Company ID', 
             400, 
-            ['company_id', 'company_branch_id'],
+            ['company_branch_id'],
             "COMPANY_BRANCH_ID_NOT_BELONG_TO_COMPANY_ID"
           );
       }
     }
 
-    // ============================================================
     const date = new Date()
+    var file_url = ""
+
+    if(file_attachment !== undefined){
+      file_url = pathToFileUrl( file_attachment?.path || "", process.env.SERVER_URL || "http://localhost:3000");
+    }
+
     const announcement = await prisma.companyAnnouncement.create({
       data: {
+        company_id: company_id,
         title: request.title,
         description: request.description,
-        company_id: request.company_id,
         date: date,
+        company_announcement_file_attachments: {
+          create: {
+            company_file: {
+              create: {
+                company_id: company_id,
+                file_name: file_attachment?.originalname || '',
+                file_size: file_attachment?.size || 0,
+                file_type: file_attachment?.mimetype || '',
+                file_url: file_url,
+                description: description,
+              }
+            }
+          }
+        }
       },
+    });
+
+    await prisma.companyAnnouncementTo.createMany({
+      data: branchesToAdd.map(branch_id => ({
+        company_announcement_id: announcement.company_announcement_id,
+        company_branch_id: branch_id ?? '',
+      })),
     });
 
     if (!announcement)
@@ -196,97 +207,10 @@ export class AnnouncementService {
         'Failed to create announcement', 
         400, 
         [
-        'company_id',
-        'title',
-        'description',
+          'Failed_Create_Announcement',
         ],
-        "FAILED_CREATE_ANNOUNCEMENT"
+        'FAILED_CREATE_ANNOUNCEMENT'
       );
-
-    // =======================================================
-    const find_company_announcement_id =
-      await prisma.companyAnnouncement.findMany({
-        where: {
-          company_id: request.company_id,
-          title: request.title,
-        },
-        select: {
-          company_announcement_id: true,
-        },
-        orderBy: {
-          company_announcement_id: 'desc',
-        },
-        take: 1,
-      });
-    
-    const branchesToAdd = Array.isArray(company_branch_id) ? company_branch_id : [company_branch_id];
-    
-    if (branchesToAdd[0] !== undefined && branchesToAdd.length > 0) {
-      for (const branchId of branchesToAdd) {
-        await AnnouncementService.createAnnouncementToBranch({
-          company_announcement_id: find_company_announcement_id[0]?.company_announcement_id || 0,
-          company_branch_id: branchId || '',
-        });
-      }
-    }
-    var file_url = ""
-    if(file_attachment !== undefined){
-      file_url = pathToFileUrl( file_attachment?.path || "", process.env.SERVER_URL || "http://localhost:3000");
-      if(file_url == (process.env.SERVER_URL || "http://localhost:3000")){
-        file_url == undefined
-      }
-    }
-    const addCompanyFile = await prisma.companyFile.create({
-      data: {
-        company_id: request.company_id,
-        file_name: file_attachment?.originalname || '',
-        file_size: file_attachment?.size || 0,
-        file_type: file_attachment?.mimetype || '',
-        file_url: file_url,
-        description: description,
-      },
-    });
-
-    if (!addCompanyFile)
-      throw new ErrorResponse(
-        'Failed to create file', 
-        400, 
-        [
-        'Failed_Create_Company_File',
-        ],
-        "FAILED_CREATE_COMPANY_FILE"
-      );
-
-    const company_file_id = await prisma.companyFile.findMany({
-      where: {
-        company_id: request.company_id,
-        file_name: file_attachment?.originalname || '',
-      },
-      select: {
-        company_file_id: true,
-      },
-      orderBy: {
-        company_file_id: 'desc',
-      },
-      take: 1,
-    });
-    const create_announcement_file_attachment = await prisma.companyAnnouncementFileAttachment.create({
-      data: {
-        company_announcement_id:
-        find_company_announcement_id[0]?.company_announcement_id,
-        company_file_id: company_file_id[0]?.company_file_id,
-      },
-    });
-    
-    if(!create_announcement_file_attachment){
-      throw new ErrorResponse(
-        'Failed to create announcement', 
-        400, 
-        [
-        'Failed_Create_Company_Announcement_File_Attachment',
-        ],
-        "FAILED_CREATE_COMPANY_ANNOUNCEMENT_FILE_ATTACHMENT")
-    }
     
     const branch_names = await prisma.companyBranches.findMany({
       where: {
@@ -305,7 +229,7 @@ export class AnnouncementService {
 
     return {
       ...request,
-      company_announcement_id: find_company_announcement_id[0]?.company_announcement_id || 0,
+      company_announcement_id: announcement.company_announcement_id,
       file_name: file_attachment?.originalname || '',
       file_url: file_url,
       company_branch_id: branch_names_str,
@@ -360,22 +284,22 @@ export class AnnouncementService {
 
       },
     });
-    if (branchesToAdd[0] !== undefined && branchesToAdd.length > 0) {
-      for (const branchId of branchesToAdd) {
-        const isCreated = await prisma.companyAnnouncementTo.findFirst({ 
-          where: {
-            company_announcement_id: request.company_announcement_id,
-            company_branch_id: branchId ?? '', 
-          },
-        });
-        if (!isCreated) {
-          await AnnouncementService.createAnnouncementToBranch({
-            company_announcement_id: request.company_announcement_id,
-            company_branch_id: branchId ?? '',
-          });
-        }
-      }
-    }
+    // if (branchesToAdd[0] !== undefined && branchesToAdd.length > 0) {
+    //   for (const branchId of branchesToAdd) {
+    //     const isCreated = await prisma.companyAnnouncementTo.findFirst({ 
+    //       where: {
+    //         company_announcement_id: request.company_announcement_id,
+    //         company_branch_id: branchId ?? '', 
+    //       },
+    //     });
+    //     if (!isCreated) {
+    //       await AnnouncementService.createAnnouncementToBranch({
+    //         company_announcement_id: request.company_announcement_id,
+    //         company_branch_id: branchId ?? '',
+    //       });
+    //     }
+    //   }
+    // }
 
     if (branchesToRemove !== undefined && branchesToRemove.length > 0) {
       for (const branchId of branchesToRemove) {

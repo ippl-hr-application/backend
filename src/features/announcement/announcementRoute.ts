@@ -12,18 +12,19 @@ announcementRoute.get('/:company_branch_id/branch', [
   AnnouncementController.getAnnouncementCompanyBranch,
 ]);
 
-// announcementRoute.post('/create', [
-//   JWTMiddleware.verifyToken,
-//   JWTMiddleware.ownerAndManagerOnly,
-//   upload.single('announcement_file'),
-//   AnnouncementController.addAnnouncement,
-// ]);
+announcementRoute.post('/create', [
+  JWTMiddleware.verifyToken,
+  JWTMiddleware.ownerAndManagerOnly,
+  // CompanyMiddleware.isCompanyBranchBelongsToCompany,
+  upload.single('announcement_file'),
+  AnnouncementController.addAnnouncement,
+]);
 
-// announcementRoute.delete('/company/:company_id/announcement/:announcement_id', [
-//   JWTMiddleware.verifyToken,
-//   JWTMiddleware.ownerAndManagerOnly,
-//   AnnouncementController.deleteAnnouncement,
-// ]);
+announcementRoute.delete('/company/:company_id/announcement/:announcement_id', [
+  JWTMiddleware.verifyToken,
+  JWTMiddleware.ownerAndManagerOnly,
+  AnnouncementController.deleteAnnouncement,
+]);
 
 // announcementRoute.put('/update',[
 //   JWTMiddleware.verifyToken,
