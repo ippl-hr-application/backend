@@ -6,53 +6,54 @@ import { CompanyMiddleware } from '../../middlewares/company_middleware';
 
 const announcementRoute: Router = Router();
 
-announcementRoute.post('/create', [
-  JWTMiddleware.verifyToken,
-  JWTMiddleware.ownerAndManagerOnly,
-  upload.single('announcement_file'),
-  AnnouncementController.addAnnouncement,
-]);
-
-announcementRoute.post('/create', [
-  JWTMiddleware.verifyToken,
-  upload.single('announcement_file'),
-  AnnouncementController.addAnnouncement,
-]);
-
-announcementRoute.get('/branch', [
-  JWTMiddleware.verifyToken,
-  AnnouncementController.getAnnouncementCompanyBranch,
-]);
-
 announcementRoute.get('/:company_branch_id/branch', [
   JWTMiddleware.verifyToken,
+  CompanyMiddleware.isCompanyBranchBelongsToCompany,
   AnnouncementController.getAnnouncementCompanyBranch,
 ]);
 
-announcementRoute.delete('/company/:company_id/announcement/:announcement_id', [
-  JWTMiddleware.verifyToken,
-  AnnouncementController.deleteAnnouncement,
-]);
+// announcementRoute.post('/create', [
+//   JWTMiddleware.verifyToken,
+//   JWTMiddleware.ownerAndManagerOnly,
+//   upload.single('announcement_file'),
+//   AnnouncementController.addAnnouncement,
+// ]);
 
-// still have some bug
-announcementRoute.put('/update',[
-  upload.single('announcement_file'),
-  JWTMiddleware.verifyToken,
-  AnnouncementController.updateAnnouncement,
-])
+// announcementRoute.delete('/company/:company_id/announcement/:announcement_id', [
+//   JWTMiddleware.verifyToken,
+//   JWTMiddleware.ownerAndManagerOnly,
+//   AnnouncementController.deleteAnnouncement,
+// ]);
 
-// versi ez
+// announcementRoute.put('/update',[
+//   JWTMiddleware.verifyToken,
+//   JWTMiddleware.ownerAndManagerOnly,
+//   upload.single('announcement_file'),
+//   AnnouncementController.updateAnnouncement,
+// ])
 
+// versi 1 // versi 1 // versi 1 //
 announcementRoute.post('/:company_branch_id/create', [
   JWTMiddleware.verifyToken,
+  JWTMiddleware.ownerAndManagerOnly,
+  CompanyMiddleware.isCompanyBranchBelongsToCompany,
   upload.single('announcement_file'),
   AnnouncementController.ezCreateAnnouncement,
 ]);
 
 announcementRoute.put('/:company_branch_id/update/:company_announcement_id', [
   JWTMiddleware.verifyToken,
+  JWTMiddleware.ownerAndManagerOnly,
+  CompanyMiddleware.isCompanyBranchBelongsToCompany,
   upload.single('announcement_file'),
   AnnouncementController.ezUpdateAnnouncement,
+]);
+
+announcementRoute.delete('/:company_branch_id/delete/:company_announcement_id', [
+  JWTMiddleware.verifyToken,
+  JWTMiddleware.ownerAndManagerOnly,
+  CompanyMiddleware.isCompanyBranchBelongsToCompany,
+  AnnouncementController.ezDeleteAnnouncement,
 ]);
 
 export default announcementRoute;

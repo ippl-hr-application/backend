@@ -48,4 +48,9 @@ export type EzCreateAnnouncementResponse = {
 
 export type EzUpdateAnnouncementRequest = EzCreateAnnouncementRequest & { company_announcement_id: number }
 
-export type EzUpdateAnnouncementResponse = EzCreateAnnouncementResponse
+export type EzUpdateAnnouncementResponse = {
+  company_announcement_id: number,
+  company_branch_id: string,
+  title: string,
+  description: string,
+}

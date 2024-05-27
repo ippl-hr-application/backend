@@ -30,7 +30,7 @@ export class AnnouncementController {
     next: NextFunction
   ) {
     try {
-      const { company_id, title, description, company_branch_id } = req.body;
+      const { company_id, title, description, company_branch_id} = req.body;
       const file_attachment: Express.Multer.File | undefined = req.file;
       const announcement = await AnnouncementService.createAnnouncementAndNotifyEmployees({
         company_id,
@@ -150,6 +150,23 @@ export class AnnouncementController {
         status: 'success',
         message: 'Announcement updated successfully',
         data: announcement,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async ezDeleteAnnouncement(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { company_branch_id, company_announcement_id } = req.params;
+      await AnnouncementService.ezDeleteAnnouncement({
+        company_announcement_id,
+        company_branch_id
+      });
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Announcement deleted successfully',
       });
     } catch (error) {
       next(error);
