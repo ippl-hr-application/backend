@@ -24,6 +24,9 @@ export class ChangeShiftManagementService {
       }
     );
     const changeShift = await prisma.submission.findMany({
+      orderBy: {
+        created_at: "desc",
+      },
       where: {
         employee: {
           company_branch_id: request.company_branch_id,

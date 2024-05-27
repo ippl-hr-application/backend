@@ -23,6 +23,11 @@ export class LeaveManagementService {
       }
     );
     const leave = await prisma.leaveSubmission.findMany({
+      orderBy: {
+        submission: {
+          created_at: "desc",
+        },
+      },
       where: {
         submission: {
           employee: {

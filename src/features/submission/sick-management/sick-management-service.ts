@@ -22,10 +22,14 @@ export class SickManagementService {
       }
     );
     const sick = await prisma.submission.findMany({
+      orderBy: {
+        created_at: "desc",
+      },
       where: {
         employee: {
           company_branch_id: request.company_branch_id,
         },
+
         type: "SAKIT",
         submission_date: {
           gte: start_date ? new Date(start_date) : undefined,
