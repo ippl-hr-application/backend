@@ -176,17 +176,17 @@ export class AuthService {
     });
 
     if (!employee) {
-      throw new ErrorResponse("Invalid unique id or password", 400, [
-        "unique_id",
+      throw new ErrorResponse("Invalid employee id or password", 400, [
+        "employee_id",
         "password",
       ]);
     }
 
     if (employee.job_position.name !== "Manager") {
       throw new ErrorResponse(
-        "You are not authorized to access this route",
+        "This account is not a manager account, please use the correct account type",
         403,
-        ["unique_id"]
+        ["employee_id"]
       );
     }
 
@@ -196,8 +196,8 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new ErrorResponse("Invalid unique id or password", 400, [
-        "unique_id",
+      throw new ErrorResponse("Invalid employee id or password", 400, [
+        "employee_id",
         "password",
       ]);
     }

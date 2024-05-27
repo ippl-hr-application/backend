@@ -13,7 +13,7 @@ companyBranchRoute.post("/create", [
   CompanyBranchController.addNewBranch,
 ]);
 
-companyBranchRoute.get("/:company_id/all", [
+companyBranchRoute.get("/all", [
   JWTMiddleware.verifyToken,
   CompanyBranchController.getAllBranches,
 ]);
