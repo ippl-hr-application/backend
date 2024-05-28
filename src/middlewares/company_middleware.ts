@@ -25,6 +25,23 @@ export class CompanyMiddleware {
         ]);
       }
 
+      if ((company_id !== company_branch_id) && req.method !== "GET") {
+        const isCompanyPremium = await prisma.company.findFirst({
+          where: {
+            company_id,
+          },
+        });
+
+        if (!isCompanyPremium || isCompanyPremium.package_type !== "PREMIUM") {
+          throw new ErrorResponse(
+            "You don't have the right package to send this request, please upgrade your package type.",
+            403,
+            ["package_type"],
+            "FORBIDDEN"
+          );
+        }
+      }
+
       next();
     } catch (error) {
       next(error);

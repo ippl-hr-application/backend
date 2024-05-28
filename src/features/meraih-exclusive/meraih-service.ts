@@ -74,7 +74,7 @@ export class MeraihService {
       },
       data: {
         package_type: PackageType[package_type],
-        package_end: new Date(package_end),
+        package_end: package_end ? new Date(package_end) : undefined,
       },
     });
   }
