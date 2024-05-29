@@ -1,6 +1,6 @@
 import { Validation } from '../../validations';
 import { AccountValidation } from './accountValidation';
-import { comparePassword, hashPassword } from '../../utils';
+import { hashPassword } from '../../utils';
 import {
   CreateRequest,
   CreateResponse,
@@ -363,7 +363,7 @@ export class AccountService {
         employee_id: request.employee_id,
       },
       data: {
-        hasResigned: true,
+        // hasResigned: true,
         delete_at: new Date(),
       },
     });
