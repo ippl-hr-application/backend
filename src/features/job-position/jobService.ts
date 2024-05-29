@@ -31,6 +31,19 @@ export class JobPositionService {
       JobPositionValidation.CREATE_JOB_POSITION,
       request
     );
+    const companyBranch = await prisma.companyBranches.findFirst({
+      where: {
+        company_id: request.company_id,
+        company_branch_id: request.company_branch_id,
+      },
+    });
+
+    if (!companyBranch) {
+      throw new ErrorResponse("Company Branch not found", 404, [
+        "company_branch_id",
+      ]);
+    }
+
     const isJobPositionExist = await prisma.jobPosition.findFirst({
       where:{
         name: {contains: request.name, mode: "insensitive"}
@@ -62,6 +75,20 @@ export class JobPositionService {
       JobPositionValidation.UPDATE_JOB_POSITION,
       request
     );
+
+    const companyBranch = await prisma.companyBranches.findFirst({
+      where: {
+        company_id: request.company_id,
+        company_branch_id: request.company_branch_id,
+      },
+    });
+
+    if (!companyBranch) {
+      throw new ErrorResponse("Company Branch not found", 404, [
+        "company_branch_id",
+      ]);
+    }
+
     const isJobPositionExist = await prisma.jobPosition.findFirst({
       where: {
         job_position_id: validatedRequest.job_position_id,
