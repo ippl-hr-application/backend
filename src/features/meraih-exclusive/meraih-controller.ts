@@ -44,4 +44,19 @@ export class MeraihController {
       next(error);
     }
   }
+
+  static async login(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email, password } = req.body;
+      const token = await MeraihService.login({ email, password });
+
+      return res.status(200).json({
+        success: true,
+        data: { token },
+        message: "User logged in successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

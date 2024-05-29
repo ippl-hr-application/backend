@@ -4,6 +4,8 @@ import { JWTMiddleware } from "../../middlewares/jwt_middleware";
 
 const meraihRoutes: Router = Router();
 
+meraihRoutes.post("/login", MeraihController.login);
+
 meraihRoutes.get("/registered-users", MeraihController.getAllRegisteredUsers);
 
 meraihRoutes.put(

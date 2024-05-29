@@ -466,3 +466,13 @@ enum SubmissionStatus {
   PENDING
   REJECTED
 }
+
+model MeraihUser {
+  user_id      String   @id @default(uuid())
+  full_name    String   @db.VarChar(50)
+  email        String   @unique
+  phone_number String
+  password     String
+  created_at   DateTime @default(now())
+  @@map("meraih_users")
+}
