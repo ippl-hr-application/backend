@@ -27,6 +27,7 @@ export class EmploymentStatusService {
   }
 
   static async createEmploymentStatus({
+    company_id,
     company_branch_id,
     name,
   }: CreateEmploymentStatusRequest): Promise<CreateEmploymentStatusResponse> {
@@ -37,6 +38,19 @@ export class EmploymentStatusService {
         name,
       }
     );
+    console.log(company_id, company_branch_id)
+    const companyBranch = await prisma.companyBranches.findFirst({
+      where: {
+        company_branch_id: validatedRequest.company_branch_id,
+        company_id: company_id,
+      },
+    });
+
+    if (!companyBranch) {
+      throw new ErrorResponse("Company Branch not found", 404, [
+        "company_branch_id",
+      ]);
+    }   
 
     const employmentStatus = await prisma.employmentStatus.create({
       data: {
