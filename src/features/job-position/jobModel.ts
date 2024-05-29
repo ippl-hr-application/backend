@@ -1,6 +1,7 @@
 import { JobPosition } from '@prisma/client'
 
 export type CreateJobPositionRequest = {
+  company_id: string;
   company_branch_id: string;
   name: string;
 };
@@ -17,6 +18,7 @@ export type GetJobPositionRequest = {
 export type GetJobPositionResponse = JobPosition[]
 
 export type UpdateJobPositionRequest = {
+  company_id: string;
   company_branch_id: string;
   job_position_id: number;
   name: string;
@@ -28,6 +30,7 @@ export type UpdateJobPositionResponse = {
 }
 
 export type DeleteJobPositionRequest = {
+  company_id: string;
   company_branch_id: string;
   job_position_id: number;
 }
