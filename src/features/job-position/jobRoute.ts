@@ -1,11 +1,13 @@
 import { Router } from "express";
 import { JobPositionController } from "./jobController";
 import { JWTMiddleware } from "../../middlewares/jwt_middleware";
+import { CompanyMiddleware } from "../../middlewares/company_middleware";
 
 const jobPositionRoute: Router = Router();
 
 jobPositionRoute.get('/:company_branch_id', [
   JWTMiddleware.verifyToken,
+  CompanyMiddleware.isCompanyBranchBelongsToCompany,
   JobPositionController.getJobPosition
 ]);
 jobPositionRoute.post('/', [
