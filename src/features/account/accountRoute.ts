@@ -20,7 +20,6 @@ accountRoute.get('/branch/:company_branch_id/employee/:employee_id', [
 // Create a new employee
 accountRoute.post('/create', [
   JWTMiddleware.verifyToken,
-  CompanyMiddleware.isCompanyBranchBelongsToCompany,
   JWTMiddleware.ownerAndManagerOnly,
   AccountController.createEmployee
 ]);
@@ -34,7 +33,6 @@ accountRoute.post('/:company_branch_id/create', [
 // Update an employee
 accountRoute.patch('/update', [
   JWTMiddleware.verifyToken,
-  CompanyMiddleware.isCompanyBranchBelongsToCompany,
   JWTMiddleware.ownerAndManagerOnly,
   AccountController.updateEmployee
 ]);
@@ -48,7 +46,6 @@ accountRoute.patch('/:company_branch_id/update', [
 // Update an employee that has resigned
 accountRoute.patch('/resigned', [
   JWTMiddleware.verifyToken,
-  CompanyMiddleware.isCompanyBranchBelongsToCompany,
   JWTMiddleware.ownerAndManagerOnly,
   AccountController.employeeResign
 ]);

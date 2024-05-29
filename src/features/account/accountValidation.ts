@@ -37,6 +37,8 @@ export class AccountValidation {
     last_name: z.string().min(3).max(50).optional(),
     email: z.string().email().optional(),
     phone_number: z.string().min(10).max(15).optional(),
+    place_of_birth: z.string().optional(),
+    birth_date: z.date().optional(),
     marital_status: z.string().max(20).optional(),
     blood_type: z.string().min(1).max(3).optional(),
     religion: z.string().min(3).max(20).optional(),
@@ -52,6 +54,7 @@ export class AccountValidation {
     hasResigned: z.string().optional(),
     gender: z.string().max(10).optional(),
     join_date: z.date().optional(),
+    resign_date: z.date().optional(),
   });
 
   static DELETE_EMPLOYEE: ZodType = z.object({

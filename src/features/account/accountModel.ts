@@ -76,7 +76,7 @@ export type UpdateRequest = {
   bank_account_number?: string;
   bank_type?: string;
   wage?: number;
-  hasresigned?: string;
+  hasResigned?: string;
   join_date?: Date;
   gender?: string;
   resign_date?: Date;
