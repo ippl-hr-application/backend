@@ -1,6 +1,7 @@
 import { EmploymentStatus } from '@prisma/client';
 
 export type CreateEmploymentStatusRequest = {
+  company_id: string;
   company_branch_id: string;
   name: string;
 };

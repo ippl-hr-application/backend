@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { EmploymentStatusService } from './employmentService';
+import { EmployeeToken, UserToken } from '../../models';
 
 export class EmploymentController {
   static async getEmploymentStatus(
@@ -29,11 +30,14 @@ export class EmploymentController {
     res: Response,
     next: NextFunction
   ) {
-    const {  } = req.body;
+    const { company_branch_id, name } = req.body;
+    const { company_id } = res.locals.user as UserToken | EmployeeToken
     try {
-      const employmentStatus = await EmploymentStatusService.createEmploymentStatus(
-        req.body
-      );
+      const employmentStatus = await EmploymentStatusService.createEmploymentStatus({
+        company_id,
+        company_branch_id,
+        name
+      });
       res.status(201).json({
         success: true,
         data: {
