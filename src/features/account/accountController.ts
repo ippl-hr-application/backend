@@ -134,7 +134,9 @@ export class AccountController {
         first_name,
         last_name,
         email,
-        phone_number, 
+        phone_number,
+        place_of_birth,
+        birth_date,
         marital_status,
         blood_type,
         religion,
@@ -148,6 +150,7 @@ export class AccountController {
         bank_type,
         wage,
         gender,
+        hasresigned,
         join_date,
         resign_date
       } = req.body;
@@ -161,6 +164,8 @@ export class AccountController {
         last_name,
         email,
         phone_number,
+        place_of_birth,
+        birth_date,
         marital_status,
         blood_type,
         religion,
@@ -174,6 +179,7 @@ export class AccountController {
         bank_type,
         wage,
         gender,
+        hasResigned: hasresigned,
         join_date,
         resign_date
       });

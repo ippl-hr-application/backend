@@ -17,40 +17,30 @@ import { ErrorResponse } from '../../models';
 import { sendEmail } from '../../utils/nodemailer';
 
 export class AccountService {
-  static async getAllEmployees({
-    company_branch_id, 
-    hasResigned, 
-    first_name,
-    last_name, 
-    gender,
-    job_position_name,
-    employment_status_name,
-    get_all,
-    deleted,
-  }: GetEmployeeRequest): Promise<GetAllEmployeeResponse> {
+  static async getAllEmployees(getEmployeeData: GetEmployeeRequest): Promise<GetAllEmployeeResponse> {
     const findJobPositionId = await prisma.jobPosition.findMany({
       where: {
-        name: {contains: job_position_name, mode: 'insensitive'},
+        name: {contains: getEmployeeData.job_position_name, mode: 'insensitive'},
       },
     });
 
     const findEmploymentStatusId = await prisma.employmentStatus.findMany({
       where: {
-        name: {contains: employment_status_name, mode: 'insensitive'},
+        name: {contains: getEmployeeData.employment_status_name, mode: 'insensitive'},
       },
     });
 
-    if(get_all === 'true'){
+    if(getEmployeeData.get_all === 'true'){
       const findEmployee = await prisma.employee.findMany({
         where: {
-          company_branch_id: company_branch_id,
+          company_branch_id: getEmployeeData.company_branch_id,
         },
       });
 
       return findEmployee;
     }
 
-    if(deleted === 'true'){
+    if(getEmployeeData.deleted === 'true'){
       const findEmployee = await prisma.employee.findMany({
         where: {
           NOT: {delete_at: null},
@@ -61,11 +51,11 @@ export class AccountService {
     
     const findEmployee = await prisma.employee.findMany({
       where: {
-        first_name: first_name ? { contains: first_name, mode: "insensitive" } : undefined,
-        last_name: last_name ? { contains: last_name, mode: "insensitive"} : undefined,
-        gender: gender,
-        company_branch_id: company_branch_id,
-        hasResigned: hasResigned === 'true' ? true : false,
+        first_name: getEmployeeData.first_name ? { contains: getEmployeeData.first_name, mode: "insensitive" } : undefined,
+        last_name: getEmployeeData.last_name ? { contains: getEmployeeData.last_name, mode: "insensitive"} : undefined,
+        gender: getEmployeeData.gender,
+        company_branch_id: getEmployeeData.company_branch_id,
+        hasResigned: getEmployeeData.hasResigned === 'true' ? true : false,
         job_position_id: {in: findJobPositionId.map((jobPosition) => jobPosition.job_position_id)},
         employment_status_id: {in: findEmploymentStatusId.map((employmentStatus) => employmentStatus.employment_status_id)},
       },
@@ -186,76 +176,25 @@ export class AccountService {
     sendEmail(mailOptions);
   }
 
-  static async createEmployee(
-    {
-      company_branch_id,
-      job_position_id,
-      employment_status_id,
-      first_name,
-      last_name,
-      email,
-      password,
-      phone_number,
-      place_of_birth,
-      birth_date,       
-      marital_status,
-      blood_type,
-      religion,
-      identity_type,
-      identity_number,
-      identity_expired_date,       
-      postcal_code,
-      citizen_id_address,
-      residential_address,
-      bank_account_number,
-      bank_type,
-      wage,
-      gender,
-      join_date
-    }: CreateRequest
+  static async createEmployee(createData: CreateRequest
   ): Promise<CreateResponse> {
-    if(identity_expired_date !== undefined){
-      identity_expired_date = new Date(
-        identity_expired_date
+    if(createData.identity_expired_date !== undefined){
+      createData.identity_expired_date = new Date(
+        createData.identity_expired_date
       );
     }
-    if(birth_date !== undefined){
-      birth_date = new Date(birth_date);
+    if(createData.birth_date !== undefined){
+      createData.birth_date = new Date(createData.birth_date);
     }
-    if (join_date !== undefined){
-      join_date = new Date(join_date);}
+    if (createData.join_date !== undefined){
+      createData.join_date = new Date(createData.join_date);}
     else{
-      join_date = new Date();
+      createData.join_date = new Date();
     }
 
     const request = Validation.validate(
       AccountValidation.CREATE_EMPLOYEE,
-      { 
-        company_branch_id,
-        job_position_id,
-        employment_status_id,
-        first_name,
-        last_name,
-        email,
-        password,
-        phone_number,
-        place_of_birth,
-        birth_date,       
-        marital_status,
-        blood_type,
-        religion,
-        identity_type,
-        identity_number,
-        identity_expired_date,       
-        postcal_code,
-        citizen_id_address,
-        residential_address,
-        bank_account_number,
-        bank_type,
-        wage,
-        gender,
-        join_date
-      }
+      createData
     );
 
     const countEmailEmployee = await prisma.employee.count({
@@ -311,30 +250,8 @@ export class AccountService {
 
     const newEmployee = await prisma.employee.create({
       data: {
-        company_branch_id: request.company_branch_id,
-        job_position_id: request.job_position_id,
-        employment_status_id: request.employment_status_id,
-        first_name: request.first_name,
-        last_name: request.last_name,
-        email: request.email,
+        ...request,
         password: hashedPassword,
-        phone_number: request.phone_number,
-        place_of_birth: request.place_of_birth,
-        birth_date: request.birth_date,
-        marital_status: request.marital_status,
-        blood_type: request.blood_type,
-        religion: request.religion,
-        identity_type: request.identity_type,
-        identity_number: request.identity_number,
-        identity_expired_date: request.identity_expired_date,
-        postcal_code: request.postcal_code,
-        citizen_id_address: request.citizen_id_address,
-        residential_address: request.residential_address,
-        bank_account_number: request.bank_account_number,
-        bank_type: request.bank_type,
-        wage: request.wage,
-        gender: request.gender,
-        join_date: request.join_date,
       },
     });
 
@@ -358,6 +275,18 @@ export class AccountService {
       employeeData.identity_expired_date = new Date(
         employeeData.identity_expired_date
       );
+    }
+    if (employeeData.birth_date !== undefined) {
+      employeeData.birth_date = new Date(employeeData.birth_date);
+    }
+    if (employeeData.join_date !== undefined) {
+      employeeData.join_date = new Date(employeeData.join_date);
+    }
+    if (employeeData.resign_date !== undefined) {
+      employeeData.resign_date = new Date(employeeData.resign_date);
+    }
+    if (employeeData.hasResigned !== undefined && employeeData.hasResigned === 'true') {
+      employeeData.resign_date = new Date();
     }
 
     const request = Validation.validate(
@@ -386,9 +315,12 @@ export class AccountService {
         company_branch_id: request.company_branch_id,
         employee_id: request.employee_id,
       },
-      data: { ...request },
+      data: { 
+        ...request,
+        hasResigned: request?.hasResigned === 'true' ? true : false,
+       },
     });
-    console.log(employeeUpdate)
+
     return {
       employee_id: employeeUpdate.employee_id,
       first_name: employeeUpdate.first_name,

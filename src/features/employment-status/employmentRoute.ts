@@ -13,19 +13,16 @@ employmentRoute.get('/:company_branch_id', [
 employmentRoute.post('/', [
   JWTMiddleware.verifyToken,
   JWTMiddleware.ownerAndManagerOnly,
-  CompanyMiddleware.isCompanyBranchBelongsToCompany,
   EmploymentController.createEmploymentStatus
 ]);
 employmentRoute.put('/update', [
   JWTMiddleware.verifyToken,
   JWTMiddleware.ownerAndManagerOnly,
-  CompanyMiddleware.isCompanyBranchBelongsToCompany,
   EmploymentController.updateEmploymentStatus
 ]);
 employmentRoute.delete('/delete', [
   JWTMiddleware.verifyToken,
   JWTMiddleware.ownerAndManagerOnly,
-  CompanyMiddleware.isCompanyBranchBelongsToCompany,
   EmploymentController.deleteEmploymentStatus
 ]);
 
