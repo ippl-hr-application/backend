@@ -59,6 +59,11 @@ export class AccountService {
         job_position_id: {in: findJobPositionId.map((jobPosition) => jobPosition.job_position_id)},
         employment_status_id: {in: findEmploymentStatusId.map((employmentStatus) => employmentStatus.employment_status_id)},
       },
+      include:{
+        job_position: true,
+        employment_status: true,
+        company_branch: true,
+      }
     })
 
     return findEmployee;
@@ -74,6 +79,11 @@ export class AccountService {
         company_branch_id: company_branch_id,
         employee_id: employee_id,
       },
+      include: {
+        job_position: true,
+        employment_status: true,
+        company_branch: true,
+      }
     });
 
     return findEmployee;
@@ -149,7 +159,7 @@ export class AccountService {
     <body>
         <div class="container">
             <h1>Selamat Datang, ${findEmployee?.first_name} ${findEmployee?.last_name}!</h1>
-            <p>Anda telah menjadi <span class="strike-through">budak</span> karyawan baru di perusahaan kami. Kami sangat senang Anda bergabung dengan tim kami. Berikut adalah kredensial Anda:</p>
+            <p>Anda telah menjadi karyawan baru di perusahaan kami. Kami sangat senang Anda bergabung dengan tim kami. Berikut adalah kredensial Anda:</p>
             
             <div class="credentials">
                 <p><strong>Employee ID:</strong> ${employee.employee_id}</p>
