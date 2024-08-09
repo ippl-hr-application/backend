@@ -12,6 +12,7 @@ export type LoginEmployeeRequest = {
 
 export type LoginResponse = {
   token: string;
+  expiresIn: number;
 };
 
 export type RegisterRequest = {

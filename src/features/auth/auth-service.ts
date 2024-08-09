@@ -61,6 +61,8 @@ export class AuthService {
       ]);
     }
 
+    // expires in 1 day
+    const expiresIn = 60 * 60 * 24;
     const token = jwt.sign(
       {
         user_id: user.user_id,
@@ -69,12 +71,13 @@ export class AuthService {
       },
       process.env.JWT_SECRET!,
       {
-        expiresIn: "1d",
+        expiresIn,
       }
     );
 
     return {
       token,
+      expiresIn,
     };
   }
 
@@ -127,6 +130,9 @@ export class AuthService {
       ]);
     }
 
+    // expires in 7 day
+    const expiresIn = 60 * 60 * 24 * 7;
+
     const token = jwt.sign(
       {
         employee_id: employee.employee_id,
@@ -136,12 +142,13 @@ export class AuthService {
       },
       process.env.JWT_SECRET!,
       {
-        expiresIn: "7d",
+        expiresIn,
       }
     );
 
     return {
       token,
+      expiresIn,
     };
   }
 
@@ -202,6 +209,7 @@ export class AuthService {
       ]);
     }
 
+    const expiresIn = 60 * 60 * 24 * 7;
     const token = jwt.sign(
       {
         employee_id: employee.employee_id,
@@ -211,12 +219,13 @@ export class AuthService {
       },
       process.env.JWT_SECRET!,
       {
-        expiresIn: "7d",
+        expiresIn,
       }
     );
 
     return {
       token,
+      expiresIn,
     };
   }
 
@@ -435,7 +444,7 @@ export class AuthService {
           company_branch: {
             include: {
               company: true,
-            }
+            },
           },
           employment_status: true,
           job_position: true,
